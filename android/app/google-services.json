@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "673062991187",
+    "project_id": "marvalfit-d2a98",
+    "storage_bucket": "marvalfit-d2a98.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673062991187:android:254bf382a8132282201da6",
+        "android_client_info": {
+          "package_name": "com.zgz.vlandiblas.marvalfit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673062991187-6cn03svjnhmg7roetaorlci99kei1aje.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWmO-7UE8aaxNzkbkehyAQDycpFDbmolc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673062991187-6cn03svjnhmg7roetaorlci99kei1aje.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
