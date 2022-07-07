@@ -1,64 +1,149 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marvalfit/constants/theme.dart';
+import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../constants/colors.dart';
+import '../../constants/marval_textfield.dart';
+import '../../constants/string.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
-
   static String routeName = "/login";
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: kWhite,
       body: SafeArea(child:
-         Container(width: 100.w, height: 100.h,
-          child:Column(
-           crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const TextH1(text: "MarvalFit", size: 10),
-                Container(height: 10.h,
-                  child: GetUserName("iiLTVNAzLOYaZHTVu3jy")
-                ),
-              ]),
+         Container( width: 100.w, height: 100.h,
+          padding: EdgeInsets.only(top: 6.h),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset("assets/images/logo.png"),
+                  Container(width: 70.w, margin: EdgeInsets.only(right: 10.w),
+                      child: const TextH1( "Bienvenido!", size: 10)),
+                  Container(width: 70.w,margin: EdgeInsets.only(right:10.w),
+                      child: const TextH2(
+                      'La mejor manera de predecir el futuro es creándolo.',
+                      size: 5, color: kGrey
+                  )),
+                  SizedBox(height: 5.h,),
+                  LoginForm(),
+                ])),
+          )
       ),
-      ));
+      );
   }
 }
 
-class GetUserName extends StatelessWidget {
-  final String documentId;
 
-  GetUserName(this.documentId);
+
+class LoginForm extends StatefulWidget {
+  const LoginForm({Key? key}) : super(key: key);
 
   @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  String _email= "";
+  String _password= "";
+  String? _loginErrors;
+  @override
   Widget build(BuildContext context) {
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
 
-    return FutureBuilder<DocumentSnapshot>(
-      future: users.doc(documentId).get(),
-      builder:
-          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+    return Form(
+        key: _formKey,
+        child: Column(
+        children: [
+        /** INPUT TEXT FIELD*/
+         MarvalInputTextField(
+          labelText: 'Email',
+          hintText: "marvalfit@gmail.com",
+          prefixIcon: Icons.email_rounded,
+          keyboardType: TextInputType.emailAddress,
+          validator: (value){
+            if(isNullOrEmpty(value)){
+              return inputErrorEmptyValue;
+            }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
+              return inputErrorEmailMissmatch;
+            }
+            return null;
+          },
+           onSaved: (value){_email = value!;},
+           onChanged: (value){ _loginErrors = null; },
+        ),
+        SizedBox(height: 5.h,),
+         MarvalInputTextField(
+          labelText: 'Contraseña',
+          hintText: "********",
+          prefixIcon: Icons.lock_rounded,
+          keyboardType: TextInputType.visiblePassword,
+          obscureText: true,
+           validator: (value){
+             if(isNullOrEmpty(value)){
+               return inputErrorEmptyValue;
+             }
+             return _loginErrors;
+           },
+           onSaved: (value){ _password = value!;},
+           onChanged: (value){ _loginErrors = null; },
 
-        if (snapshot.hasError) {
-          return Text("Something went wrong");
-        }
+        ),
+        SizedBox(height: 5.h),
+        ElevatedButton(
+            onPressed: () async{
+              // Validate returns true if the form is valid, or false otherwise.
+                  if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  print('Email: $_email\nPassword: $_password');
 
-        if (snapshot.hasData && !snapshot.data!.exists) {
-          return Text("Document does not exist");
-        }
+                  /// We try to LogIn
+                  _loginErrors = await LogIn(_email, _password);
+                  _formKey.currentState!.validate();
+                  /** @TODO If it works _loginErrors will be null so we can get the user and switch pages
+                  *
+                  */
+                  ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Processing Data')),
+                );
+              }
+            },
+            style: ButtonStyle(
+                backgroundColor: MaterialStateColor.resolveWith((states){
+                  return states.contains(MaterialState.pressed) ? kGreen : kBlack;
+                }),
+                elevation: MaterialStateProperty.all(2.w),
+                shape: MaterialStateProperty.all( RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.w)))
+            ),
 
-        if (snapshot.connectionState == ConnectionState.done) {
-          Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
-          return Text("Nombre: ${data['name']} ", style: const TextStyle(color: kBlack),);
-        }
-
-        return Text("loading");
-      },
-    );
+            child: Container(
+                padding: EdgeInsets.all(1.71.w),
+                child: const TextH2('Comenzar', color: kWhite))
+            ),
+          SizedBox(height: 5.h,)
+      ],
+    ));
   }
+}
+
+Future<String?> LogIn(String email, String password)async{
+  try {
+    final credential = await FirebaseAuth.instance.
+    signInWithEmailAndPassword(
+        email: email,
+        password: password
+    );
+  } on FirebaseAuthException catch (e) {
+    if (e.code == 'user-not-found') { return inputErrorEmail; }
+    else if (e.code == 'wrong-password') { return inputErrorPassword; }
+  }
+  return null;
 }
