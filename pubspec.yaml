@@ -66,3 +66,6 @@ flutter:
     - family: RedHatRegular
       fonts:
         - asset: assets/fonts/RedHatDisplayRegular.ttf
+    - family: CustomIcons
+      fonts:
+        - asset: assets/fonts/CustomIcons.ttf

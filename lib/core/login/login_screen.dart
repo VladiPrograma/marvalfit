@@ -4,10 +4,12 @@ import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../config/custom_icons.dart';
 import '../../constants/colors.dart';
 import '../../constants/marval_textfield.dart';
 import '../../constants/string.dart';
 
+/// @TODO Add "ForgotPassowrd ?" logic and DialogPanel.
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
   static String routeName = "/login";
@@ -67,7 +69,7 @@ class _LoginFormState extends State<LoginForm> {
          MarvalInputTextField(
           labelText: 'Email',
           hintText: "marvalfit@gmail.com",
-          prefixIcon: Icons.email_rounded,
+          prefixIcon: CustomIcons.mail,
           keyboardType: TextInputType.emailAddress,
           validator: (value){
             if(isNullOrEmpty(value)){
@@ -84,7 +86,7 @@ class _LoginFormState extends State<LoginForm> {
          MarvalInputTextField(
           labelText: 'Contraseña',
           hintText: "********",
-          prefixIcon: Icons.lock_rounded,
+          prefixIcon: CustomIcons.lock,
           keyboardType: TextInputType.visiblePassword,
           obscureText: true,
            validator: (value){
