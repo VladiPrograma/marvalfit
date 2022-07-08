@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marvalfit/constants/theme.dart';
@@ -6,6 +8,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../config/custom_icons.dart';
 import '../../constants/colors.dart';
+import '../../constants/marval_snackbar.dart';
 import '../../constants/marval_textfield.dart';
 import '../../constants/string.dart';
 
@@ -30,7 +33,7 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   Image.asset("assets/images/logo.png"),
                   Container(width: 70.w, margin: EdgeInsets.only(right: 10.w),
-                      child: const TextH1( "Bienvenido!", size: 10)),
+                      child: const TextH1( "Bienvenido!")),
                   Container(width: 70.w,margin: EdgeInsets.only(right:10.w),
                       child: const TextH2(
                       'La mejor manera de predecir el futuro es creándolo.',
@@ -102,6 +105,9 @@ class _LoginFormState extends State<LoginForm> {
         SizedBox(height: 5.h),
         ElevatedButton(
             onPressed: () async{
+              MarvalSnackBar(context);
+              ///@TODO Create custom SnackBars for: INFO // SUCESS // FAIL with params.
+              ///@TODO Manage to dont start 2 SnackBars when u press the button twice
               // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
@@ -110,12 +116,9 @@ class _LoginFormState extends State<LoginForm> {
                   /// We try to LogIn
                   _loginErrors = await LogIn(_email, _password);
                   _formKey.currentState!.validate();
-                  /** @TODO If it works _loginErrors will be null so we can get the user and switch pages
-                  *
-                  */
-                  ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Processing Data')),
-                );
+                  /// @TODO If it works _loginErrors will be null so we can get the user and switch pages
+
+                  /// @TODO Add Green snackBar to say it worked properly
               }
             },
             style: ButtonStyle(
@@ -149,3 +152,4 @@ Future<String?> LogIn(String email, String password)async{
   }
   return null;
 }
+

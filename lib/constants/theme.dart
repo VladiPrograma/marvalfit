@@ -20,7 +20,7 @@ class TextH1 extends StatelessWidget {
       text ?? "",
       style: TextStyle(
       fontFamily: h1,
-      fontSize: size?.w ?? 10.w,
+      fontSize: size?.w ?? 9.w,
       color: color ?? kBlack,
       ),
     );
