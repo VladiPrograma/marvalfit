@@ -105,8 +105,9 @@ class _LoginFormState extends State<LoginForm> {
         SizedBox(height: 5.h),
         ElevatedButton(
             onPressed: () async{
-              MarvalSnackBar(context);
-              ///@TODO Create custom SnackBars for: INFO // SUCESS // FAIL with params.
+              MarvalSnackBar(context, SNACKTYPE.success,
+                  title: "Todo Correcto",
+                  subtitle: "Los datos se han subido a la base de datos con exito. Cada dia un paso mas cerca de nuestro objetivo!");
               ///@TODO Manage to dont start 2 SnackBars when u press the button twice
               // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
@@ -118,7 +119,6 @@ class _LoginFormState extends State<LoginForm> {
                   _formKey.currentState!.validate();
                   /// @TODO If it works _loginErrors will be null so we can get the user and switch pages
 
-                  /// @TODO Add Green snackBar to say it worked properly
               }
             },
             style: ButtonStyle(

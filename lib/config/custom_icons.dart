@@ -17,6 +17,7 @@
 ///         License:   SIL (http://scripts.sil.org/OFL)
 ///         Homepage:  http://thedesignoffice.org/project/modern-pictograms/
 ///
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class CustomIcons  {
@@ -27,4 +28,7 @@ class CustomIcons  {
 
   static const IconData lock = IconData(0xe800, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData mail = IconData(0xe801, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData info = IconData(0xe802, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData alert = IconData(0xe803, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData success = IconData(0xe804, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

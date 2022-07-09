@@ -1,16 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:marvalfit/config/custom_icons.dart';
 import 'package:marvalfit/constants/string.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:sizer/sizer.dart';
 
 import 'colors.dart';
 
+ enum SNACKTYPE { info, alert, success}
 
-void MarvalSnackBar(BuildContext context){
+void MarvalSnackBar(BuildContext context, SNACKTYPE type, {String? title, String? subtitle}){
+   late Color _backgroundColor;
+   late Color _iconColor;
+   late List<Color> _barColor;
+   late IconData _icon;
+
+   if(type == SNACKTYPE.info){
+    _backgroundColor = kBlueThi;
+    _iconColor = kBlue;
+    _barColor = [kBlue, kBlueSec];
+    _icon = CustomIcons.info;
+   }else if(type == SNACKTYPE.alert){
+     _backgroundColor = kRedThi;
+     _iconColor = kRed;
+     _barColor = [kRed, kRedSec];
+     _icon = CustomIcons.alert;
+   }else{
+     _backgroundColor = kGreenThi;
+     _iconColor = kGreen;
+     _barColor = [kGreen, kGreenSec];
+     _icon = CustomIcons.success ;
+   }
   ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           padding: EdgeInsets.zero,
-          backgroundColor: kBlueThi,
+          backgroundColor: _backgroundColor,
           content: Container(width: 100.w, height: 10.h,
               padding: EdgeInsets.only(top: 1.h, bottom: 0),
               child: Column(
@@ -20,7 +43,7 @@ void MarvalSnackBar(BuildContext context){
                       child:Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(Icons.info, color: kBlue, size: 13.w,),
+                          Icon( _icon, color: _iconColor, size: 13.w,),
                           Container(height: 6.h, width: 0.4.w,
                             color: kGrey,
                             margin: EdgeInsets.symmetric(horizontal: 3.w),
@@ -28,11 +51,11 @@ void MarvalSnackBar(BuildContext context){
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const TextH2("Revisa tus datos", size: 4,),
+                              TextH2(title ?? "", size: 4,),
                               SizedBox(
                                   width: 69.w,
                                   child: Text(
-                                    "Se debe a un problema en la configuracion de la la la la la tu sabras como lo gestionas",
+                                    subtitle ?? "",
                                     style: TextStyle( fontSize: 2.3.w, color: kBlack, fontFamily: p1),
                                     maxLines: 2,
                                   )
@@ -43,7 +66,7 @@ void MarvalSnackBar(BuildContext context){
                         ],
                       )),
                   const Spacer(),
-                  SnackLineAnimation(),
+                  SnackLineAnimation(colors: _barColor),
                 ],
               )
           ))
@@ -51,8 +74,8 @@ void MarvalSnackBar(BuildContext context){
 }
 
 class SnackLineAnimation extends StatefulWidget {
-  const SnackLineAnimation({Key? key}) : super(key: key);
-
+  const SnackLineAnimation({required this.colors, Key? key}) : super(key: key);
+  final List<Color> colors;
   @override
   State<SnackLineAnimation> createState() => _SnackLineAnimationState();
 }
@@ -88,13 +111,13 @@ class _SnackLineAnimationState extends State<SnackLineAnimation> with SingleTick
           bottom: 0,
           child: Container(
               width: 100.w, height: 0.5.h,
-              color: kBlueSec,
+              color: widget.colors[1],
               margin: EdgeInsets.only(right: _dx.w)
           )
       ),
       AnimatedContainer(
         width: 100.w, height: 0.5.h,
-        color: kBlue,
+        color: widget.colors[0],
         duration: const Duration(milliseconds: 4000),
         curve: Curves.linear,
         margin: EdgeInsets.only(right: _dx.w),
