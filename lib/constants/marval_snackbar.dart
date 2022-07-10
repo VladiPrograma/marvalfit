@@ -28,13 +28,24 @@ void MarvalSnackBar(BuildContext context, SNACKTYPE type, {String? title, String
      _backgroundColor = kGreenThi;
      _iconColor = kGreen;
      _barColor = [kGreen, kGreenSec];
-     _icon = CustomIcons.success ;
+     _icon = Icons.tag_faces_rounded ;
    }
   ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           padding: EdgeInsets.zero,
           backgroundColor: _backgroundColor,
           content: Container(width: 100.w, height: 10.h,
+              decoration: BoxDecoration(
+                color: _backgroundColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: kBlack.withOpacity(0.6),
+                    spreadRadius: 1.w,
+                    blurRadius: 6.w,
+                    offset: Offset(0, 1.w), // changes position of shadow
+                  ),
+                ],
+              ),
               padding: EdgeInsets.only(top: 1.h, bottom: 0),
               child: Column(
                 children: [
