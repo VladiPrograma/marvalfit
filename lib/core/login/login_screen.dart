@@ -10,11 +10,13 @@ import 'package:sizer/sizer.dart';
 
 import '../../config/custom_icons.dart';
 import '../../constants/colors.dart';
+import '../../constants/global_variables.dart';
 import '../../constants/marval_snackbar.dart';
 import '../../constants/marval_textfield.dart';
 import '../../constants/string.dart';
 
-/// @TODO Add "ForgotPassowrd ?" logic and DialogPanel.
+/// @TODO: Add "ForgotPassowrd ?" logic and DialogPanel.
+/// FIXME: Pop and push when login.
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
   static String routeName = "/login";
@@ -118,15 +120,12 @@ class _LoginFormState extends State<LoginForm> {
                   _loginErrors = await LogIn(_email, _password);
                   _formKey.currentState!.validate();
                   if(isNull(_loginErrors)&&isNotNull(FirebaseAuth.instance.currentUser)){
-
+                    user = FirebaseAuth.instance.currentUser;
                     /** PANTALLA TEST */
                     Navigator.pushNamed(context, TestComponentScreen.routeName);
                   }
-                  /// @TODO If it works _loginErrors will be null so we can get the user and switch pages
-                  MarvalSnackBar(context, SNACKTYPE.success,
-                      title: "Perfecto!",
-                      subtitle: "Los datos se han subido a la base de datos con exito. Cada dia un paso mas cerca de nuestro objetivo!");
-                  ///@TODO Manage to dont start 2 SnackBars when u press the button twice
+                  /// TODO: If it works _loginErrors will be null so we can get the user and switch pages
+                  /// FIXME: Manage to dont start 2 SnackBars when u press the button twice
               }
             },
            ),

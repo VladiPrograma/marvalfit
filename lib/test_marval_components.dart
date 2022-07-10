@@ -1,15 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:marvalfit/constants/marval_dialogs.dart';
 import 'package:marvalfit/constants/marval_elevated_button.dart';
-import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../config/custom_icons.dart';
 import '../../constants/colors.dart';
 import '../../constants/marval_snackbar.dart';
-import '../../constants/marval_textfield.dart';
 import '../../constants/string.dart';
+import 'config/custom_icons.dart';
+import 'constants/marval_textfield.dart';
 
 /// @TODO Add "ForgotPassowrd ?" logic and DialogPanel.
 class TestComponentScreen extends StatelessWidget {
@@ -18,6 +17,7 @@ class TestComponentScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? _email = "";
     return Scaffold(
       appBar: null,
       backgroundColor: kWhite,
@@ -54,58 +54,106 @@ class TestComponentScreen extends StatelessWidget {
 
                 );}),
               SizedBox(height: 3.h,),
-              MarvalElevatedButton("Dialog Info", onPressed: (){
-                ///@TODO Create marvalDialog component
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (_) => Dialog(
-                      insetPadding: EdgeInsets.symmetric(horizontal: 2.w),
-                      backgroundColor: Colors.transparent,
-                      child: Container(
-                        width: 100.w, height: 50.h,
-                        decoration: BoxDecoration(
-                          color: kWhite,
-                          borderRadius: BorderRadius.circular(7.w),
+              MarvalElevatedButton(
+                  "Dialog Info",
+                  onPressed: (){
+                  RichText _richText = RichText(
+                    textAlign: TextAlign.justify,
+                    text: TextSpan(
+                      text: "La incorporación de hábitos en tu vida promueve la creación de nuevos",
+                      style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
+                      children: const <TextSpan>[
+                        TextSpan(
+                            text:  " circuitos neuronales",
+                            style: TextStyle(fontWeight: FontWeight.bold)
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 3.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(CustomIcons.info, color: kBlue, size: 12.w,),
-                                TextH2("Dialogo de ejemplo"),
-                              ],
-                            ),
-                            SizedBox(height: 2.h,),
-                            const TextP2(
-                                "Primero tienes que importar contenido de la app"
-                                    " para poder usar este componente. Copia y pega el"
-                                    " ejemplo que estas viendo y a continuación ve la"
-                                    " tabla del elemento CODE. Los ajustes básicos"
-                                    " pueden ser omitidos y debes quedarte en la sección"
-                                    " de aplicaciones automáticas"
-                            ),
-                            Spacer(),
-                            Row(children: [
-                              MarvalElevatedButton(
-                                  "Cancelar",
-                                  onPressed: (){},
-                                  backgroundColor: MaterialStateColor.resolveWith((states) => kRed)
-                              ),
-                              Spacer(),
-                              MarvalElevatedButton(
-                                  "Aceptar",
-                                  onPressed: (){},
-                                  backgroundColor: MaterialStateColor.resolveWith((states) => kGreen)
-                              )
-                            ],),
-                          ],),
-                      )
-                  ),
-                );}),
+                        TextSpan(
+                            text:", con los cuales se conforman patrones nuevos de pensamiento hasta que"
+                                " progresivamente se va dejando de actuar de determinada manera o haciendo"
+                                " acciones nuevas que se convertirán en rutinas."
+                        ),
+                      ],
+                    ),
+                  );
+                  MarvalDialogsInfo(context, 42, richText: _richText, title: "Los indiscutibles");
+               }),
+              SizedBox(height: 3.h,),
+              MarvalElevatedButton(
+                  "Dialog alert",
+                  onPressed: (){
+                    RichText _richText = RichText(
+                      textAlign: TextAlign.justify,
+                      text: TextSpan(
+                        text: "Al pulsar en eliminar estaras eliminando todos tus datos",
+                        style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
+                        children: const <TextSpan>[
+                          TextSpan(
+                              text:  " para siempre",
+                              style: TextStyle(fontWeight: FontWeight.bold)
+                          ),
+                          TextSpan(
+                              text:" y será imposible recuperarlos"
+                          ),
+                        ],
+                      ),
+                    );
+                    MarvalDialogsAlert(
+                      context,
+                      type: MarvalDialogAlertType.DELETE,
+                      title: "¿Deseas eliminar datos?",
+                      height: 30,
+                      richText: _richText,
+                      onAccept: (){
+                        print("weeebo");
+                      }
+                    );
+              }),
+              SizedBox(height: 3.h,),
+              MarvalElevatedButton(
+                  "Dialog input",
+                  onPressed: (){
+                    RichText _richText = RichText(
+                      textAlign: TextAlign.justify,
+                      text: TextSpan(
+                        text: "Si el correo se encuentra dado de alta se enviará un ",
+                        style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
+                        children: const <TextSpan>[
+                          TextSpan(
+                              text:  " correo de inmediato",
+                              style: TextStyle(fontWeight: FontWeight.bold)
+                          ),
+                          TextSpan(
+                              text:" desde el que podra restablecer su contraseña"
+                          ),
+                        ],
+                      ),
+                    );
+                    GlobalKey<FormState> _formKey = GlobalKey();
+                    Form _form = Form(
+                      key: _formKey,
+                      child: MarvalInputTextField(
+                        labelText: 'Email',
+                        hintText: "marvalfit@gmail.com",
+                        prefixIcon: CustomIcons.mail,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value){
+                          if(isNullOrEmpty(value)){
+                            return inputErrorEmptyValue;
+                          }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
+                            return inputErrorEmailMissmatch;
+                          }
+                          return null;
+                        },
+                        onSaved: (value){_email = value!;},
+                      ),
+                    );
+                    MarvalDialogsInput(context,
+                        title: "Recuperar contraseña",
+                        height: 48,
+                        form: _form,
+                        richText: _richText);
+
+                  }),
             ],
           ),
         )
