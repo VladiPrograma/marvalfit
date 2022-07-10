@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:marvalfit/constants/marval_elevated_button.dart';
 import 'package:marvalfit/constants/theme.dart';
+import 'package:marvalfit/test_marval_components.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:sizer/sizer.dart';
 
@@ -36,8 +38,8 @@ class LoginScreen extends StatelessWidget {
                       child: const TextH1( "Bienvenido!")),
                   Container(width: 70.w,margin: EdgeInsets.only(right:10.w),
                       child: const TextH2(
-                      'La mejor manera de predecir el futuro es creándolo.',
-                      size: 5, color: kGrey
+                      'La forma de predecir el futuro es creándolo.',
+                      color: kGrey
                   )),
                   SizedBox(height: 5.h,),
                   LoginForm(),
@@ -103,12 +105,10 @@ class _LoginFormState extends State<LoginForm> {
 
         ),
         SizedBox(height: 5.h),
-        ElevatedButton(
-            onPressed: () async{
-              MarvalSnackBar(context, SNACKTYPE.success,
-                  title: "Todo Correcto",
-                  subtitle: "Los datos se han subido a la base de datos con exito. Cada dia un paso mas cerca de nuestro objetivo!");
-              ///@TODO Manage to dont start 2 SnackBars when u press the button twice
+        MarvalElevatedButton(
+            "Comenzar",
+            onPressed:  () async{
+
               // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
@@ -117,22 +117,19 @@ class _LoginFormState extends State<LoginForm> {
                   /// We try to LogIn
                   _loginErrors = await LogIn(_email, _password);
                   _formKey.currentState!.validate();
-                  /// @TODO If it works _loginErrors will be null so we can get the user and switch pages
+                  if(isNull(_loginErrors)&&isNotNull(FirebaseAuth.instance.currentUser)){
 
+                    /** PANTALLA TEST */
+                    Navigator.pushNamed(context, TestComponentScreen.routeName);
+                  }
+                  /// @TODO If it works _loginErrors will be null so we can get the user and switch pages
+                  MarvalSnackBar(context, SNACKTYPE.success,
+                      title: "Perfecto!",
+                      subtitle: "Los datos se han subido a la base de datos con exito. Cada dia un paso mas cerca de nuestro objetivo!");
+                  ///@TODO Manage to dont start 2 SnackBars when u press the button twice
               }
             },
-            style: ButtonStyle(
-                backgroundColor: MaterialStateColor.resolveWith((states){
-                  return states.contains(MaterialState.pressed) ? kGreen : kBlack;
-                }),
-                elevation: MaterialStateProperty.all(2.w),
-                shape: MaterialStateProperty.all( RoundedRectangleBorder(borderRadius: BorderRadius.circular(2.w)))
-            ),
-
-            child: Container(
-                padding: EdgeInsets.all(1.71.w),
-                child: const TextH2('Comenzar', color: kWhite))
-            ),
+           ),
           SizedBox(height: 5.h,)
       ],
     ));

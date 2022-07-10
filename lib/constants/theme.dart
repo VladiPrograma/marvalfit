@@ -4,8 +4,8 @@ import '../../constants/string.dart';
 import '../../constants/colors.dart';
 
 
-/// H1 Sizes: 10 //
-/// H2 Sizes: 5 // 3 [ error msg ] //
+/// H1 Sizes: 9 //
+/// H2 Sizes: 4 // 3 [ error msg ] //
 /// P1 Sizes: 4 //
 /// P2 Sizes
 
@@ -52,6 +52,7 @@ class TextP1 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text ?? "",
+      textAlign: TextAlign.justify,
       style: TextStyle(
         fontFamily: p1,
         fontSize: size?.w ?? 4.w,
@@ -69,6 +70,7 @@ class TextP2 extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text ?? "",
+      textAlign: TextAlign.justify,
       style: TextStyle(
         fontFamily: p2,
         fontSize: size?.w,
