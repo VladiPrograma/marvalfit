@@ -11,6 +11,7 @@ import 'package:sizer/sizer.dart';
 import '../../config/custom_icons.dart';
 import '../../constants/colors.dart';
 import '../../constants/global_variables.dart';
+import '../../constants/marval_dialogs.dart';
 import '../../constants/marval_snackbar.dart';
 import '../../constants/marval_textfield.dart';
 import '../../constants/string.dart';
@@ -80,9 +81,9 @@ class _LoginFormState extends State<LoginForm> {
           keyboardType: TextInputType.emailAddress,
           validator: (value){
             if(isNullOrEmpty(value)){
-              return inputErrorEmptyValue;
+              return kInputErrorEmptyValue;
             }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
-              return inputErrorEmailMissmatch;
+              return kInputErrorEmailMissmatch;
             }
             return null;
           },
@@ -98,13 +99,12 @@ class _LoginFormState extends State<LoginForm> {
           obscureText: true,
            validator: (value){
              if(isNullOrEmpty(value)){
-               return inputErrorEmptyValue;
+               return kInputErrorEmptyValue;
              }
              return _loginErrors;
            },
            onSaved: (value){ _password = value!;},
            onChanged: (value){ _loginErrors = null; },
-
         ),
         SizedBox(height: 5.h),
         MarvalElevatedButton(
@@ -124,18 +124,75 @@ class _LoginFormState extends State<LoginForm> {
                     /** PANTALLA TEST */
                     Navigator.pushNamed(context, TestComponentScreen.routeName);
                   }
-                  /// TODO: If it works _loginErrors will be null so we can get the user and switch pages
-                  /// FIXME: Manage to dont start 2 SnackBars when u press the button twice
               }
             },
            ),
-          SizedBox(height: 5.h,)
+          GestureDetector(
+            child:Container(
+              margin: EdgeInsets.only( top: 2.w),
+              child: TextH2("¿Olvidaste tu contraseña?", size: 3, color: kGrey,),
+            ),
+            onTap: (){
+              RichText _richText = RichText(
+                textAlign: TextAlign.justify,
+                text: TextSpan(
+                  text: "Si el correo se encuentra dado de alta se enviará un ",
+                  style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
+                  children: const <TextSpan>[
+                    TextSpan(
+                        text:  " email de inmediato",
+                        style: TextStyle(fontWeight: FontWeight.bold)
+                    ),
+                    TextSpan(
+                        text:" desde el que podra restablecer su contraseña"
+                    ),
+                  ],
+                ),
+              );
+              GlobalKey<FormState> _formKey = GlobalKey();
+              Form _form = Form(
+                key: _formKey,
+                child: MarvalInputTextField(
+                  labelText: 'Email',
+                  hintText: "marvalfit@gmail.com",
+                  prefixIcon: CustomIcons.mail,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value){
+                    if(isNullOrEmpty(value)){
+                      return kInputErrorEmptyValue;
+                    }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
+                      return kInputErrorEmailMissmatch;
+                    }
+                    return null;
+                  },
+                  onSaved: (value){_email = value!;},
+                ),
+              );
+              MarvalDialogsInput(context,
+                  title: "Recuperar contraseña",
+                  height: 48,
+                  form: _form,
+                  richText: _richText,
+                  onSucess: (){ ResetPassword(context, _email); }
+              );
+            }),
+          SizedBox(height: 5.h,),
       ],
     ));
   }
 }
 
-Future<String?> LogIn(String email, String password)async{
+
+void ResetPassword(BuildContext context, String email){
+  FirebaseAuth.instance.sendPasswordResetEmail(email: email)
+      .then((value) {
+    MarvalSnackBar(context, SNACKTYPE.success, title: kResetPasswordSuccesTitle, subtitle: kResetPasswordSucessSubtitle);
+  }).catchError((error){
+    MarvalSnackBar(context, SNACKTYPE.alert, title: kResetPasswordErrorTitle, subtitle: kResetPasswordErrorSubtitle);
+  });
+}
+
+Future<String?> LogIn(String email, String password) async{
   try {
     final credential = await FirebaseAuth.instance.
     signInWithEmailAndPassword(
@@ -143,8 +200,8 @@ Future<String?> LogIn(String email, String password)async{
         password: password
     );
   } on FirebaseAuthException catch (e) {
-    if (e.code == 'user-not-found') { return inputErrorEmail; }
-    else if (e.code == 'wrong-password') { return inputErrorPassword; }
+    if (e.code == 'user-not-found') { return kInputErrorEmail; }
+    else if (e.code == 'wrong-password') { return kInputErrorPassword; }
   }
   return null;
 }

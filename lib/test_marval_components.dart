@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marvalfit/constants/marval_dialogs.dart';
 import 'package:marvalfit/constants/marval_elevated_button.dart';
@@ -10,7 +11,7 @@ import '../../constants/string.dart';
 import 'config/custom_icons.dart';
 import 'constants/marval_textfield.dart';
 
-/// @TODO Add "ForgotPassowrd ?" logic and DialogPanel.
+
 class TestComponentScreen extends StatelessWidget {
   const TestComponentScreen({Key? key}) : super(key: key);
   static String routeName = "/testComponents";
@@ -123,7 +124,7 @@ class TestComponentScreen extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.bold)
                           ),
                           TextSpan(
-                              text:" desde el que podra restablecer su contraseña"
+                              text:" desde el que podra restablecer su contraseña."
                           ),
                         ],
                       ),
@@ -138,9 +139,9 @@ class TestComponentScreen extends StatelessWidget {
                         keyboardType: TextInputType.emailAddress,
                         validator: (value){
                           if(isNullOrEmpty(value)){
-                            return inputErrorEmptyValue;
+                            return kInputErrorEmptyValue;
                           }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
-                            return inputErrorEmailMissmatch;
+                            return kInputErrorEmailMissmatch;
                           }
                           return null;
                         },
@@ -151,7 +152,13 @@ class TestComponentScreen extends StatelessWidget {
                         title: "Recuperar contraseña",
                         height: 48,
                         form: _form,
-                        richText: _richText);
+                        richText: _richText,
+                        onSucess: (){
+                          FirebaseAuth.instance.sendPasswordResetEmail(email: _email!)
+                              .onError((error, stackTrace) => MarvalSnackBar(context, SNACKTYPE.alert, title: "Fallo en el envio del correo", subtitle: "El correo indicado no esta dado de alta"))
+                              .then((value) => MarvalSnackBar(context, SNACKTYPE.success, title: "Email en camino!", subtitle: "El correo se ha enviado con exito, consulte su bandeja de entrada"));
+                        }
+                    );
 
                   }),
             ],
