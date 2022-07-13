@@ -3,13 +3,15 @@ import 'package:marvalfit/constants/string.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:sizer/sizer.dart';
 
+import '../constants/colors.dart';
 import '../utils/decoration.dart';
 import '../utils/marval_arq.dart';
-import 'colors.dart';
+
 
 /// Custom TextField
 class MarvalInputTextField extends StatefulWidget {
-  const MarvalInputTextField({Key? key, this.labelText, this.validator, this.onSaved, this.onChanged, this.hintText, this.keyboardType, this.prefixIcon, this.obscureText}) : super(key: key);
+  const MarvalInputTextField({Key? key,this.controller, this.readOnly, this.width, this.labelText,this.onTap, this.validator, this.onSaved, this.onChanged, this.hintText, this.keyboardType, this.prefixIcon, this.obscureText}) : super(key: key);
+  final double? width;
   final String? labelText;
   final String? hintText;
   final TextInputType? keyboardType;
@@ -17,7 +19,10 @@ class MarvalInputTextField extends StatefulWidget {
   final bool? obscureText;
   final String? Function(String? value)? validator;
   final Function(String? value)? onSaved;
+  final Function()? onTap;
   final Function(String? value)? onChanged;
+  final TextEditingController? controller;
+  final bool? readOnly;
 
 
   @override
@@ -35,10 +40,12 @@ class _MarvalInputTextFieldState extends State<MarvalInputTextField> {
                 children: [
                   /** Text field */
                   Container(
-                      width: 70.w,
+                      width: widget.width ?? 70.w,
                       child:  TextFormField(
+                            controller: widget.controller,
+                            readOnly: widget.readOnly ?? false,
                             cursorColor: kWhite,
-                            keyboardType: TextInputType.emailAddress,
+                            keyboardType: widget.keyboardType ?? TextInputType.text,
                             obscureText: widget.obscureText ?? false,
                             style: TextStyle( fontFamily: p1, color: hasFocus ? kWhite : kBlack, fontSize: 4.w),
                             decoration: InputDecoration(
@@ -72,6 +79,7 @@ class _MarvalInputTextFieldState extends State<MarvalInputTextField> {
                               hintStyle:  TextStyle(fontFamily: p1, color: hasFocus ? kGreenThi : kGrey, fontSize: 4.w),
                               prefixIcon: widget.prefixIcon!=null ? Icon( widget.prefixIcon, color: hasFocus ? kWhite : kGreen,size: 7.w,) : null,
                               errorStyle: TextStyle(fontSize: 3.w, fontFamily: h2, color: kRed, overflow: TextOverflow.visible),
+                              errorMaxLines: 2
 
                             ),
                             validator: (value) {
@@ -82,6 +90,8 @@ class _MarvalInputTextFieldState extends State<MarvalInputTextField> {
                             },
                             onSaved:(value){ isNotNull(widget.onSaved) ? widget.onSaved!(value) : null;},
                             onChanged: (value){isNotNull(widget.onChanged) ? widget.onChanged!(value):null;},
+                            onTap: (){isNotNull(widget.onTap) ? widget.onTap!() : null;},
+
 
                       )),
                 ],

@@ -4,7 +4,7 @@ import 'package:sizer/sizer.dart';
 
 import '../config/custom_icons.dart';
 import '../utils/marval_arq.dart';
-import 'colors.dart';
+import '../constants/colors.dart';
 
 void MarvalDialogsInfo(BuildContext context, double height, {RichText? richText, String? title}){
   showDialog(

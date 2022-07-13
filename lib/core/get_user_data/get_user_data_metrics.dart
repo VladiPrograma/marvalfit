@@ -1,0 +1,218 @@
+import 'package:flutter/material.dart';
+import 'package:marvalfit/config/custom_icons.dart';
+import 'package:marvalfit/utils/objects/user_details.dart';
+import 'package:marvalfit/widgets/marval_elevated_button.dart';
+import 'package:marvalfit/widgets/marval_textfield.dart';
+import 'package:sizer/sizer.dart';
+
+import '../../constants/colors.dart';
+import '../../constants/string.dart';
+import '../../constants/theme.dart';
+import '../../utils/marval_arq.dart';
+import 'get_user_data_screen.dart';
+
+class GetUserMetricsScreen extends StatelessWidget {
+  const GetUserMetricsScreen({Key? key}) : super(key: key);
+  static String routeName = "/get_user_metrics";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        backgroundColor: kWhite,
+        body: SafeArea(
+            child: Container( width: 100.w, height: 100.h,
+              child: SingleChildScrollView(child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(height: 5.h,),
+                  Container( width: 100.w,
+                      child: TextH1("Ya casi esta !"),
+                      margin: EdgeInsets.symmetric(horizontal: 5.w)),
+                  Container( width: 100.w,
+                      child:TextH2("Necesito recopilar estos datos para trabajar de forma optima", color: kGrey,),
+                      margin: EdgeInsets.symmetric(horizontal: 5.w)
+                  ),
+                  SizedBox(height: 2.h,),
+                  _Form()
+                ],
+              ),
+              ),
+            )));
+  }
+}
+
+class _Form extends StatelessWidget {
+  const _Form({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final _formKey = GlobalKey<FormState>();
+    String? _hobbie;
+    String? _food;
+    DateTime? _birthDate;
+    double? _height;
+    double? _weight;
+    TextEditingController _textController = TextEditingController();
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          MarvalInputTextField(
+              prefixIcon: CustomIcons.person,
+              labelText: "Hobbie Favorito",
+              hintText: "Ir en Bicicleta",
+              validator: (value){
+                if(isNullOrEmpty(value)){
+                  return kInputErrorEmptyValue;
+                }if(value!.length>50){
+                  return kInputErrorToLong;
+                }
+                return null;
+              },
+              onSaved: (value) => _hobbie = normalize(value)!
+          ),
+          SizedBox(height: 3.h,),
+          MarvalInputTextField(
+              prefixIcon: CustomIcons.food,
+              labelText: "Comida Favorita",
+              hintText: "Macarrones con tomate",
+              validator: (value){
+                if(isNullOrEmpty(value)){
+                  return kInputErrorEmptyValue;
+                }if(value!.length>50){
+                  return kInputErrorToLong;
+                }
+                return null;
+              },
+              onSaved: (value) => _food = normalize(value)!
+          ),
+          SizedBox(height: 3.h,),
+          MarvalInputTextField(
+              prefixIcon: CustomIcons.calendar,
+              keyboardType: TextInputType.number,
+              controller: _textController,
+              readOnly: true,
+              labelText: "Fecha de Nacimiento",
+              hintText: "06/12/2022",
+              onTap: () async {
+                _birthDate = await pickDate(context);
+                if(isNotNull(_birthDate)){
+                String dateToText = "${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}";
+                _textController.text = dateToText;
+                }
+              },
+              validator: (value){
+                if(isNullOrEmpty(value)){
+                  return kInputErrorEmptyValue;
+                }
+                return null;
+              },
+          ),
+          SizedBox(height: 3.h,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              MarvalInputTextField(
+                width: 33.w,
+                prefixIcon: CustomIcons.weight,
+                keyboardType: TextInputType.number,
+                labelText: "Peso",
+                hintText: "79.5",
+                validator: (value) => validateNumber(value),
+                onSaved: (value) => _weight = double.parse(value!),
+              ),
+              SizedBox(width: 4.w,),
+              MarvalInputTextField(
+                  width: 33.w,
+                  keyboardType: TextInputType.number,
+                  prefixIcon: CustomIcons.size,
+                  labelText: "Altura",
+                  hintText: "1.89",
+                  validator: (value) => validateNumber(value),
+                  onSaved: (value){
+                    double _curr = double.parse(value!);
+                    if(_curr>3){
+                      String _newValue = value.replaceFirst(value.characters.first, value.characters.first+'.');
+                      _height = double.parse(_newValue);
+                      return;
+                    }
+                    _height = _curr;
+                  }
+              ),
+            ],),
+          SizedBox(height: 4.h,),
+          MarvalElevatedButton(
+              "Continuar",
+              onPressed: () async{
+                if (_formKey.currentState!.validate()) {
+                  _formKey.currentState!.save();
+                  MarvalUserDetails details = MarvalUserDetails.create(_height!, _food!, _hobbie!, phone!, _birthDate!, _weight!);
+                  details.setUserDetails();
+                  currUser!.updateWeight(_weight!);
+
+                }
+              })
+        ],
+      ),
+    );
+  }
+
+}
+
+Future<DateTime?> pickDate(BuildContext context) => showDatePicker(
+    context: context,
+    initialDate: DateTime.now(),
+    firstDate: DateTime(1900),
+    lastDate:DateTime(2100),
+    locale: const Locale("es", "ES"),
+    builder: (context, child) {
+      return Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: kGreen,
+            onPrimary: kWhite,
+            onSurface: kBlack,
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(
+              primary: kBlack,
+              textStyle: TextStyle(fontSize: 3.3.w, fontFamily: h2, color: kBlack)
+            ),
+
+          ),
+        ),
+        child: child!,
+      );
+    },
+  );
+
+
+String? validateNumber(String? value){
+  double? _curr;
+  if(isNullOrEmpty(value)){
+    return kInputErrorEmptyValue;
+  }
+  try{
+    _curr = double.parse(value!);
+  }catch(E){
+    return kInputErrorNotNum;
+  }
+  if(_curr.isNaN||_curr.isNegative||_curr>500){
+    return kInputErrorNotNum;
+  }
+  return null;
+}
+
+String? normalize(String? value){
+  if(value==null) return null;
+  String res = value.toLowerCase();
+  res = res.replaceFirst(res.characters.first, res.characters.first.toUpperCase());
+  return res;
+}
+
+
+
+
+
+

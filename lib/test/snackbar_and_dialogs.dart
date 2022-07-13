@@ -1,15 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:marvalfit/constants/marval_dialogs.dart';
-import 'package:marvalfit/constants/marval_elevated_button.dart';
-import 'package:marvalfit/utils/marval_arq.dart';
+import 'package:marvalfit/constants/colors.dart';
+import 'package:marvalfit/constants/string.dart';
 import 'package:sizer/sizer.dart';
 
-import '../../constants/colors.dart';
-import '../../constants/marval_snackbar.dart';
-import '../../constants/string.dart';
-import 'config/custom_icons.dart';
-import 'constants/marval_textfield.dart';
+import '../config/custom_icons.dart';
+import '../utils/marval_arq.dart';
+
+import '../widgets/marval_dialogs.dart';
+import '../widgets/marval_elevated_button.dart';
+import '../widgets/marval_snackbar.dart';
+import '../widgets/marval_textfield.dart';
 
 
 class TestComponentScreen extends StatelessWidget {

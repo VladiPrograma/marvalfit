@@ -4,7 +4,7 @@ import 'package:marvalfit/constants/string.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:sizer/sizer.dart';
 
-import 'colors.dart';
+import '../constants/colors.dart';
 
  enum SNACKTYPE { info, alert, success}
 

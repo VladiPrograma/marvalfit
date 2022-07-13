@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:sizer/sizer.dart';
 
-import 'colors.dart';
+import '../constants/colors.dart';
 
 
 class MarvalElevatedButton extends StatefulWidget {
