@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/string.dart';
+import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 
 class MarvalUser{
@@ -10,14 +11,15 @@ class MarvalUser{
   String name;
   String lastName;
   String work;
+  String? profileImage;
   double lastWeight;
   double currWeight;
   DateTime lastUpdate;
   MarvalUserDetails? details;
 
-  MarvalUser(this.id, this.name, this.lastName, this.work, this.lastWeight ,this.currWeight, this.lastUpdate);
+  MarvalUser(this.id, this.name, this.lastName, this.work,this.profileImage, this.lastWeight ,this.currWeight, this.lastUpdate);
 
-  MarvalUser.create(this.name, this.lastName, this.work, this.lastWeight, this.currWeight)
+  MarvalUser.create(this.name, this.lastName, this.work, this.profileImage, this.lastWeight, this.currWeight)
      : id = FirebaseAuth.instance.currentUser!.uid,
        lastUpdate = DateTime.now();
 
@@ -26,6 +28,7 @@ class MarvalUser{
     name = map["name"],
     lastName = map["last_name"],
     work = map["work"],
+    profileImage  = map["profile_image"],
     currWeight = map["curr_weight"],
     lastWeight = map["last_weight"],
     lastUpdate = map["last_update"];
@@ -35,8 +38,8 @@ class MarvalUser{
 
   static Future<MarvalUser> getFromDB(String uid) async {
     DocumentSnapshot doc = await usersDB.doc(uid).get();
-    Map<String, dynamic> map  = doc.data() as Map<String, dynamic>;
-    return MarvalUser.fromJson(map);
+    Map<String, dynamic>? map  = toMap(doc);
+    return MarvalUser.fromJson(map!);
   }
 
   Future<void> setMarvalUser(){
@@ -47,6 +50,7 @@ class MarvalUser{
       'name': name, // Vlad
       'last_name': lastName, // Dumitru
       'work': work, // Programador
+      'profile_image': profileImage, // Programador
       'last_weight' : lastWeight, // 76.3
       'curr_weight' : currWeight, // 77.4
       'last_update' : lastUpdate, // 11/07/2022
@@ -79,7 +83,8 @@ class MarvalUser{
     "\n Name: $name Last Name: $lastName"
     "\n Job: $work"
     "\n Curr: $currWeight Kg  Last: $lastWeight Kg "
-    "\n Last Update: $lastUpdate";
+    "\n Last Update: $lastUpdate"
+    "\n Profile image URL: $profileImage";
   }
 
 }

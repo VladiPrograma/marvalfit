@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:marvalfit/utils/marval_arq.dart';
 
 import '../../config/log_msg.dart';
 import '../../constants/string.dart';
@@ -36,8 +37,8 @@ class MarvalUserDetails{
 
   static Future<MarvalUserDetails> getFromDB(String uid) async {
     DocumentSnapshot doc = await detailsDB.doc(uid).get();
-    Map<String, dynamic> map  = doc.data() as Map<String, dynamic>;
-    return MarvalUserDetails.fromJson(map);
+    Map<String, dynamic>? map  = toMap(doc);
+    return MarvalUserDetails.fromJson(map!);
   }
 
   Future<void> setUserDetails(){

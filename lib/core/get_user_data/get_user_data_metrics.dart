@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marvalfit/config/custom_icons.dart';
+import 'package:marvalfit/test/snackbar_and_dialogs.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
 import 'package:marvalfit/widgets/marval_textfield.dart';
@@ -9,6 +10,7 @@ import '../../constants/colors.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
 import '../../utils/marval_arq.dart';
+import 'form_screen.dart';
 import 'get_user_data_screen.dart';
 
 class GetUserMetricsScreen extends StatelessWidget {
@@ -120,7 +122,7 @@ class _Form extends StatelessWidget {
                 labelText: "Peso",
                 hintText: "79.5",
                 validator: (value) => validateNumber(value),
-                onSaved: (value) => _weight = double.parse(value!),
+                onSaved: (value) => _weight = toDouble(value),
               ),
               SizedBox(width: 4.w,),
               MarvalInputTextField(
@@ -131,10 +133,10 @@ class _Form extends StatelessWidget {
                   hintText: "1.89",
                   validator: (value) => validateNumber(value),
                   onSaved: (value){
-                    double _curr = double.parse(value!);
-                    if(_curr>3){
-                      String _newValue = value.replaceFirst(value.characters.first, value.characters.first+'.');
-                      _height = double.parse(_newValue);
+                    double? _curr = toDouble(value);
+                    if(_curr!>3){
+                      String _newValue = value!.replaceFirst(value.characters.first, value.characters.first+'.');
+                      _height = toDouble(_newValue);
                       return;
                     }
                     _height = _curr;
@@ -149,8 +151,9 @@ class _Form extends StatelessWidget {
                   _formKey.currentState!.save();
                   MarvalUserDetails details = MarvalUserDetails.create(_height!, _food!, _hobbie!, phone!, _birthDate!, _weight!);
                   details.setUserDetails();
+                  print(currUser);
                   currUser!.updateWeight(_weight!);
-
+                  Navigator.pushNamed(context, FormScreen.routeName);
                 }
               })
         ],
@@ -188,28 +191,7 @@ Future<DateTime?> pickDate(BuildContext context) => showDatePicker(
   );
 
 
-String? validateNumber(String? value){
-  double? _curr;
-  if(isNullOrEmpty(value)){
-    return kInputErrorEmptyValue;
-  }
-  try{
-    _curr = double.parse(value!);
-  }catch(E){
-    return kInputErrorNotNum;
-  }
-  if(_curr.isNaN||_curr.isNegative||_curr>500){
-    return kInputErrorNotNum;
-  }
-  return null;
-}
 
-String? normalize(String? value){
-  if(value==null) return null;
-  String res = value.toLowerCase();
-  res = res.replaceFirst(res.characters.first, res.characters.first.toUpperCase());
-  return res;
-}
 
 
 

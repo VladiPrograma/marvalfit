@@ -20,5 +20,9 @@ const Color kRed = Color(0xFFDB5252);
 const Color kRedSec = Color(0xFFEDA5A5);
 const Color kRedThi = Color(0xFFFCEFEF);
 
+const LinearGradient kFormGradient = LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [ Color(0xFF3D7855), Color(0xFF2D2D2D), ]);
 
 

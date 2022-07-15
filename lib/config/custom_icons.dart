@@ -48,4 +48,8 @@ class CustomIcons  {
   static const IconData playerKing = IconData(0xea68, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData food = IconData(0xf0f5, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData phone = IconData(0xf879, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData camera = IconData(0xf083, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData bicycle = IconData(0xf206, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+
+
 }
