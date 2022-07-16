@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:marvalfit/config/custom_icons.dart';
-import 'package:marvalfit/test/snackbar_and_dialogs.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
 import 'package:marvalfit/widgets/marval_textfield.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../config/log_msg.dart';
 import '../../constants/colors.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
 import '../../utils/marval_arq.dart';
+import '../../utils/objects/form.dart';
 import 'form_screen.dart';
 import 'get_user_data_screen.dart';
 
@@ -153,6 +154,7 @@ class _Form extends StatelessWidget {
                   details.setUserDetails();
                   print(currUser);
                   currUser!.updateWeight(_weight!);
+
                   Navigator.pushNamed(context, FormScreen.routeName);
                 }
               })
@@ -162,6 +164,7 @@ class _Form extends StatelessWidget {
   }
 
 }
+
 
 Future<DateTime?> pickDate(BuildContext context) => showDatePicker(
     context: context,

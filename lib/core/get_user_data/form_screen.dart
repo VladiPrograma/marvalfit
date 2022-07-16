@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:marvalfit/config/log_msg.dart';
+import 'package:marvalfit/constants/string.dart';
 import 'package:marvalfit/constants/theme.dart';
+import 'package:marvalfit/core/login/login_screen.dart';
+import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../config/custom_icons.dart';
 import '../../constants/colors.dart';
+import '../../utils/objects/form.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({Key? key}) : super(key: key);
@@ -13,54 +17,78 @@ class FormScreen extends StatefulWidget {
   @override
   State<FormScreen> createState() => _FormScreenState();
 }
-///@TODO TextFormField when only one answer.
 ///@TODO Simplificar formulario (Hablar con Mario)
-///@TODO Update Form to Firebase
-///@TODO Read Form from Firebase and transform in Page() Style
-class _FormScreenState extends State<FormScreen> {
-  int pageNumber = 1;
+///@TODO Añadir campo de Sexo / DNI? / Ciudad
 
+
+var completedForm = Map<String,String>();
+late String lastQuestion;
+int pointer = 0;
+List<String> specify = [""];
+class _FormScreenState extends State<FormScreen> {
+  List<Widget> pages = List.empty(growable: true);
+  int pageNumber = 1;
+  void initState(){
+    super.initState();
+    // Create anonymous function:
+        () async {
+      /** Using async methods to fetch Data */
+          List<FormItem> formItems = await FormItem.getFromDB();
+          for (var element in formItems) {
+            pages.add(
+                FormPage(
+                    key: Key(element.key),
+                    onOptionSelected: (){ setState(() {
+                      pageNumber = pageNumber+1;
+                    });},
+                    number: element.number,
+                    question: element.question,
+                    answers: element.answers
+                )
+            );
+          }
+          pages = pages.reversed.toList();
+          lastQuestion = formItems.first.question;
+          setState(() { });
+    }();
+
+  }
   @override
   Widget build(BuildContext context) {
-    Widget page = pageNumber == 1
-        ? Page(
-      key: Key('page1'),
-      onOptionSelected: () => setState(() => pageNumber = 2),
-      question:
-      'Do you typically fly for business, personal reasons, or some other reason?',
-      answers: <String>['Business', 'Personal', 'Others', 'Jabali', 'Rinoceronte'],
-      number: 1,
-    )
-        : Page(
-      key: Key('page2'),
-      onOptionSelected: () => setState(() => pageNumber = 1),
-      question: 'How many hours is your average flight?',
-      answers: <String>[
-        'Less than two hours',
-        'More than two but less than five hours',
-        'Others'
-      ],
-      number: 2,
-    );
     return Scaffold(
       body: Container(width: 100.w, height: 100.h,
-      decoration: const BoxDecoration(
-        gradient: kFormGradient
-      ),
-      child: SafeArea(
-        child: Stack(
+          decoration: const BoxDecoration(
+          gradient: kFormGradient
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+          child: Container(width: 100.w, height: 100.h,
+          child: Stack(
           children: [
-            ArrowIcons(),
-            Bicyclet(),
-            Line(),
+            Positioned(
+                left: 2.5.w,
+                bottom: 5.h,
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: (){setState(() { if(pageNumber<pages.length&&pageNumber<completedForm.length+1){  pageNumber++; pointer++;  }});},
+                      child:Icon(Icons.arrow_upward_rounded, color: kWhite, size: 8.w,),
+                    ),
+                    SizedBox(height: 2.h,),
+              GestureDetector(
+                onTap: (){setState(() { if(pageNumber>1){ pageNumber--; pointer--;} });},
+                child: Icon(Icons.arrow_downward_rounded, color: kWhite, size: 8.w,)),
+             ])), // Arrows
+            const Bicyclet(),
+            const Line(),
             Positioned.fill(
               left: 10.w,
               child: AnimatedSwitcher(
-                child: page,
-                duration: Duration(milliseconds: 250),
+                child: pages.isNotEmpty&&pageNumber!=pages.length+1 ? pages[pageNumber-1] : const Text(""),
+                duration: const Duration(milliseconds: 250),
               ),
             ),
-          ]),
+          ]))),
       )),
     );
   }
@@ -71,13 +99,13 @@ class _FormScreenState extends State<FormScreen> {
 
 
 
-class Page extends StatefulWidget {
+class FormPage extends StatefulWidget {
   final int number;
   final String question;
   final List<String> answers;
   final VoidCallback onOptionSelected;
 
-  const Page(
+  const FormPage(
       {Key? key,
         required this.onOptionSelected,
         required this.number,
@@ -86,9 +114,9 @@ class Page extends StatefulWidget {
       : super(key: key);
 
   @override
-  _PageState createState() => _PageState();
+  _FormPageState createState() => _FormPageState();
 }
-class _PageState extends State<Page> with SingleTickerProviderStateMixin {
+class _FormPageState extends State<FormPage> with SingleTickerProviderStateMixin {
   late List<GlobalKey<_ItemFaderState>> keys;
   late AnimationController _animationController;
   int? selectedOptionKeyIndex;
@@ -106,7 +134,6 @@ class _PageState extends State<Page> with SingleTickerProviderStateMixin {
     );
     onInit();
   }
-
   Future<void> animateDot(Offset startOffset) async {
     OverlayEntry entry = OverlayEntry(
       builder: (context) {
@@ -139,7 +166,7 @@ class _PageState extends State<Page> with SingleTickerProviderStateMixin {
         ItemFader(key: keys[0], child: StepNumber(number: widget.number)),
         ItemFader(
           key: keys[1],
-          child: StepQuestion(question: widget.question),
+          child:  StepQuestion(question: widget.question),
         ),
         Spacer(),
         ...widget.answers.map((String answer) {
@@ -147,11 +174,32 @@ class _PageState extends State<Page> with SingleTickerProviderStateMixin {
           int keyIndex = answerIndex + 2;
           return ItemFader(
             key: keys[keyIndex],
-            child: OptionItem(
+            child: answer.contains('Especifica')  ?
+            OptionItemField(
               name: answer,
-              onTap: (offset) {
+              onTap: (offset) async{
                 onTap(keyIndex, offset);
-                logInfo('You select: "$answer"' );
+              },
+              showDot: selectedOptionKeyIndex != keyIndex,
+            )
+             :
+            OptionItem(
+              name: answer,
+              onTap: (offset) async{
+
+                if(answer==widget.answers.first&&widget.answers.last.contains('Especifica')){
+                  answer+= '. ${specify[pointer]}';
+                }
+                completedForm[widget.question] = normalize(answer)!;
+                if(widget.question == lastQuestion){
+                  await FormItem.setUserResponse(completedForm);
+                  logInfo(completedForm.toString());
+                  logInfo(specify.toString());
+                  Navigator.pushNamed(context, LoginScreen.routeName);
+                }else{
+                onTap(keyIndex, offset);
+                pointer++;
+                }
               },
               showDot: selectedOptionKeyIndex != keyIndex,
             ),
@@ -167,14 +215,16 @@ class _PageState extends State<Page> with SingleTickerProviderStateMixin {
       key.currentState!.hide();
       if (keys.indexOf(key) == keyIndex) {
         setState(() => selectedOptionKeyIndex = keyIndex);
-        animateDot(offset).then((_) => widget.onOptionSelected());
+        animateDot(offset).then((_){
+          setState(() => widget.onOptionSelected());
+        });
 
       }
     }
   }
   void onInit() async {
     for (GlobalKey<_ItemFaderState> key in keys) {
-      await Future.delayed(Duration(milliseconds: 40));
+      await Future.delayed(const Duration(milliseconds: 40));
       key.currentState!.show();
     }
   }
@@ -287,6 +337,9 @@ class OptionItem extends StatefulWidget {
 class _OptionItemState extends State<OptionItem> {
   @override
   Widget build(BuildContext context) {
+    if(specify.length==pointer){
+      specify.add("");
+    }
     return InkWell(
       onTap: () {
         RenderBox? object = context.findRenderObject() as RenderBox;
@@ -312,24 +365,53 @@ class _OptionItemState extends State<OptionItem> {
 
 
 
-class ArrowIcons extends StatelessWidget {
-  const ArrowIcons({Key? key}) : super(key: key);
+class OptionItemField extends StatefulWidget {
+  final String name;
+  final void Function(Offset dotOffset) onTap;
+  final bool showDot;
 
+  const OptionItemField(
+      {Key? key, required this.name, required this.onTap, this.showDot = true})
+      : super(key: key);
+  @override
+  State<OptionItemField> createState() => _OptionItemFieldState();
+}
+class _OptionItemFieldState extends State<OptionItemField> {
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-        left: 2.5.w,
-        bottom: 2.h,
-        child: Column(
-          children: [
-            Icon(Icons.arrow_upward_rounded, color: kWhite, size: 8.w,),
-            SizedBox(height: 2.h,),
-            Icon(Icons.arrow_downward_rounded, color: kWhite, size: 8.w,),
+    if(specify.length==pointer){
+      specify.add("");
+    }
+    return  Padding(
+        padding:  EdgeInsets.symmetric(vertical: 4.w),
+        child: Row(
+          children: <Widget>[
+            SizedBox(width: 2.5.w),
+            Dot(visible: widget.showDot),
+            SizedBox(width: 6.w),
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  hintText: widget.name,
+                  hintStyle: TextStyle(fontFamily: h2, color: kGrey, fontSize: 5.w),
+                  hintMaxLines: 2,
+                ),
+                onChanged: (value){
+                  logInfo(pointer.toString()+" "+specify.length.toString());
+                   specify[pointer] = value;
+                  },
+                style: TextStyle(fontFamily: h2, color: kWhite, fontSize: 5.w),
+                maxLines: 2,
+              ),
+            )
           ],
-        )
+        ),
     );
   }
 }
+
+
 class Bicyclet extends StatelessWidget {
   const Bicyclet({Key? key}) : super(key: key);
 

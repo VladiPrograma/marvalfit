@@ -36,7 +36,7 @@ class MarvalUser{
   void getDetails() async => details = await MarvalUserDetails.getFromDB(id);
 
 
-  static Future<MarvalUser> getFromDB(String uid) async {
+  static Future<MarvalUser> getUser(String uid) async {
     DocumentSnapshot doc = await usersDB.doc(uid).get();
     Map<String, dynamic>? map  = toMap(doc);
     return MarvalUser.fromJson(map!);

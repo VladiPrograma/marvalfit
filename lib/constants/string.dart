@@ -30,9 +30,11 @@ const String kResetPasswordErrorSubtitle = 'El correo indicado no esta dado de a
 const String userID = 'USERID_000';
 
 /// Log ASCII Line Art
-
 const String logSuccessPrefix = ":.:.:.:.:.: ";
 const String logErrorPrefix = "(__!!!__) --> ";
+
+///Form Constants
+const String kSpecifyText = 'Especifica cual, luego pulsa en Si';
 
 class ErrorText{
   late String text;
