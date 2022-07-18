@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marvalfit/config/custom_icons.dart';
+import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
 import 'package:marvalfit/widgets/marval_textfield.dart';
@@ -152,9 +153,10 @@ class _Form extends StatelessWidget {
                   _formKey.currentState!.save();
                   MarvalUserDetails details = MarvalUserDetails.create(_height!, _food!, _hobbie!, phone!, _birthDate!, _weight!);
                   details.setUserDetails();
-                  print(currUser);
-                  currUser!.updateWeight(_weight!);
-
+                  logInfo(details.toString());
+                  user!.updateWeight(_weight!);
+                  user!.details = details;
+                  logInfo(user.toString());
                   Navigator.pushNamed(context, FormScreen.routeName);
                 }
               })

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:marvalfit/core/get_user_data/form_screen.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
+import 'package:marvalfit/modules/home_screen.dart';
 import 'package:sizer/sizer.dart';
 import 'config/firebase_options.dart';
 import 'config/routes.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Comienza el reto',
             routes: routes,
-            initialRoute: FormScreen.routeName,
+            initialRoute: HomeScreen.routeName,
           );
         }
     );

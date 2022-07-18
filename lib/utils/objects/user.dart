@@ -84,7 +84,9 @@ class MarvalUser{
     "\n Job: $work"
     "\n Curr: $currWeight Kg  Last: $lastWeight Kg "
     "\n Last Update: $lastUpdate"
-    "\n Profile image URL: $profileImage";
+    "\n Profile image URL: $profileImage"
+    "\n Details: ${details?.toString}";
+
   }
 
 }

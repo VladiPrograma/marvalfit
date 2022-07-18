@@ -34,7 +34,7 @@ const String logSuccessPrefix = ":.:.:.:.:.: ";
 const String logErrorPrefix = "(__!!!__) --> ";
 
 ///Form Constants
-const String kSpecifyText = 'Especifica cual, luego pulsa en Si';
+const String kSpecifyText = 'Especifica cual, luego pulsa en si';
 
 class ErrorText{
   late String text;

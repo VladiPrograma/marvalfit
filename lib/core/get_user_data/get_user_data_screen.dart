@@ -1,20 +1,20 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:marvalfit/config/custom_icons.dart';
+import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
+
 import 'package:marvalfit/core/get_user_data/get_user_data_metrics.dart';
-import 'package:marvalfit/utils/firebase/auth.dart';
-import 'package:marvalfit/utils/firebase/storage.dart';
-import 'package:marvalfit/utils/objects/user.dart';
-import 'package:marvalfit/widgets/marval_dialogs.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
 import 'package:marvalfit/widgets/marval_textfield.dart';
-import 'package:sizer/sizer.dart';
+import 'package:marvalfit/widgets/marval_dialogs.dart';
+import 'package:marvalfit/utils/firebase/storage.dart';
+import 'package:marvalfit/config/custom_icons.dart';
+import 'package:marvalfit/utils/objects/user.dart';
 
 import '../../config/log_msg.dart';
 import '../../constants/colors.dart';
+import '../../constants/global_variables.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
 import '../../utils/marval_arq.dart';
@@ -34,7 +34,6 @@ class GetUserDataScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
             SizedBox(height: 3.h,),
-            ///@FIXME Add some kind of logic to set the Auth user in the start of the app to not be using FirebaseAuth constantly
             ProfilePhoto(),
             Container( width: 100.w,
                 child: const TextH1("Sube una foto"),
@@ -52,7 +51,6 @@ class GetUserDataScreen extends StatelessWidget {
   }
 }
 /// @TODO: do something with this variables, is really ugly to see
-MarvalUser? currUser;
 String? phone;
 class _Form extends StatelessWidget {
   const _Form({Key? key}) : super(key: key);
@@ -137,7 +135,6 @@ class _Form extends StatelessWidget {
               onPressed: () async{
             if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  User? authUser = getCurrUser();
                   if(isNull(_backgroundImage)){
                      MarvalDialogsAlert(context, type: MarvalDialogAlertType.ACCEPT, height: 37,
                         title: "Sube una foto de perfil!",
@@ -165,21 +162,24 @@ class _Form extends StatelessWidget {
                           ),
                         ),
                         onAccept: () async {
-                          currUser = MarvalUser.create(_name!, _lastName!, _job!, null,  0, 0);
-                          logInfo(currUser.toString());
-                          await currUser!.setMarvalUser();
+                          user = MarvalUser.create(_name!, _lastName!, _job!, null,  0, 0);
+
+                          logInfo(user.toString());
+                          await user!.setMarvalUser();
+
+                          /// Update To Firebase User
+                          authUser!.updateDisplayName("$_name $_lastName");
                           Navigator.pushNamed(context, GetUserMetricsScreen.routeName);
                        }
                     );
                   }else{
                     String? _urlImage = await uploadProfileImg(authUser!.uid, _backgroundImage!);
-                    currUser = MarvalUser.create(_name!, _lastName!, _job!, _urlImage,  0, 0);
-                    await currUser!.setMarvalUser();
-                    authUser.updatePhotoURL(_urlImage);
+                    user = MarvalUser.create(_name!, _lastName!, _job!, _urlImage,  0, 0);
+                    await user!.setMarvalUser();
+                    authUser!.updatePhotoURL(_urlImage);
+                    authUser!.updateDisplayName("$_name $_lastName");
                     Navigator.pushNamed(context, GetUserMetricsScreen.routeName);
-
                   }
-                  authUser!.updateDisplayName("$_name $_lastName");
             }})
         ],
       ),

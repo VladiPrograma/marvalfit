@@ -3,6 +3,7 @@ import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/string.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
+import 'package:marvalfit/modules/home_screen.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:sizer/sizer.dart';
 
@@ -195,7 +196,7 @@ class _FormPageState extends State<FormPage> with SingleTickerProviderStateMixin
                   await FormItem.setUserResponse(completedForm);
                   logInfo(completedForm.toString());
                   logInfo(specify.toString());
-                  Navigator.pushNamed(context, LoginScreen.routeName);
+                  Navigator.pushNamed(context, HomeScreen.routeName);
                 }else{
                 onTap(keyIndex, offset);
                 pointer++;
