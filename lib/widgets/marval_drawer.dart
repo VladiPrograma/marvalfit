@@ -18,7 +18,7 @@ class MarvalDrawer extends StatelessWidget {
       child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 3.w),
         children:  <Widget>[
-          SizedBox(height: 42.h,
+          SizedBox(height: 39.h,
               child: DrawerHeader(
                 decoration: BoxDecoration( color: kWhite, border: Border.all(color: kWhite) ),
                 child: Column(
@@ -30,7 +30,7 @@ class MarvalDrawer extends StatelessWidget {
                       child: isNull(authUser!.photoURL) ? Icon(CustomIcons.person, color: kWhite, size: 13.w,): null,
                     ),
                     const TextH2('Bienvenido', color: kGrey, size: 6,),
-                    const TextH1('Vlad', color: kBlack),
+                    TextH1(authUser!.displayName!, color: kBlack, size: 100/authUser!.displayName!.length,),
                   ],
                 ),
               )),
@@ -79,6 +79,9 @@ class MarvalDrawer extends StatelessWidget {
               title: TextH2('Ajustes', size: 4, color: name=="Ajustes" ? kGreen : kBlack),
             ),
           ),
+          SizedBox(height: 7.h),
+          Container( height: 15.h,
+            child: Image.asset('assets/images/marval_logo.png'),)
         ],
       ),
     );

@@ -35,6 +35,14 @@ class MarvalUser{
 
   void getDetails() async => details = await MarvalUserDetails.getFromDB(id);
 
+    static Future<bool> userExists(String? uid) async{
+    if(isNull(uid)){ return false;}
+    DocumentSnapshot ds = await usersDB.doc(uid).get();
+    return ds.exists;
+
+  }
+
+
 
   static Future<MarvalUser> getUser(String uid) async {
     DocumentSnapshot doc = await usersDB.doc(uid).get();

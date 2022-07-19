@@ -168,7 +168,7 @@ class _Form extends StatelessWidget {
                           await user!.setMarvalUser();
 
                           /// Update To Firebase User
-                          authUser!.updateDisplayName("$_name $_lastName");
+                          authUser!.updateDisplayName("$_name");
                           Navigator.pushNamed(context, GetUserMetricsScreen.routeName);
                        }
                     );
@@ -177,7 +177,7 @@ class _Form extends StatelessWidget {
                     user = MarvalUser.create(_name!, _lastName!, _job!, _urlImage,  0, 0);
                     await user!.setMarvalUser();
                     authUser!.updatePhotoURL(_urlImage);
-                    authUser!.updateDisplayName("$_name $_lastName");
+                    authUser!.updateDisplayName("$_name");
                     Navigator.pushNamed(context, GetUserMetricsScreen.routeName);
                   }
             }})

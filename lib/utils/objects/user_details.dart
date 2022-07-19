@@ -40,7 +40,6 @@ class MarvalUserDetails{
     Map<String, dynamic>? map  = toMap(doc);
     return MarvalUserDetails.fromJson(map!);
   }
-
   Future<void> setUserDetails(){
     // Call the user's CollectionReference to add a new user
     return detailsDB
@@ -77,4 +76,22 @@ class MarvalUserDetails{
         "\n Start Date: $startDate"
         "\n Initial Weight: $initialWeight Height: $height";
   }
+
+  int getAge(){
+    DateTime currentDate = DateTime.now();
+    int age = currentDate.year - birthDate.year;
+    int month1 = currentDate.month;
+    int month2 = birthDate.month;
+    if (month2 > month1) {
+      age--;
+    } else if (month1 == month2) {
+      int day1 = currentDate.day;
+      int day2 = birthDate.day;
+      if (day2 > day1) {
+        age--;
+      }
+    }
+    return age;
+  }
+
 }
