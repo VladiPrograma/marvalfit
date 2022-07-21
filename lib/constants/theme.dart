@@ -13,11 +13,13 @@ class TextH1 extends StatelessWidget {
   final String? text;
   final double? size;
   final Color? color;
-  const TextH1(String this.text,{Key? key, this.size, this.color}) : super(key: key);
+  final TextAlign? textAlign;
+  const TextH1(String this.text,{Key? key, this.size, this.color, this.textAlign}) : super(key: key);
 
   Widget build(BuildContext context) {
     return Text(
       text ?? "",
+      textAlign: textAlign ?? TextAlign.start,
       style: TextStyle(
       fontFamily: h1,
       fontSize: size?.w ?? 9.w,

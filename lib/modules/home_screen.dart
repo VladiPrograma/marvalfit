@@ -44,92 +44,104 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-             Container(width: 100.w, height: 26.h,
-                padding: EdgeInsets.all(4.w),
-                decoration: BoxDecoration(
-                  color: kBlue,
-                  borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15.w)),
-                  boxShadow: [kMarvalBoxShadow]
-                ),
-            child: SafeArea(
-              child:Column(
-                children: [
-                  Row(children: [
-                      GestureDetector(
-                        onTap: (){
-                          dateNotifier!.value = dateNotifier!.value.add(Duration(days: -7));
-                          setState(() {});
-                        },
-                        child:Container(
-                            child: Row(children: [
-                          Icon(Icons.arrow_back, color: kWhite, size: 6.w,),
-                          TextH2(' Anterior', color: kWhite, size: 4,)
-                      ]))),
-                      Spacer(),
-                      TextH1(dateNotifier!.value.toStringMonth(), color: kWhite, size: 7.5,),
-                      Spacer(),
-                      GestureDetector(
-                        onTap: (){
-                          dateNotifier!.value = dateNotifier!.value.add(Duration(days: 7));
-                          setState(() {});
-                        },
-                        child:Container(
-                            child: Row(children: [
-                              TextH2('Siguiente ', color: kWhite, size: 4,),
-                              Icon(Icons.arrow_forward, color: kWhite, size: 6.w,),
-                      ]))),
-                    ]),
-                  SizedBox(height: 1.h,),
-                  ValueListenableBuilder(
-                      valueListenable: dateNotifier!,
-                      builder: (context, value, child) {
-                        return DateList(startDate: dateNotifier!.value,);
-                      },
-                  )
-                ],
-              ),
-            )),
-            Container(width: 20.w, height: 10.h, color: kBlue,
-            alignment: Alignment.topRight,
+
+            Container(width: 100.w, height: 50.h, color: kWhite,
             child: Stack(
                 children: [
+                  Positioned(
+                    top: 0,
+                    child: Container(width: 100.w, height: 26.h,
+                      padding: EdgeInsets.all(4.w),
+                      decoration: BoxDecoration(
+                          color: kBlue,
+                          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15.w)),
+                          boxShadow: [kMarvalBoxShadow]
+                      ),
+                      child: SafeArea(
+                        child:Column(
+                          children: [
+                            Row(children: [
+                              GestureDetector(
+                                  onTap: (){
+                                    dateNotifier!.value = dateNotifier!.value.add(Duration(days: -7));
+                                    setState(() {});
+                                  },
+                                  child:Container(
+                                      child: Row(children: [
+                                        Icon(Icons.arrow_back, color: kWhite, size: 6.w,),
+                                        TextH2(' Anterior', color: kWhite, size: 4,)
+                                      ]))),
+                              Spacer(),
+                              TextH1(dateNotifier!.value.toStringMonth(), color: kWhite, size: 7.5,),
+                              Spacer(),
+                              GestureDetector(
+                                  onTap: (){
+                                    dateNotifier!.value = dateNotifier!.value.add(Duration(days: 7));
+                                    setState(() {});
+                                  },
+                                  child:Container(
+                                      child: Row(children: [
+                                        TextH2('Siguiente ', color: kWhite, size: 4,),
+                                        Icon(Icons.arrow_forward, color: kWhite, size: 6.w,),
+                                      ]))),
+                            ]),
+                            SizedBox(height: 1.h,),
+                            ValueListenableBuilder(
+                              valueListenable: dateNotifier!,
+                              builder: (context, value, child) {
+                                return DateList(startDate: dateNotifier!.value,);
+                              },
+                            )
+                          ],
+                        ),
+                      )),),
                   /// Little Box to make blue Right Margin
                   Positioned(
-                  right: 0,
-                  child: Container(width: 20.w, height: 20.h,
-                  decoration: BoxDecoration(
-                    color: Colors.transparent,
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(15.w))
-                  ),
-                    child: InnerShadow(
-                      color: kBlack.withOpacity(0.45),
-                      offset: Offset(0, 1.4.w),
-                      blur: 1.5.w,
+                      right: 0,
+                      top: 25.h,
+                      child: Container(width: 20.w, height: 10.h, color: kBlue
+                 )),
+                  Positioned(
+                      right: 0,
+                      top: 26.h,
+                      child: Container(width: 20.w, height: 50.h,
+                          decoration: BoxDecoration(
+                              color: kBlue,
+                              borderRadius: BorderRadius.only(topRight: Radius.circular(15.w))
+                          ),
+                          child: InnerShadow(
+                              color: kBlack.withOpacity(0.45),
+                              offset: Offset(0, 1.4.w),
+                              blur: 1.5.w,
+                              child: Container(
+                                  decoration:  BoxDecoration(
+                                    borderRadius: BorderRadius.only(topRight:  Radius.circular(12.w)),
+                                    color: kWhite,
+                                  ))))),
+                  /// Weight & Sleep Widgets
+                  Positioned(
+                      top: 28.h,
                       child: Container(
-                        decoration:  BoxDecoration(
-                          borderRadius: BorderRadius.only(topRight:  Radius.circular(12.w)),
-                          color: kWhite,
-                  ))))),
+                        width: 100.w,
+                        height: 20.h,
+                        padding: EdgeInsets.symmetric(horizontal: 2.w),
+                        child: Row(
+                            children:[
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row( children: [
+                                    Icon(Icons.check_box, size: 9.w, color: kGreen,),
+                                    TextH2("  Peso & Sueño"),
+                                  ]),
+                                  MoonList(),
+                                ],),
+                              Spacer(),
+                              MarvalKnob(),
+                            ]),
+                      )),
             ])),
-            Container(
-              width: 100.w,
-              height: 23.h,
-              padding: EdgeInsets.symmetric(horizontal: 2.w),
-              child: Row(
-                  children:[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row( children: [
-                          Icon(Icons.check_box, size: 9.w, color: kGreen,),
-                          TextH2("  Peso & Sueño"),
-                        ]),
-                        MoonList(),
-                      ],),
-                    Spacer(),
-                    MarvalKnob(),
-                  ]),
-            )
+
           ],
         )),
     );
@@ -195,8 +207,8 @@ class DateCell extends StatelessWidget {
  }
  class _MarvalKnobState extends State<MarvalKnob> {
 
-    final double _minimum = 75;
-    final double _maximum = 79;
+    final double _minimum = 73;
+    final double _maximum = 77;
     double _added = 0;
     bool _tapDown = true;
    late KnobController _controller;
@@ -229,7 +241,7 @@ class DateCell extends StatelessWidget {
        minimum: _minimum,
        maximum: _maximum,
        startAngle: 0,
-       endAngle: 360,
+       endAngle: 180,
      );
      _controller.addOnValueChangedListener(valueChangedListener);
    }
@@ -253,7 +265,7 @@ class DateCell extends StatelessWidget {
            showLabels: false,
            pointerStyle: PointerStyle(
              color: kWhite,
-             offset: 10.w
+             offset: 6.w
            ),
            controlStyle: const ControlStyle(
              glowColor: kBlue,
@@ -268,7 +280,7 @@ class DateCell extends StatelessWidget {
        )),
        Container( width: 37.w, height: 37.w,
            margin: EdgeInsets.only(top: 7.w),
-           child: Center(child: TextH1(_knobValue.toStringAsPrecision(4)+"\n    Kg", color: kWhite, size: 5,))),
+           child: Center(child: TextH1("${_knobValue.toStringAsPrecision(3)}\n Kg", color: kWhite, size: 5, textAlign: TextAlign.center, ))),
        ],);
    }
  }
