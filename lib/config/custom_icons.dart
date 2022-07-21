@@ -50,6 +50,12 @@ class CustomIcons  {
   static const IconData phone = IconData(0xf879, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData camera = IconData(0xf083, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData bicycle = IconData(0xf206, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData moon = IconData(0xe80b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData moon_inv = IconData(0xe80c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData arrow_down = IconData(0xe80d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData arrow_left = IconData(0xe80e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData arrow_right = IconData(0xe80f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData arrow_up = IconData(0xe810, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 
 
 }

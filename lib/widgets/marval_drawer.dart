@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marvalfit/test/snackbar_and_dialogs.dart';
 import 'package:sizer/sizer.dart';
 
 import '../config/custom_icons.dart';
@@ -73,7 +74,7 @@ class MarvalDrawer extends StatelessWidget {
           GestureDetector(
             onTap: (){
               Navigator.pop(context);
-              Navigator.pushNamed(context, LoginScreen.routeName);},
+              Navigator.pushNamed(context, TestComponentScreen.routeName);},
             child: ListTile(
               leading: Icon(Icons.settings_rounded,color: name=="Ajustes" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Ajustes', size: 4, color: name=="Ajustes" ? kGreen : kBlack),

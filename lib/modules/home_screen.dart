@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:knob_widget/knob_widget.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/colors.dart';
 import 'package:marvalfit/constants/components.dart';
@@ -6,6 +7,7 @@ import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
 
+import '../config/custom_icons.dart';
 import '../constants/global_variables.dart';
 import '../utils/decoration.dart';
 import '../utils/marval_arq.dart';
@@ -18,8 +20,9 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-///@TODO Get User data when is Already Logged.
 ///@TODO Main page Logic when is Logged but he doesnt complete de forms.
+
+
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
@@ -90,11 +93,12 @@ class _HomeScreenState extends State<HomeScreen> {
             alignment: Alignment.topRight,
             child: Stack(
                 children: [
+                  /// Little Box to make blue Right Margin
                   Positioned(
                   right: 0,
                   child: Container(width: 20.w, height: 20.h,
                   decoration: BoxDecoration(
-                    color: kWhite,
+                    color: Colors.transparent,
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15.w))
                   ),
                     child: InnerShadow(
@@ -105,17 +109,34 @@ class _HomeScreenState extends State<HomeScreen> {
                         decoration:  BoxDecoration(
                           borderRadius: BorderRadius.only(topRight:  Radius.circular(12.w)),
                           color: kWhite,
-                        ),
-                      ),
-                    ),
-              )),
-            ]))
+                  ))))),
+            ])),
+            Container(
+              width: 100.w,
+              height: 23.h,
+              padding: EdgeInsets.symmetric(horizontal: 2.w),
+              child: Row(
+                  children:[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row( children: [
+                          Icon(Icons.check_box, size: 9.w, color: kGreen,),
+                          TextH2("  Peso & Sueño"),
+                        ]),
+                        MoonList(),
+                      ],),
+                    Spacer(),
+                    MarvalKnob(),
+                  ]),
+            )
           ],
         )),
     );
   }
 }
 
+/// CALENDAR WIDGETS */
 class DateList extends StatefulWidget {
   const DateList({required this.startDate, Key? key}) : super(key: key);
   final DateTime startDate;
@@ -123,20 +144,14 @@ class DateList extends StatefulWidget {
   State<DateList> createState() => _DateListState();
 }
 class _DateListState extends State<DateList> {
-  late ScrollController _scrollController;
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController();
-  }
   @override
   Widget build(BuildContext context) {
      DateTime _lastMonday = widget.startDate.lastMonday();
     return  Container(width: 100.w, height: 10.h, child:
     ListView.builder(
         itemCount: 7,
-        controller: _scrollController,
         scrollDirection: Axis.horizontal,
+        physics: const NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
            DateTime _day =  _lastMonday.add(Duration(days: index));
           return Container(
@@ -146,34 +161,181 @@ class _DateListState extends State<DateList> {
   }
 }
 
-
-class DateCell extends StatefulWidget {
+class DateCell extends StatelessWidget {
   const DateCell({required this.date, Key? key}) : super(key: key);
   final DateTime date;
   @override
-  State<DateCell> createState() => _DateCellState();
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: (){
+          dateNotifier!.value = date;
+        },
+        child: Container(width: 11.w, height: 11.h,
+          decoration: BoxDecoration(
+            color:  dateNotifier!.value.day == date.day ? kGreen : kBlack,
+            borderRadius: BorderRadius.circular(12.w),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextH2("${date.day}", color: kWhite, size: 4,),
+              TextH2(date.toStringWeekDay(),color: kWhite, size: 3,)
+
+            ],),
+        ));
+  }
 }
 
-class _DateCellState extends State<DateCell> {
+/// Weight WIDGETS */
+ class MarvalKnob extends StatefulWidget {
+   const MarvalKnob({Key? key}) : super(key: key);
+
+   @override
+   State<MarvalKnob> createState() => _MarvalKnobState();
+ }
+ class _MarvalKnobState extends State<MarvalKnob> {
+
+    final double _minimum = 75;
+    final double _maximum = 79;
+    double _added = 0;
+    bool _tapDown = true;
+   late KnobController _controller;
+   late double _knobValue;
+   void valueChangedListener(double value) {
+     if (mounted) {
+       setState(() {
+
+         if(value.toStringAsPrecision(3) == _maximum.toStringAsPrecision(3) && _tapDown){
+           _tapDown = false;
+            _added+=4;
+            logSuccess("added +4");
+         }else if(value.toStringAsPrecision(3) == _minimum.toStringAsPrecision(3) && _tapDown){
+           _tapDown = false;
+           _added-=4;
+           logError("added -4");
+         }
+         _knobValue = value+_added;
+
+       });
+     }
+   }
+
+   @override
+   void initState() {
+     super.initState();
+     _knobValue = _minimum+2;
+     _controller = KnobController(
+       initial: _knobValue,
+       minimum: _minimum,
+       maximum: _maximum,
+       startAngle: 0,
+       endAngle: 360,
+     );
+     _controller.addOnValueChangedListener(valueChangedListener);
+   }
+    @override
+   void dispose() {
+      _controller.removeOnValueChangedListener(valueChangedListener);
+      super.dispose();
+    }
+
+
+   @override
+   Widget build(BuildContext context) {
+     return  Stack(children: [
+       GestureDetector(
+         onTapDown: (v){ _tapDown = true; logInfo("doIt true");},
+         child: Knob(
+         controller: _controller,
+         width: 37.w,
+         style: KnobStyle(
+           minorTicksPerInterval: -1,
+           showLabels: false,
+           pointerStyle: PointerStyle(
+             color: kWhite,
+             offset: 10.w
+           ),
+           controlStyle: const ControlStyle(
+             glowColor: kBlue,
+             backgroundColor: kBlack,
+             shadowColor: kBlack,
+             tickStyle:  ControlTickStyle(
+               count: 80,
+               color: kBlue
+             )
+           )
+         ),
+       )),
+       Container( width: 37.w, height: 37.w,
+           margin: EdgeInsets.only(top: 7.w),
+           child: Center(child: TextH1(_knobValue.toStringAsPrecision(4)+"\n    Kg", color: kWhite, size: 5,))),
+       ],);
+   }
+ }
+
+/// Sleep WIDGETS */
+late ValueNotifier<int> _sleepNotifier;
+
+class Moon extends StatelessWidget {
+  const Moon({required this.num, Key? key}) : super(key: key);
+  final int num;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: (){
-        dateNotifier!.value = widget.date;
-        setState(() { });
-      },
-      child: Container(width: 11.w, height: 11.h,
-      decoration: BoxDecoration(
-        color:  dateNotifier!.value.day == widget.date.day ? kGreen : kBlack,
-        borderRadius: BorderRadius.circular(12.w),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextH2("${widget.date.day}", color: kWhite, size: 4,),
-          TextH2(widget.date.toStringWeekDay(),color: kWhite, size: 3,)
-
-        ],),
-     ));
+        if( num == 1 && _sleepNotifier.value == 1){
+          _sleepNotifier.value = 0;
+        }else {
+          _sleepNotifier.value = num;
+        }
+        logSuccess("Moon Tapped ${_sleepNotifier.value}, Widget Num: $num");
+       },
+      child: Icon(CustomIcons.moon_inv, size: 9.w, color:  _sleepNotifier.value < num ? kBlack : kBlue)
+    );
   }
 }
+class MoonList extends StatefulWidget {
+  const MoonList({Key? key}) : super(key: key);
+
+  @override
+  State<MoonList> createState() => _MoonListState();
+}
+class _MoonListState extends State<MoonList> {
+
+  @override
+  void initState() {
+    super.initState();
+    _sleepNotifier = ValueNotifier(0);
+  }
+  @override
+  void dispose() {
+    _sleepNotifier.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: _sleepNotifier,
+      builder: (context, value, child) {
+        return Container(width: 55.w, height: 10.h, child:
+        ListView.builder(
+            itemCount: 5,
+            scrollDirection: Axis.horizontal,
+            physics: const NeverScrollableScrollPhysics(),
+            itemBuilder: (context, index) {
+              return Container(
+                  margin: EdgeInsets.only(right: 2.3.w),
+                  child: Moon(num: index+1));
+            }));
+      },
+    );
+
+
+  }
+}
+
+
+
+
+ 
