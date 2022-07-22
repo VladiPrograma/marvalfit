@@ -31,7 +31,7 @@ class MarvalDrawer extends StatelessWidget {
                       child: isNull(authUser!.photoURL) ? Icon(CustomIcons.person, color: kWhite, size: 13.w,): null,
                     ),
                     const TextH2('Bienvenido', color: kGrey, size: 6,),
-                    TextH1(authUser!.displayName!, color: kBlack, size: 100/authUser!.displayName!.length,),
+                    TextH1(authUser!.displayName!, color: kBlack, size: 100/(authUser!.displayName!.length+7),),
                   ],
                 ),
               )),

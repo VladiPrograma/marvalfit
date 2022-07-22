@@ -22,7 +22,7 @@ class HomeScreen extends StatefulWidget {
 
 ///@TODO Main page Logic when is Logged but he doesnt complete de forms.
 
-
+final habits = ["Frio", "Naturaleza", "Agradecer", "Sol", "Caminar"];
 
 class _HomeScreenState extends State<HomeScreen> {
   @override
@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
 
-            Container(width: 100.w, height: 50.h, color: kWhite,
+            Container(width: 100.w, height: 100.h, color: kWhite,
             child: Stack(
                 children: [
                   Positioned(
@@ -131,16 +131,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row( children: [
-                                    Icon(Icons.check_box, size: 9.w, color: kGreen,),
-                                    TextH2("  Peso & Sueño"),
+                                    Icon(Icons.check_box, size: 5.w, color: kGreen,),
+                                    TextH2("  Sueño y Peso", size: 4,),
                                   ]),
                                   MoonList(),
-                                ],),
+                                ]),
                               Spacer(),
                               MarvalKnob(),
                             ]),
                       )),
+                  Positioned(
+                      top: 44.h,
+                      child: MarvalHabitList()),
+                  Positioned(
+                      top: 68.h,
+                      child: InnerShadow(
+                      color: Colors.black,
+                      offset: Offset(0, 1.4.w),
+                      blur: 1.5.w,
+                      child: Container( width: 100.w, height: 50.h,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
+                        color: kBlack
+                      )))),
             ])),
+
 
           ],
         )),
@@ -347,7 +362,80 @@ class _MoonListState extends State<MoonList> {
   }
 }
 
+/// Habits WIDGETS */
+
+class MarvalHabit extends StatefulWidget {
+  const MarvalHabit({required this.name, Key? key}) : super(key: key);
+  final String name;
+  @override
+  State<MarvalHabit> createState() => _MarvalHabitState();
+}
+
+class _MarvalHabitState extends State<MarvalHabit> {
+  @override
+  bool _done = false;
+  Widget build(BuildContext context) {
+    return  Container( width: 33.w,
+        decoration: BoxDecoration(
+          color: kBlack,
+          borderRadius: BorderRadius.only(topRight: Radius.circular(7.w), bottomLeft:  Radius.circular(7.w), bottomRight:  Radius.circular(7.w)),
+        ),
+        child: Center(
+          child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            TextH1(widget.name, size: 3.8, color: kWhite,),
+            SizedBox(height: 1.5.h,),
+            GestureDetector(
+              onTap:() => setState(() => _done = !_done ),
+              child: Container(
+                decoration: BoxDecoration(
+                  boxShadow: [BoxShadow(
+                    color: Colors.black.withOpacity(0.8),
+                    offset: Offset(0, 1.3.w),
+                    blurRadius: 3.1.w,
+                  )],
+                  borderRadius: BorderRadius.circular(100.w),
+                  border: Border.all(
+                    width: 0.7.w,
+                    color: kWhite
+                  )
+                ),
+              child: CircleAvatar(
+                backgroundColor: _done ? kGreen : kGrey,
+                radius: 4.w,
+            )))
+          ])),
+        );
+  }
+}
 
 
 
- 
+ class MarvalHabitList extends StatelessWidget {
+   const MarvalHabitList({Key? key}) : super(key: key);
+
+   @override
+   Widget build(BuildContext context) {
+     return Column(
+       crossAxisAlignment: CrossAxisAlignment.start,
+       children: [
+         Row( children: [
+           SizedBox(width: 2.w,),
+           Icon(Icons.library_add_check, size: 5.w, color: kGreen,),
+           TextH2("  Innegociables", size: 4,),
+         ]),
+         SizedBox(height: 2.h,),
+         Container(width: 100.w, height: 16.h,
+           child: ListView.builder(
+               itemCount: 5,
+               scrollDirection: Axis.horizontal,
+               itemBuilder: (context, index) {
+                 return Container(
+                     margin: EdgeInsets.symmetric(horizontal: 2.w),
+                     child: MarvalHabit(name: habits[index]));
+               }),)
+       ],
+     );
+   }
+ }
