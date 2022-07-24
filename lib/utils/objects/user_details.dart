@@ -5,6 +5,7 @@ import 'package:marvalfit/utils/marval_arq.dart';
 import '../../config/log_msg.dart';
 import '../../constants/string.dart';
 
+///@TODO Check City implementation Works
 class MarvalUserDetails{
   static CollectionReference detailsDB = FirebaseFirestore.instance.collection("details");
   String id;
@@ -12,14 +13,15 @@ class MarvalUserDetails{
   String hobbie;
   String phone;
   String email;
+  String city;
   DateTime birthDate;
   DateTime startDate;
   double height;
   double initialWeight;
 
-  MarvalUserDetails(this.id, this.height, this.favoriteFood, this.hobbie, this.phone, this.email,  this.initialWeight, this.startDate,this.birthDate );
+  MarvalUserDetails(this.id, this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.email,  this.initialWeight, this.startDate,this.birthDate );
 
-  MarvalUserDetails.create(this.height, this.favoriteFood, this.hobbie, this.phone,this.birthDate, this.initialWeight) :
+  MarvalUserDetails.create(this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.birthDate, this.initialWeight) :
         id = FirebaseAuth.instance.currentUser!.uid,
         email = FirebaseAuth.instance.currentUser?.email ?? "",
         startDate = DateTime.now();
@@ -29,6 +31,7 @@ class MarvalUserDetails{
         phone = map["phone"],
         email = map["email"],
         hobbie = map['hobbie'],
+        city = map['city'],
         favoriteFood = map["favorite_food"],
         birthDate = map["birth_date"],
         startDate = map["start_date"],
@@ -48,6 +51,7 @@ class MarvalUserDetails{
       'phone': phone, // Vlad
       'email': email, // Dumitru
       'hobbie': hobbie, // Programador
+      'city': city, // Programador
       'favorite_food' : favoriteFood, // 76.3
       'birth_date' : birthDate, // 77.4
       'start_date' : startDate, // 11/07/2022
@@ -72,6 +76,7 @@ class MarvalUserDetails{
         "\n Email: $email Phone: $phone"
         "\n Hobbie: $hobbie"
         "\n Favorite Food: $favoriteFood"
+        "\n City: $city"
         "\n Birth Date: $birthDate"
         "\n Start Date: $startDate"
         "\n Initial Weight: $initialWeight Height: $height";

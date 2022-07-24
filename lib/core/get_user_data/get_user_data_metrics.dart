@@ -11,7 +11,6 @@ import '../../constants/colors.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
 import '../../utils/marval_arq.dart';
-import '../../utils/objects/form.dart';
 import 'form_screen.dart';
 import 'get_user_data_screen.dart';
 
@@ -25,10 +24,12 @@ class GetUserMetricsScreen extends StatelessWidget {
         backgroundColor: kWhite,
         body: SafeArea(
             child: Container( width: 100.w, height: 100.h,
-              child: SingleChildScrollView(child: Column(
+              child: SingleChildScrollView(
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  SizedBox(height: 5.h,),
+                  SizedBox(height: 4.h,),
                   Container( width: 100.w,
                       child: TextH1("Ya casi esta !"),
                       margin: EdgeInsets.symmetric(horizontal: 5.w)),
@@ -36,7 +37,7 @@ class GetUserMetricsScreen extends StatelessWidget {
                       child:TextH2("Necesito recopilar estos datos para trabajar de forma optima", color: kGrey,),
                       margin: EdgeInsets.symmetric(horizontal: 5.w)
                   ),
-                  SizedBox(height: 2.h,),
+                  SizedBox(height: 4.h,),
                   _Form()
                 ],
               ),
@@ -53,6 +54,7 @@ class _Form extends StatelessWidget {
     final _formKey = GlobalKey<FormState>();
     String? _hobbie;
     String? _food;
+    String? _city;
     DateTime? _birthDate;
     double? _height;
     double? _weight;
@@ -89,6 +91,21 @@ class _Form extends StatelessWidget {
                 return null;
               },
               onSaved: (value) => _food = normalize(value)!
+          ),
+          SizedBox(height: 3.h,),
+          MarvalInputTextField(
+              prefixIcon: Icons.location_city,
+              labelText: "Localidad",
+              hintText: "Zaragoza",
+              validator: (value){
+                if(isNullOrEmpty(value)){
+                  return kInputErrorEmptyValue;
+                }if(value!.length>50){
+                  return kInputErrorToLong;
+                }
+                return null;
+              },
+              onSaved: (value) => _city = normalize(value)!
           ),
           SizedBox(height: 3.h,),
           MarvalInputTextField(
@@ -145,13 +162,13 @@ class _Form extends StatelessWidget {
                   }
               ),
             ],),
-          SizedBox(height: 4.h,),
+          SizedBox(height: 6.h,),
           MarvalElevatedButton(
               "Continuar",
               onPressed: () async{
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  MarvalUserDetails details = MarvalUserDetails.create(_height!, _food!, _hobbie!, phone!, _birthDate!, _weight!);
+                  MarvalUserDetails details = MarvalUserDetails.create(_height!, _food!, _hobbie!, phone!, _city!, _birthDate!, _weight!);
                   details.setUserDetails();
                   logInfo(details.toString());
                   user!.updateWeight(_weight!);
