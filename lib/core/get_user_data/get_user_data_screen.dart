@@ -165,7 +165,7 @@ class _Form extends StatelessWidget {
                           user = MarvalUser.create(_name!, _lastName!, _job!, null,  0, 0);
 
                           logInfo(user.toString());
-                          await user!.setMarvalUser();
+                          await user!.setInDB();
 
                           /// Update To Firebase User
                           authUser!.updateDisplayName("$_name");
@@ -175,7 +175,7 @@ class _Form extends StatelessWidget {
                   }else{
                     String? _urlImage = await uploadProfileImg(authUser!.uid, _backgroundImage!);
                     user = MarvalUser.create(_name!, _lastName!, _job!, _urlImage,  0, 0);
-                    await user!.setMarvalUser();
+                    await user!.setInDB();
                     authUser!.updatePhotoURL(_urlImage);
                     authUser!.updateDisplayName("$_name");
                     Navigator.pushNamed(context, GetUserMetricsScreen.routeName);

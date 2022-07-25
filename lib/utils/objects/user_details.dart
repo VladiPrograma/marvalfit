@@ -6,7 +6,7 @@ import '../../config/log_msg.dart';
 import '../../constants/string.dart';
 
 ///@TODO Check City implementation Works
-class MarvalUserDetails{
+class UserDetails{
   static CollectionReference detailsDB = FirebaseFirestore.instance.collection("details");
   String id;
   String favoriteFood;
@@ -19,29 +19,29 @@ class MarvalUserDetails{
   double height;
   double initialWeight;
 
-  MarvalUserDetails(this.id, this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.email,  this.initialWeight, this.startDate,this.birthDate );
+  UserDetails(this.id, this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.email,  this.initialWeight, this.startDate,this.birthDate );
 
-  MarvalUserDetails.create(this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.birthDate, this.initialWeight) :
+  UserDetails.create(this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.birthDate, this.initialWeight) :
         id = FirebaseAuth.instance.currentUser!.uid,
         email = FirebaseAuth.instance.currentUser?.email ?? "",
         startDate = DateTime.now();
 
-  MarvalUserDetails.fromJson(Map<String, dynamic> map):
+  UserDetails.fromJson(Map<String, dynamic> map):
         id = map["id"],
         phone = map["phone"],
         email = map["email"],
         hobbie = map['hobbie'],
         city = map['city'],
         favoriteFood = map["favorite_food"],
-        birthDate = map["birth_date"],
-        startDate = map["start_date"],
+        birthDate = map["birth_date"].toDate(),
+        startDate = map["start_date"].toDate(),
         initialWeight = map["initial_weight"],
         height = map["height"];
 
-  static Future<MarvalUserDetails> getFromDB(String uid) async {
+  static Future<UserDetails> getFromDB(String uid) async {
     DocumentSnapshot doc = await detailsDB.doc(uid).get();
     Map<String, dynamic>? map  = toMap(doc);
-    return MarvalUserDetails.fromJson(map!);
+    return UserDetails.fromJson(map!);
   }
   Future<void> setUserDetails(){
     // Call the user's CollectionReference to add a new user

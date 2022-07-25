@@ -9,6 +9,7 @@ import 'package:marvalfit/modules/home_screen.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/user.dart';
+import 'package:marvalfit/utils/objects/user_curr.dart';
 import 'package:sizer/sizer.dart';
 import 'config/firebase_options.dart';
 import 'config/routes.dart';
@@ -21,7 +22,7 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
   authUser = getCurrUser();
-  _flag = await MarvalUser.userExists(authUser?.uid);
+  _flag = await MarvalUser.existsInDB(authUser?.uid);
   runApp(MyApp());
 }
 

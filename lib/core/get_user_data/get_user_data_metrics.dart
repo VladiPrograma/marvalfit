@@ -168,7 +168,7 @@ class _Form extends StatelessWidget {
               onPressed: () async{
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  MarvalUserDetails details = MarvalUserDetails.create(_height!, _food!, _hobbie!, phone!, _city!, _birthDate!, _weight!);
+                  UserDetails details = UserDetails.create(_height!, _food!, _hobbie!, phone!, _city!, _birthDate!, _weight!);
                   details.setUserDetails();
                   logInfo(details.toString());
                   user!.updateWeight(_weight!);

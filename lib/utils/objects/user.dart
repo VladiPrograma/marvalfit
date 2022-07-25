@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/string.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
+import 'package:marvalfit/utils/objects/user_curr.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 
 class MarvalUser{
@@ -15,9 +16,10 @@ class MarvalUser{
   double lastWeight;
   double currWeight;
   DateTime lastUpdate;
-  MarvalUserDetails? details;
+  UserDetails? details;
+  CurrentUser? currenTraining;
 
-  MarvalUser(this.id, this.name, this.lastName, this.work,this.profileImage, this.lastWeight ,this.currWeight, this.lastUpdate);
+  MarvalUser({required this.id, required this.name, required this.lastName, required this.work,this.profileImage, required this.lastWeight ,required this.currWeight, required this.lastUpdate});
 
   MarvalUser.create(this.name, this.lastName, this.work, this.profileImage, this.lastWeight, this.currWeight)
      : id = FirebaseAuth.instance.currentUser!.uid,
@@ -31,11 +33,13 @@ class MarvalUser{
     profileImage  = map["profile_image"],
     currWeight = map["curr_weight"],
     lastWeight = map["last_weight"],
-    lastUpdate = map["last_update"];
+    lastUpdate = map["last_update"].toDate();
 
-  void getDetails() async => details = await MarvalUserDetails.getFromDB(id);
+  void getDetails() async => details = await UserDetails.getFromDB(id);
 
-    static Future<bool> userExists(String? uid) async{
+  void getCurrentTraining() async => currenTraining = await CurrentUser.getFromBD(id);
+
+    static Future<bool> existsInDB(String? uid) async{
     if(isNull(uid)){ return false;}
     DocumentSnapshot ds = await usersDB.doc(uid).get();
     return ds.exists;
@@ -44,13 +48,13 @@ class MarvalUser{
 
 
 
-  static Future<MarvalUser> getUser(String uid) async {
+  static Future<MarvalUser> getFromDB(String uid) async {
     DocumentSnapshot doc = await usersDB.doc(uid).get();
     Map<String, dynamic>? map  = toMap(doc);
     return MarvalUser.fromJson(map!);
   }
 
-  Future<void> setMarvalUser(){
+  Future<void> setInDB(){
     // Call the user's CollectionReference to add a new user
     return usersDB
         .doc(id).set({
@@ -67,7 +71,7 @@ class MarvalUser{
         .catchError((error) => logError("$logErrorPrefix Failed to add user: $error"));
   }
 
-  Future<void> uploadMarvalUser(Map<String, Object> map){
+  Future<void> uploadInDB(Map<String, Object> map){
     // Call the user's CollectionReference to add a new user
     return usersDB
         .doc(id).update(map)
@@ -77,7 +81,7 @@ class MarvalUser{
 
   void updateWeight(double weight){
     if(currWeight == 0){ currWeight = weight; }
-    uploadMarvalUser({
+    uploadInDB({
       "last_weight" : currWeight,
       "curr_weight" : weight,
       "last_update" : DateTime.now()
@@ -93,7 +97,8 @@ class MarvalUser{
     "\n Curr: $currWeight Kg  Last: $lastWeight Kg "
     "\n Last Update: $lastUpdate"
     "\n Profile image URL: $profileImage"
-    "\n Details: ${details?.toString}";
+    "\n Details: ${details?.toString()}"
+    "\n Current Training: ${currenTraining?.toString()}";
 
   }
 

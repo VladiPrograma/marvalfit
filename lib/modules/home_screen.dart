@@ -11,6 +11,7 @@ import '../config/custom_icons.dart';
 import '../constants/global_variables.dart';
 import '../utils/decoration.dart';
 import '../utils/marval_arq.dart';
+import '../utils/objects/user.dart';
 import '../widgets/marval_drawer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,11 +27,23 @@ final habits = ["Frio", "Naturaleza", "Agradecer", "Sol", "Caminar"];
 final activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
 final activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
 class _HomeScreenState extends State<HomeScreen> {
+
   @override
-  void initState() {
+  void initState(){
     super.initState();
     if(isNull(dateNotifier)){ dateNotifier = ValueNotifier(DateTime.now()); }
+
+  // Create anonymous function:
+    () async {
+  /** Using async methods to fetch Data */
+      user = await MarvalUser.getFromDB(authUser!.uid);
+      user!.getCurrentTraining();
+
+      logInfo(user.toString());
+      setState(() {});
+    }();
   }
+
   @override
   void dispose() {
     dateNotifier!.dispose();
@@ -41,12 +54,14 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       drawer: const MarvalDrawer(name: "Home",),
       backgroundColor: kWhite,
-      body:  Container( width: 100.w, height: 100.h,
+      body:  SingleChildScrollView(
+        physics: NeverScrollableScrollPhysics(),
+        child: Container( width: 100.w, height: 124.h,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-             Container(width: 100.w, height: 100.h, color: kWhite,
-              child: Stack(
+             Container(width: 100.w, height: 124.h, color: kWhite,
+              child:  Stack(
                 children: [
                   Positioned(
                     top: 0,
@@ -144,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.black,
                     offset: Offset(0, 1.4.w),
                     blur: 1.5.w,
-                    child: Container( width: 100.w, height: 35.h,
+                    child: Container( width: 100.w, height: 59.h,
                         padding: EdgeInsets.symmetric(horizontal: 4.w),
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
@@ -153,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     )),
                   /// Activities Widget
                   Positioned( top: 66.5.h,
-                      child: Container( width: 100.w, height: 33.5.h,
+                      child: Container( width: 100.w, height: 34.5.h,
                         padding: EdgeInsets.symmetric(horizontal: 4.w),
                          child: MarvalActivityList()
                       )),
@@ -172,11 +187,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         )),
                   ),
             ])),
-
-
           ],
         )),
-    );
+    ));
   }
 }
 
@@ -311,7 +324,7 @@ class DateCell extends StatelessWidget {
          ),
        )),
        Container( width: 37.w, height: 37.w,
-           margin: EdgeInsets.only(top: 7.w),
+           margin: EdgeInsets.only(top: 2.h),
            child: Center(child: TextH1("${_knobValue.toStringAsPrecision(3)}\n Kg", color: kWhite, size: 5, textAlign: TextAlign.center, ))),
        ],);
    }
