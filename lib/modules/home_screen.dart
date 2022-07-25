@@ -151,11 +151,26 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: kBlack
                         )),
                     )),
+                  /// Activities Widget
                   Positioned( top: 66.5.h,
                       child: Container( width: 100.w, height: 33.5.h,
                         padding: EdgeInsets.symmetric(horizontal: 4.w),
                          child: MarvalActivityList()
-                      ))
+                      )),
+
+                  Positioned( top: 65.5.h, left: 6.w,
+                    child:  Container( width: 88.w, height: 1.3.h,
+                        padding: EdgeInsets.symmetric(horizontal: 4.w),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
+                            color: Colors.transparent,
+                            boxShadow: [BoxShadow(
+                              color: Colors.black.withOpacity(0.8),
+                              offset: Offset(0, 4.w),
+                              blurRadius: 4.w,
+                            )]
+                        )),
+                  ),
             ])),
 
 
@@ -366,7 +381,6 @@ class _MoonListState extends State<MoonList> {
 }
 
 /// Habits WIDGETS */
-
 class MarvalHabit extends StatefulWidget {
   const MarvalHabit({required this.name, Key? key}) : super(key: key);
   final String name;
@@ -496,7 +510,7 @@ class _MarvalActivityState extends State<MarvalActivity> {
     );
   }
 }
-///@TODO Remove blue borders when scroll ends...
+
 class MarvalActivityList extends StatelessWidget {
   const MarvalActivityList({Key? key}) : super(key: key);
 
