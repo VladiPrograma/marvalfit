@@ -6,13 +6,17 @@ import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
+import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 import '../config/custom_icons.dart';
 import '../constants/global_variables.dart';
+import '../constants/string.dart';
 import '../utils/decoration.dart';
 import '../utils/marval_arq.dart';
 import '../utils/objects/user.dart';
+import '../widgets/marval_dialogs.dart';
 import '../widgets/marval_drawer.dart';
+import '../widgets/marval_textfield.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -147,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   MoonList(),
                                 ]),
                               Spacer(),
-                              MarvalKnob(),
+                              isNull(user) ? Text("") : MarvalWeight(initialValue: user!.currWeight),
                             ]),
                       )),
                   /// Habits Row
@@ -192,6 +196,104 @@ class _HomeScreenState extends State<HomeScreen> {
     ));
   }
 }
+
+/// SLIDER WIDGET */
+class MarvalWeight extends StatelessWidget {
+  const MarvalWeight({required this.initialValue, Key? key}) : super(key: key);
+  final double initialValue;
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+        radius: 18.w,
+        child:Container(
+            padding: EdgeInsets.all(1.w),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(100.w)),
+              color: kBlack,
+            ),
+            child: SleekCircularSlider(
+                min: initialValue-4,
+                max: initialValue +4,
+                initialValue: initialValue,
+                onChangeEnd: (value) {
+                  ///@TODO Save weight data to Firebase
+                },
+                appearance: CircularSliderAppearance(
+                    size: 38.w,
+                    startAngle: 215,
+                    customColors: CustomSliderColors(
+                        progressBarColor: kBlue,
+                        trackColor: kBlueSec,
+                        hideShadow: true,
+                        dotColor: kWhite
+                    ),
+                    angleRange: 305,
+                    customWidths: CustomSliderWidths(
+                        trackWidth: 1.3.w,
+                        progressBarWidth: 3.5.w,
+                        handlerSize: 1.1.w
+                    )
+
+                ),
+                innerWidget: (percentage) =>   Center(
+                        child: TextH1(
+                          "${percentage.toStringAsPrecision(3)}\nKg",
+                          color: kWhite,
+                          size: 5.5,
+                          textAlign: TextAlign.center,
+                        )
+                    ),
+                onChange: (double value) {
+                  ///@TODO move this dialog to "onChangeEnd" then modify the Dialog to set Max and Min values.
+                  if(value == initialValue+4||value == initialValue-4){
+                    RichText _richText = RichText(
+                      textAlign: TextAlign.justify,
+                      text: TextSpan(
+                        text: "Si el correo se encuentra dado de alta se enviará un ",
+                        style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
+                        children: const <TextSpan>[
+                          TextSpan(
+                              text:  " correo de inmediato",
+                              style: TextStyle(fontWeight: FontWeight.bold)
+                          ),
+                          TextSpan(
+                              text:" desde el que podra restablecer su contraseña."
+                          ),
+                        ],
+                      ),
+                    );
+                    GlobalKey<FormState> _formKey = GlobalKey();
+                    Form _form = Form(
+                      key: _formKey,
+                      child: MarvalInputTextField(
+                        labelText: 'Email',
+                        hintText: "marvalfit@gmail.com",
+                        prefixIcon: CustomIcons.mail,
+                        keyboardType: TextInputType.emailAddress,
+                        validator: (value){
+                          if(isNullOrEmpty(value)){
+                            return kInputErrorEmptyValue;
+                          }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
+                            return kInputErrorEmailMissmatch;
+                          }
+                          return null;
+                        },
+                        onSaved: (value){ },
+                      ),
+                    );
+                    MarvalDialogsInput(context,
+                        title: "Recuperar contraseña",
+                        height: 48,
+                        form: _form,
+                        richText: _richText,
+                        onSucess: (){ }
+                    );
+                  }
+                })));
+  }
+}
+
+
 
 /// CALENDAR WIDGETS */
 class DateList extends StatefulWidget {
@@ -243,92 +345,6 @@ class DateCell extends StatelessWidget {
   }
 }
 
-/// Weight WIDGETS */
- class MarvalKnob extends StatefulWidget {
-   const MarvalKnob({Key? key}) : super(key: key);
-
-   @override
-   State<MarvalKnob> createState() => _MarvalKnobState();
- }
- class _MarvalKnobState extends State<MarvalKnob> {
-
-    final double _minimum = 73;
-    final double _maximum = 77;
-    double _added = 0;
-    bool _tapDown = true;
-   late KnobController _controller;
-   late double _knobValue;
-   void valueChangedListener(double value) {
-     if (mounted) {
-       setState(() {
-
-         if(value.toStringAsPrecision(3) == _maximum.toStringAsPrecision(3) && _tapDown){
-           _tapDown = false;
-            _added+=4;
-            logSuccess("added +4");
-         }else if(value.toStringAsPrecision(3) == _minimum.toStringAsPrecision(3) && _tapDown){
-           _tapDown = false;
-           _added-=4;
-           logError("added -4");
-         }
-         _knobValue = value+_added;
-
-       });
-     }
-   }
-
-   @override
-   void initState() {
-     super.initState();
-     _knobValue = _minimum+2;
-     _controller = KnobController(
-       initial: _knobValue,
-       minimum: _minimum,
-       maximum: _maximum,
-       startAngle: 0,
-       endAngle: 180,
-     );
-     _controller.addOnValueChangedListener(valueChangedListener);
-   }
-    @override
-   void dispose() {
-      _controller.removeOnValueChangedListener(valueChangedListener);
-      super.dispose();
-    }
-
-
-   @override
-   Widget build(BuildContext context) {
-     return  Stack(children: [
-       GestureDetector(
-         onTapDown: (v){ _tapDown = true; logInfo("doIt true");},
-         child: Knob(
-         controller: _controller,
-         width: 37.w,
-         style: KnobStyle(
-           minorTicksPerInterval: -1,
-           showLabels: false,
-           pointerStyle: PointerStyle(
-             color: kWhite,
-             offset: 6.w
-           ),
-           controlStyle: const ControlStyle(
-             glowColor: kBlue,
-             backgroundColor: kBlack,
-             shadowColor: kBlack,
-             tickStyle:  ControlTickStyle(
-               count: 80,
-               color: kBlue
-             )
-           )
-         ),
-       )),
-       Container( width: 37.w, height: 37.w,
-           margin: EdgeInsets.only(top: 2.h),
-           child: Center(child: TextH1("${_knobValue.toStringAsPrecision(3)}\n Kg", color: kWhite, size: 5, textAlign: TextAlign.center, ))),
-       ],);
-   }
- }
 
 /// Sleep WIDGETS */
 late ValueNotifier<int> _sleepNotifier;
