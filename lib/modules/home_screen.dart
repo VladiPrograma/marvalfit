@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:knob_widget/knob_widget.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/colors.dart';
 import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/extensions.dart';
+import 'package:marvalfit/widgets/marval_snackbar.dart';
 import 'package:sizer/sizer.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
@@ -14,9 +14,13 @@ import '../constants/string.dart';
 import '../utils/decoration.dart';
 import '../utils/marval_arq.dart';
 import '../utils/objects/user.dart';
+import '../utils/objects/user_daily.dart';
 import '../widgets/marval_dialogs.dart';
 import '../widgets/marval_drawer.dart';
 import '../widgets/marval_textfield.dart';
+
+late Daily _daily;
+late ValueNotifier<int> _sleepNotifier;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -26,23 +30,38 @@ class HomeScreen extends StatefulWidget {
 }
 
 ///@TODO Main page Logic when is Logged but he doesnt complete de forms.
+///@TODO Normalize names like "Name" or "Tittle".
 
-final habits = ["Frio", "Naturaleza", "Agradecer", "Sol", "Caminar"];
 final activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
 final activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
+
 class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState(){
     super.initState();
-    if(isNull(dateNotifier)){ dateNotifier = ValueNotifier(DateTime.now()); }
-
+    dateNotifier = ValueNotifier(DateTime.now());
+    _daily = Daily.create(day: dateNotifier.value);
+    _sleepNotifier = ValueNotifier(0);
+    user = MarvalUser.create("", "", "", "", 0, 0);
   // Create anonymous function:
     () async {
   /** Using async methods to fetch Data */
-      user = await MarvalUser.getFromDB(authUser!.uid);
-      user!.getCurrentTraining();
+        user = await MarvalUser.getFromDB(authUser!.uid);
+      /// @TODO Add the onCreate Current Training.
+      await user.getCurrentTraining();
 
+      if(await Daily.existsInDB(dateNotifier.value)){
+        await user.getDaily(dateNotifier.value);
+        _daily = user.dailys![dateNotifier.value.iDay()]!;
+      }else{
+        Daily _today = Daily.create(day: dateNotifier.value);
+        user.dailys![_today.id] = _today;
+        _daily = _today;
+        _today.setInDB();
+      }
+
+      _sleepNotifier = ValueNotifier(_daily.sleep);
       logInfo(user.toString());
       setState(() {});
     }();
@@ -50,7 +69,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    dateNotifier!.dispose();
+    dateNotifier.dispose();
+    _sleepNotifier.dispose();
     super.dispose();
   }
   @override
@@ -82,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             Row(children: [
                               GestureDetector(
                                   onTap: (){
-                                    dateNotifier!.value = dateNotifier!.value.add(Duration(days: -7));
+                                    dateNotifier.value = dateNotifier.value.add(Duration(days: -7));
                                     setState(() {});
                                   },
                                   child:Container(
@@ -91,11 +111,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                         TextH2(' Anterior', color: kWhite, size: 4,)
                                       ]))),
                               Spacer(),
-                              TextH1(dateNotifier!.value.toStringMonth(), color: kWhite, size: 7.5,),
+                              TextH1(dateNotifier.value.toStringMonth(), color: kWhite, size: 7.5,),
                               Spacer(),
                               GestureDetector(
                                   onTap: (){
-                                      dateNotifier!.value = dateNotifier!.value.add(Duration(days: 7));
+                                      dateNotifier.value = dateNotifier.value.add(Duration(days: 7));
                                     setState(() {});
                                   },
                                   child:Container(
@@ -106,9 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ]),
                             SizedBox(height: 1.h,),
                             ValueListenableBuilder(
-                              valueListenable: dateNotifier!,
+                              valueListenable: dateNotifier,
                               builder: (context, value, child) {
-                                return DateList(startDate: dateNotifier!.value,);
+                                return DateList(startDate: dateNotifier.value,);
                               },
                             )
                           ],
@@ -148,15 +168,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Icon(CustomIcons.fitness, size: 7.w, color: kGreen,),
                                     TextH2("  Sueño y Peso", size: 4,),
                                   ]),
-                                  MoonList(),
+                                  MoonList(curr: user.dailys![dateNotifier.value]?.sleep),
                                 ]),
                               Spacer(),
-                              isNull(user) ? Text("") : MarvalWeight(initialValue: user!.currWeight),
+                              MarvalWeight(initialValue: user.currWeight),
                             ]),
                       )),
                   /// Habits Row
                   Positioned(top: 44.h,
-                      child: MarvalHabitList()),
+                      child: MarvalHabitList(data: user.currenTraining?.habits!,)),
                   /// Activities Row
                   Positioned( top: 66.5.h,
                     child: InnerShadow(
@@ -203,6 +223,7 @@ class MarvalWeight extends StatelessWidget {
   final double initialValue;
   @override
   Widget build(BuildContext context) {
+    double _weight = initialValue;
     return CircleAvatar(
         radius: 18.w,
         child:Container(
@@ -216,7 +237,10 @@ class MarvalWeight extends StatelessWidget {
                 max: initialValue +4,
                 initialValue: initialValue,
                 onChangeEnd: (value) {
-                  ///@TODO Save weight data to Firebase
+                  double _weight = double.parse(value.toStringAsPrecision(3));
+                  logInfo(_weight.toString());
+                  user.updateWeight(_weight);
+                  _daily.updateWeight(_weight);
                 },
                 appearance: CircularSliderAppearance(
                     size: 38.w,
@@ -237,7 +261,7 @@ class MarvalWeight extends StatelessWidget {
                 ),
                 innerWidget: (percentage) =>   Center(
                         child: TextH1(
-                          "${percentage.toStringAsPrecision(3)}\nKg",
+                          "${_weight.toStringAsPrecision(3)}\nKg",
                           color: kWhite,
                           size: 5.5,
                           textAlign: TextAlign.center,
@@ -245,19 +269,21 @@ class MarvalWeight extends StatelessWidget {
                     ),
                 onChange: (double value) {
                   ///@TODO move this dialog to "onChangeEnd" then modify the Dialog to set Max and Min values.
+                  _weight = value;
                   if(value == initialValue+4||value == initialValue-4){
                     RichText _richText = RichText(
                       textAlign: TextAlign.justify,
                       text: TextSpan(
-                        text: "Si el correo se encuentra dado de alta se enviará un ",
+                        text: "No te preocupes si ganas o pierdes mucho peso de golpe, es un cambio temporal"
+                              " y no tardaras en volver a tu peso anterior.",
                         style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
                         children: const <TextSpan>[
                           TextSpan(
-                              text:  " correo de inmediato",
+                              text:  " Recuerda",
                               style: TextStyle(fontWeight: FontWeight.bold)
                           ),
                           TextSpan(
-                              text:" desde el que podra restablecer su contraseña."
+                              text:" buscamos un cambio que perdure en el tiempo."
                           ),
                         ],
                       ),
@@ -266,34 +292,31 @@ class MarvalWeight extends StatelessWidget {
                     Form _form = Form(
                       key: _formKey,
                       child: MarvalInputTextField(
-                        labelText: 'Email',
-                        hintText: "marvalfit@gmail.com",
-                        prefixIcon: CustomIcons.mail,
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value){
-                          if(isNullOrEmpty(value)){
-                            return kInputErrorEmptyValue;
-                          }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
-                            return kInputErrorEmailMissmatch;
-                          }
-                          return null;
-                        },
-                        onSaved: (value){ },
+                        width: 43.w,
+                        prefixIcon: CustomIcons.weight,
+                        keyboardType: TextInputType.number,
+                        labelText: "Peso",
+                        hintText: user.currWeight.toString(),
+                        validator: (value) => validateNumber(value),
+                        onSaved: (value) => _weight = toDouble(value)!,
                       ),
                     );
                     MarvalDialogsInput(context,
-                        title: "Recuperar contraseña",
-                        height: 48,
+                        title: "Vaya Cambio!",
+                        height: 53,
                         form: _form,
                         richText: _richText,
-                        onSucess: (){ }
+                        onSucess: () async {
+                          user.updateWeight(_weight);
+                          MarvalSnackBar(context, SNACKTYPE.success, title: "VAMOOSSSS", subtitle: "El peso ha sido actualizado con exito");
+                        }
                     );
+                    
                   }
-                })));
+                }
+                )));
   }
 }
-
-
 
 /// CALENDAR WIDGETS */
 class DateList extends StatefulWidget {
@@ -327,11 +350,11 @@ class DateCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: (){
-          dateNotifier!.value = date;
+          dateNotifier.value = date;
         },
         child: Container(width: 11.w, height: 11.h,
           decoration: BoxDecoration(
-            color:  dateNotifier!.value.day == date.day ? kGreen : kBlack,
+            color:  dateNotifier.value.day == date.day ? kGreen : kBlack,
             borderRadius: BorderRadius.circular(12.w),
           ),
           child: Column(
@@ -347,7 +370,6 @@ class DateCell extends StatelessWidget {
 
 
 /// Sleep WIDGETS */
-late ValueNotifier<int> _sleepNotifier;
 
 class Moon extends StatelessWidget {
   const Moon({required this.num, Key? key}) : super(key: key);
@@ -355,12 +377,13 @@ class Moon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         if( num == 1 && _sleepNotifier.value == 1){
           _sleepNotifier.value = 0;
         }else {
           _sleepNotifier.value = num;
         }
+        _daily.updateSleep(_sleepNotifier.value);
         logSuccess("Moon Tapped ${_sleepNotifier.value}, Widget Num: $num");
        },
       child: Icon(CustomIcons.moon_inv, size: 9.w, color:  _sleepNotifier.value < num ? kBlack : kBlue)
@@ -369,24 +392,12 @@ class Moon extends StatelessWidget {
 }
 
 class MoonList extends StatefulWidget {
-  const MoonList({Key? key}) : super(key: key);
-
+  const MoonList({ this.curr, Key? key}) : super(key: key);
+  final int? curr;
   @override
   State<MoonList> createState() => _MoonListState();
 }
 class _MoonListState extends State<MoonList> {
-
-  @override
-  void initState() {
-    super.initState();
-    _sleepNotifier = ValueNotifier(0);
-  }
-  @override
-  void dispose() {
-    _sleepNotifier.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
@@ -411,14 +422,13 @@ class _MoonListState extends State<MoonList> {
 
 /// Habits WIDGETS */
 class MarvalHabit extends StatefulWidget {
-  const MarvalHabit({required this.name, Key? key}) : super(key: key);
+  const MarvalHabit({required this.name,  Key? key}) : super(key: key);
   final String name;
   @override
   State<MarvalHabit> createState() => _MarvalHabitState();
 }
 class _MarvalHabitState extends State<MarvalHabit> {
   @override
-  bool _done = false;
   Widget build(BuildContext context) {
     return  Container( width: 33.w,
         decoration: BoxDecoration(
@@ -432,7 +442,11 @@ class _MarvalHabitState extends State<MarvalHabit> {
             TextH1(widget.name, size: 3.8, color: kWhite,),
             SizedBox(height: 1.5.h,),
             GestureDetector(
-              onTap:() => setState(() => _done = !_done ),
+              onTap:() => setState(() {
+                _daily.updateHabits(widget.name);
+                 logInfo(user.toString());
+
+              }),
               child: Container(
                 decoration: BoxDecoration(
                   boxShadow: [BoxShadow(
@@ -447,7 +461,7 @@ class _MarvalHabitState extends State<MarvalHabit> {
                   )
                 ),
               child: CircleAvatar(
-                backgroundColor: _done ? kGreen : kGrey,
+                backgroundColor:  _daily.habits.contains(widget.name) ? kGreen : kGrey  ,
                 radius: 4.w,
             )))
           ])),
@@ -456,8 +470,8 @@ class _MarvalHabitState extends State<MarvalHabit> {
 }
 
 class MarvalHabitList extends StatelessWidget {
-   const MarvalHabitList({Key? key}) : super(key: key);
-
+   const MarvalHabitList({ this.data, Key? key}) : super(key: key);
+   final List<String>? data;
    @override
    Widget build(BuildContext context) {
      return Column(
@@ -471,12 +485,12 @@ class MarvalHabitList extends StatelessWidget {
          SizedBox(height: 2.h,),
          Container(width: 100.w, height: 16.h,
            child: ListView.builder(
-               itemCount: 5,
+               itemCount: data?.length ?? 0,
                scrollDirection: Axis.horizontal,
                itemBuilder: (context, index) {
                  return Container(
                      margin: EdgeInsets.symmetric(horizontal: 2.w),
-                     child: MarvalHabit(name: habits[index]));
+                     child: MarvalHabit(name: data![index]));
                }),)
        ],
      );

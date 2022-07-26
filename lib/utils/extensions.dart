@@ -28,6 +28,13 @@ extension DateFormat on DateTime{
       default : return "";
     }
   }
+  String iDay(){
+    String dayValue = day.toString();
+    if(dayValue.length == 1){
+      dayValue = '0$day';
+    }
+    return '$dayValue-$month-$year';
+  }
   DateTime lastMonday(){
     DateTime res = this;
     while(res.weekday!=1){
@@ -35,5 +42,7 @@ extension DateFormat on DateTime{
     }
     return res;
   }
+
+
 }
 

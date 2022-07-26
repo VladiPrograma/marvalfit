@@ -171,8 +171,8 @@ class _Form extends StatelessWidget {
                   UserDetails details = UserDetails.create(_height!, _food!, _hobbie!, phone!, _city!, _birthDate!, _weight!);
                   details.setUserDetails();
                   logInfo(details.toString());
-                  user!.updateWeight(_weight!);
-                  user!.details = details;
+                  user.updateWeight(_weight!);
+                  user.details = details;
                   logInfo(user.toString());
                   Navigator.pushNamed(context, FormScreen.routeName);
                 }

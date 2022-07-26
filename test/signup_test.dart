@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 void SignUp() async{
   try {
     final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: "vlad@gmail.com",
+      email: "mario@gmail.com",
       password: "hector10ten",
     );
   } on FirebaseAuthException catch (e) {

@@ -67,7 +67,7 @@ void MarvalSnackBar(BuildContext context, SNACKTYPE type, {String? title, String
                                   width: 69.w,
                                   child: Text(
                                     subtitle ?? "",
-                                    style: TextStyle( fontSize: 2.3.w, color: kBlack, fontFamily: p1),
+                                    style: TextStyle( fontSize: 2.6.w, color: kBlack, fontFamily: p1),
                                     maxLines: 2,
                                   )
                               ),

@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/core/get_user_data/get_user_data_screen.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
@@ -9,7 +8,6 @@ import 'package:marvalfit/modules/home_screen.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/user.dart';
-import 'package:marvalfit/utils/objects/user_curr.dart';
 import 'package:sizer/sizer.dart';
 import 'config/firebase_options.dart';
 import 'config/routes.dart';

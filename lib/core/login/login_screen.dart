@@ -114,7 +114,7 @@ class _LogInForm extends StatelessWidget {
                   _loginErrors = await LogIn(_email, _password);
                   _formKey.currentState!.validate();
                   if(isNull(_loginErrors)&&isNotNull(FirebaseAuth.instance.currentUser)){
-                    authUser = FirebaseAuth.instance.currentUser;
+                    authUser = FirebaseAuth.instance.currentUser!;
                     /** PANTALLA TEST */
                     Navigator.pushNamed(context, GetUserDataScreen.routeName);
                   }

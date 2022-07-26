@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../utils/objects/user.dart';
 
 /// - - - FIREBASE AUTH - - -  */
-User? authUser;
-MarvalUser? user;
+ User? authUser;
+ late MarvalUser user;
 
 /// HOME VARIABLES */
-ValueNotifier<DateTime>? dateNotifier;
+late ValueNotifier<DateTime> dateNotifier;

@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/string.dart';
+import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/user_curr.dart';
+import 'package:marvalfit/utils/objects/user_daily.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 
 class MarvalUser{
@@ -18,11 +20,13 @@ class MarvalUser{
   DateTime lastUpdate;
   UserDetails? details;
   CurrentUser? currenTraining;
+  Map<String, Daily>? dailys;
 
   MarvalUser({required this.id, required this.name, required this.lastName, required this.work,this.profileImage, required this.lastWeight ,required this.currWeight, required this.lastUpdate});
 
   MarvalUser.create(this.name, this.lastName, this.work, this.profileImage, this.lastWeight, this.currWeight)
      : id = FirebaseAuth.instance.currentUser!.uid,
+       dailys = <String, Daily>{},
        lastUpdate = DateTime.now();
 
   MarvalUser.fromJson(Map<String, dynamic> map)
@@ -33,27 +37,26 @@ class MarvalUser{
     profileImage  = map["profile_image"],
     currWeight = map["curr_weight"],
     lastWeight = map["last_weight"],
-    lastUpdate = map["last_update"].toDate();
+    lastUpdate = map["last_update"].toDate(),
+    dailys = <String, Daily>{};
 
-  void getDetails() async => details = await UserDetails.getFromDB(id);
+  Future<void> getDetails() async => details = await UserDetails.getFromDB(id);
 
-  void getCurrentTraining() async => currenTraining = await CurrentUser.getFromBD(id);
+  Future<void> getCurrentTraining() async => currenTraining = await CurrentUser.getFromBD(id);
 
-    static Future<bool> existsInDB(String? uid) async{
+  Future<void> getDaily(DateTime date) async => dailys![date.iDay()]= await Daily.getFromDB(date);
+
+  static Future<bool> existsInDB(String? uid) async{
     if(isNull(uid)){ return false;}
     DocumentSnapshot ds = await usersDB.doc(uid).get();
     return ds.exists;
 
   }
-
-
-
   static Future<MarvalUser> getFromDB(String uid) async {
     DocumentSnapshot doc = await usersDB.doc(uid).get();
     Map<String, dynamic>? map  = toMap(doc);
     return MarvalUser.fromJson(map!);
   }
-
   Future<void> setInDB(){
     // Call the user's CollectionReference to add a new user
     return usersDB
@@ -70,7 +73,6 @@ class MarvalUser{
         .then((value) => logSuccess("$logSuccessPrefix User Added"))
         .catchError((error) => logError("$logErrorPrefix Failed to add user: $error"));
   }
-
   Future<void> uploadInDB(Map<String, Object> map){
     // Call the user's CollectionReference to add a new user
     return usersDB
@@ -79,28 +81,33 @@ class MarvalUser{
         .catchError((error) => logError("$logErrorPrefix Failed to Upload user: $error"));
   }
 
+  @override
+  String toString() {
+    return " ID: $id"
+        "\n Name: $name Last Name: $lastName"
+        "\n Job: $work"
+        "\n Curr: $currWeight Kg  Last: $lastWeight Kg "
+        "\n Last Update: $lastUpdate"
+        "\n Profile image URL: $profileImage"
+        "\n Details: ${details?.toString()}"
+        "\n Current Training: ${currenTraining?.toString()}"
+        "\n Dailys: \n${dailys.toString()}";
+
+  }
+
   void updateWeight(double weight){
-    if(currWeight == 0){ currWeight = weight; }
+    lastWeight = currWeight;
+    currWeight = weight;
+    lastUpdate = DateTime.now();
+    if(lastWeight == 0){ lastWeight = weight; }
     uploadInDB({
-      "last_weight" : currWeight,
-      "curr_weight" : weight,
-      "last_update" : DateTime.now()
+      "last_weight" : lastWeight,
+      "curr_weight" : currWeight,
+      "last_update" : lastUpdate
     });
   }
 
 
-  @override
-  String toString() {
-    return " ID: $id"
-    "\n Name: $name Last Name: $lastName"
-    "\n Job: $work"
-    "\n Curr: $currWeight Kg  Last: $lastWeight Kg "
-    "\n Last Update: $lastUpdate"
-    "\n Profile image URL: $profileImage"
-    "\n Details: ${details?.toString()}"
-    "\n Current Training: ${currenTraining?.toString()}";
-
-  }
 
 }
 
