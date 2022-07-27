@@ -1,6 +1,6 @@
 // Blue text
-void logInfo(String msg) {
-  print('\x1B[34m$msg\x1B[0m');
+void logInfo(Object msg) {
+  print('\x1B[34m${msg.toString()}\x1B[0m');
 }
 
 // Green text

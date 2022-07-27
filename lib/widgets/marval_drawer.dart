@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:marvalfit/core/get_user_data/get_user_data_metrics.dart';
 import 'package:marvalfit/modules/home_screen.dart';
+import 'package:marvalfit/test/sleek_change.dart';
 import 'package:marvalfit/test/snackbar_and_dialogs.dart';
 import 'package:sizer/sizer.dart';
 
@@ -49,7 +50,7 @@ class MarvalDrawer extends StatelessWidget {
           GestureDetector(
             onTap: (){
               Navigator.pop(context);
-              Navigator.pushNamed(context, LoginScreen.routeName);},
+              Navigator.pushNamed(context, TestSleekScreen.routeName);},
             child: ListTile(
               leading: Icon(Icons.message_outlined,color: name=="Chat" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Chat', size: 4, color: name=="Chat" ? kGreen : kBlack),

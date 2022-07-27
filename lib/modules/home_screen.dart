@@ -21,6 +21,28 @@ import '../widgets/marval_textfield.dart';
 
 late Daily _daily;
 late ValueNotifier<int> _sleepNotifier;
+late double sleekMax, sleekMin, sleekInit, sleekWeight;
+
+Future<Daily> _onNewDay(DateTime date) async{
+  if(user.dailys!.containsKey(date.iDay())){
+    return user.dailys![date.iDay()]!;
+  }
+  else if(await Daily.existsInDB(date)){
+    await user.getDaily(date);
+    return user.dailys![date.iDay()]!;
+  }else{
+    String key = date.iDay();
+    user.dailys![key] = Daily.create(day: date);
+    user.dailys![key]!.setInDB();
+    return user.dailys![key]!;
+  }
+}
+///@TODO Main page Logic when is Logged but he doesnt complete de forms.
+///@TODO The dataForm Page stay more time than expected uploading images and data to Firebase.
+///@TODO Normalize names like "Name" or "Tittle".
+///
+final activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
+final activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -28,12 +50,6 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
-///@TODO Main page Logic when is Logged but he doesnt complete de forms.
-///@TODO Normalize names like "Name" or "Tittle".
-
-final activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
-final activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
 
 class _HomeScreenState extends State<HomeScreen> {
 
@@ -44,6 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
     _daily = Daily.create(day: dateNotifier.value);
     _sleepNotifier = ValueNotifier(0);
     user = MarvalUser.create("", "", "", "", 0, 0);
+    sleekInit=sleekWeight=50;
+    sleekMax=sleekInit+4;
+    sleekMin = sleekInit-4;
   // Create anonymous function:
     () async {
   /** Using async methods to fetch Data */
@@ -51,28 +70,22 @@ class _HomeScreenState extends State<HomeScreen> {
       /// @TODO Add the onCreate Current Training.
       await user.getCurrentTraining();
 
-      if(await Daily.existsInDB(dateNotifier.value)){
-        await user.getDaily(dateNotifier.value);
-        _daily = user.dailys![dateNotifier.value.iDay()]!;
-      }else{
-        Daily _today = Daily.create(day: dateNotifier.value);
-        user.dailys![_today.id] = _today;
-        _daily = _today;
-        _today.setInDB();
-      }
-
+      _daily = await _onNewDay(dateNotifier.value);
       _sleepNotifier = ValueNotifier(_daily.sleep);
-      logInfo(user.toString());
+      sleekInit= _daily.weight == 0 ? user.currWeight : _daily.weight;
+      sleekWeight = sleekInit;
+      sleekMax = sleekInit +4;
+      sleekMin = sleekInit -4;
       setState(() {});
     }();
   }
-
   @override
   void dispose() {
     dateNotifier.dispose();
     _sleepNotifier.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,6 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
              Container(width: 100.w, height: 124.h, color: kWhite,
               child:  Stack(
                 children: [
+                  /// Calendar Widget
                   Positioned(
                     top: 0,
                     child: Container(width: 100.w, height: 26.h,
@@ -99,6 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: SafeArea(
                         child:Column(
                           children: [
+                            /// Calendar Arrows
                             Row(children: [
                               GestureDetector(
                                   onTap: (){
@@ -116,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               GestureDetector(
                                   onTap: (){
                                       dateNotifier.value = dateNotifier.value.add(Duration(days: 7));
-                                    setState(() {});
+                                      setState(() {});
                                   },
                                   child:Container(
                                       child: Row(children: [
@@ -154,62 +169,71 @@ class _HomeScreenState extends State<HomeScreen> {
                                     color: kWhite,
                                   ))))),
                   /// Weight & Sleep Widgets
-                  Positioned(top: 28.h,
-                      child: Container(
-                        width: 100.w,
-                        height: 20.h,
-                        padding: EdgeInsets.symmetric(horizontal: 2.w),
-                        child: Row(
-                            children:[
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row( children: [
-                                    Icon(CustomIcons.fitness, size: 7.w, color: kGreen,),
-                                    TextH2("  Sueño y Peso", size: 4,),
-                                  ]),
-                                  MoonList(curr: user.dailys![dateNotifier.value]?.sleep),
+                  ValueListenableBuilder(
+                  valueListenable: dateNotifier,
+                  builder: (context, value, child) {
+                    return Stack(
+                      children: [
+                        Positioned(top: 28.h,
+                          child: Container(
+                            width: 100.w,
+                            height: 20.h,
+                            padding: EdgeInsets.symmetric(horizontal: 2.w),
+                            child: Row(
+                                children:[
+                                  Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row( children: [
+                                          Icon(CustomIcons.fitness, size: 7.w, color: kGreen,),
+                                          TextH2("  Sueño y Peso", size: 4,),
+                                        ]),
+                                        MoonList(curr: _daily.sleep),
+                                      ]),
+                                  Spacer(),
+                                  MarvalWeight(initialValue: _daily.weight == 0 ? user.currWeight : _daily.weight ),
                                 ]),
-                              Spacer(),
-                              MarvalWeight(initialValue: user.currWeight),
-                            ]),
-                      )),
-                  /// Habits Row
-                  Positioned(top: 44.h,
-                      child: MarvalHabitList(data: user.currenTraining?.habits!,)),
-                  /// Activities Row
-                  Positioned( top: 66.5.h,
-                    child: InnerShadow(
-                    color: Colors.black,
-                    offset: Offset(0, 1.4.w),
-                    blur: 1.5.w,
-                    child: Container( width: 100.w, height: 59.h,
-                        padding: EdgeInsets.symmetric(horizontal: 4.w),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
-                            color: kBlack
-                        )),
-                    )),
-                  /// Activities Widget
-                  Positioned( top: 66.5.h,
-                      child: Container( width: 100.w, height: 34.5.h,
-                        padding: EdgeInsets.symmetric(horizontal: 4.w),
-                         child: MarvalActivityList()
-                      )),
+                          )),
+                        /// Habits Row
+                        Positioned(top: 44.h,
+                            child: MarvalHabitList(data: user.currenTraining?.habits!,)),
+                        /// Activities Row
+                        Positioned( top: 66.5.h,
+                            child: InnerShadow(
+                              color: Colors.black,
+                              offset: Offset(0, 1.4.w),
+                              blur: 1.5.w,
+                              child: Container( width: 100.w, height: 59.h,
+                                  padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
+                                      color: kBlack
+                                  )),
+                            )),
+                        /// Activities Widget
+                        Positioned( top: 66.5.h,
+                            child: Container( width: 100.w, height: 34.5.h,
+                                padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                child: MarvalActivityList()
+                            )),
 
-                  Positioned( top: 65.5.h, left: 6.w,
-                    child:  Container( width: 88.w, height: 1.3.h,
-                        padding: EdgeInsets.symmetric(horizontal: 4.w),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
-                            color: Colors.transparent,
-                            boxShadow: [BoxShadow(
-                              color: Colors.black.withOpacity(0.8),
-                              offset: Offset(0, 4.w),
-                              blurRadius: 4.w,
-                            )]
-                        )),
-                  ),
+                        Positioned( top: 65.5.h, left: 6.w,
+                          child:  Container( width: 88.w, height: 1.3.h,
+                              padding: EdgeInsets.symmetric(horizontal: 4.w),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
+                                  color: Colors.transparent,
+                                  boxShadow: [BoxShadow(
+                                    color: Colors.black.withOpacity(0.8),
+                                    offset: Offset(0, 4.w),
+                                    blurRadius: 4.w,
+                                  )]
+                              )),
+                        ),
+                      ]);
+                  }),
+
+
             ])),
           ],
         )),
@@ -218,12 +242,25 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 /// SLIDER WIDGET */
-class MarvalWeight extends StatelessWidget {
+class MarvalWeight extends StatefulWidget {
   const MarvalWeight({required this.initialValue, Key? key}) : super(key: key);
   final double initialValue;
   @override
+  State<MarvalWeight> createState() => _MarvalWeightState();
+}
+
+class _MarvalWeightState extends State<MarvalWeight>{
+
+  @override
   Widget build(BuildContext context) {
-    double _weight = initialValue;
+
+    () async{
+      sleekMax = _daily.weight+4;
+      sleekMin = _daily.weight-4;
+      logInfo("$sleekMax--$sleekMin");
+      setState(() { });
+    };
+
     return CircleAvatar(
         radius: 18.w,
         child:Container(
@@ -233,14 +270,13 @@ class MarvalWeight extends StatelessWidget {
               color: kBlack,
             ),
             child: SleekCircularSlider(
-                min: initialValue-4,
-                max: initialValue +4,
-                initialValue: initialValue,
+                min: sleekMin,
+                max: sleekMax,
+                initialValue: sleekInit,
                 onChangeEnd: (value) {
-                  double _weight = double.parse(value.toStringAsPrecision(3));
-                  logInfo(_weight.toString());
-                  user.updateWeight(_weight);
-                  _daily.updateWeight(_weight);
+                  sleekWeight  = double.parse(value.toStringAsPrecision(3));
+                  user.updateWeight(sleekWeight);
+                  _daily.updateWeight(sleekWeight);
                 },
                 appearance: CircularSliderAppearance(
                     size: 38.w,
@@ -260,22 +296,21 @@ class MarvalWeight extends StatelessWidget {
 
                 ),
                 innerWidget: (percentage) =>   Center(
-                        child: TextH1(
-                          "${_weight.toStringAsPrecision(3)}\nKg",
-                          color: kWhite,
-                          size: 5.5,
-                          textAlign: TextAlign.center,
-                        )
-                    ),
+                    child: TextH1(
+                      "${sleekWeight.toStringAsPrecision(3)}\nKg",
+                      color: kWhite,
+                      size: 5.5,
+                      textAlign: TextAlign.center,
+                    )
+                ),
                 onChange: (double value) {
-                  ///@TODO move this dialog to "onChangeEnd" then modify the Dialog to set Max and Min values.
-                  _weight = value;
-                  if(value == initialValue+4||value == initialValue-4){
+                  sleekWeight = value;
+                  if(value == widget.initialValue+4||value == widget.initialValue-4){
                     RichText _richText = RichText(
                       textAlign: TextAlign.justify,
                       text: TextSpan(
                         text: "No te preocupes si ganas o pierdes mucho peso de golpe, es un cambio temporal"
-                              " y no tardaras en volver a tu peso anterior.",
+                            " y no tardaras en volver a tu peso anterior.",
                         style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
                         children: const <TextSpan>[
                           TextSpan(
@@ -298,7 +333,7 @@ class MarvalWeight extends StatelessWidget {
                         labelText: "Peso",
                         hintText: user.currWeight.toString(),
                         validator: (value) => validateNumber(value),
-                        onSaved: (value) => _weight = toDouble(value)!,
+                        onSaved: (value) => sleekWeight = toDouble(value)!,
                       ),
                     );
                     MarvalDialogsInput(context,
@@ -306,19 +341,47 @@ class MarvalWeight extends StatelessWidget {
                         height: 53,
                         form: _form,
                         richText: _richText,
-                        onSucess: () async {
-                          user.updateWeight(_weight);
+                        onSucess: (){
+                          user.updateWeight(sleekWeight);
                           MarvalSnackBar(context, SNACKTYPE.success, title: "VAMOOSSSS", subtitle: "El peso ha sido actualizado con exito");
                         }
                     );
-                    
+
                   }
                 }
-                )));
+            )));
   }
 }
 
 /// CALENDAR WIDGETS */
+class DateCell extends StatelessWidget {
+  const DateCell({required this.date, Key? key}) : super(key: key);
+  final DateTime date;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: () async{
+          _daily = await _onNewDay(date);
+          logInfo(_daily.day.iDay());
+          _sleepNotifier.value = _daily.sleep;
+          dateNotifier.value = date;
+        },
+        child: Container(width: 11.w, height: 11.h,
+          decoration: BoxDecoration(
+            color:  dateNotifier.value.day == date.day ? kGreen : kBlack,
+            borderRadius: BorderRadius.circular(12.w),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextH2("${date.day}", color: kWhite, size: 4,),
+              TextH2(date.toStringWeekDay(),color: kWhite, size: 3,)
+
+            ],),
+        ));
+  }
+}
+
 class DateList extends StatefulWidget {
   const DateList({required this.startDate, Key? key}) : super(key: key);
   final DateTime startDate;
@@ -343,34 +406,7 @@ class _DateListState extends State<DateList> {
   }
 }
 
-class DateCell extends StatelessWidget {
-  const DateCell({required this.date, Key? key}) : super(key: key);
-  final DateTime date;
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: (){
-          dateNotifier.value = date;
-        },
-        child: Container(width: 11.w, height: 11.h,
-          decoration: BoxDecoration(
-            color:  dateNotifier.value.day == date.day ? kGreen : kBlack,
-            borderRadius: BorderRadius.circular(12.w),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextH2("${date.day}", color: kWhite, size: 4,),
-              TextH2(date.toStringWeekDay(),color: kWhite, size: 3,)
-
-            ],),
-        ));
-  }
-}
-
-
 /// Sleep WIDGETS */
-
 class Moon extends StatelessWidget {
   const Moon({required this.num, Key? key}) : super(key: key);
   final int num;
@@ -384,7 +420,7 @@ class Moon extends StatelessWidget {
           _sleepNotifier.value = num;
         }
         _daily.updateSleep(_sleepNotifier.value);
-        logSuccess("Moon Tapped ${_sleepNotifier.value}, Widget Num: $num");
+        logInfo("Moon Tapped ${_sleepNotifier.value}/5");
        },
       child: Icon(CustomIcons.moon_inv, size: 9.w, color:  _sleepNotifier.value < num ? kBlack : kBlue)
     );
@@ -401,24 +437,22 @@ class _MoonListState extends State<MoonList> {
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: _sleepNotifier,
-      builder: (context, value, child) {
-        return Container(width: 55.w, height: 10.h, child:
-        ListView.builder(
-            itemCount: 5,
-            scrollDirection: Axis.horizontal,
-            physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return Container(
-                  margin: EdgeInsets.only(right: 2.3.w),
-                  child: Moon(num: index+1));
-            }));
-      },
-    );
-
-
+        valueListenable: _sleepNotifier,
+        builder: (context, value, child) {
+          return Container(width: 55.w, height: 10.h, child:
+          ListView.builder(
+              itemCount: 5,
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              itemBuilder: (context, index) {
+                return Container(
+                    margin: EdgeInsets.only(right: 2.3.w),
+                    child: Moon(num: index+1));
+              }));
+        },
+      );
+    }
   }
-}
 
 /// Habits WIDGETS */
 class MarvalHabit extends StatefulWidget {
@@ -444,7 +478,7 @@ class _MarvalHabitState extends State<MarvalHabit> {
             GestureDetector(
               onTap:() => setState(() {
                 _daily.updateHabits(widget.name);
-                 logInfo(user.toString());
+                 logInfo(user.dailys![dateNotifier.value.iDay()]!.habits.toString());
 
               }),
               child: Container(
@@ -506,6 +540,7 @@ class MarvalActivity extends StatefulWidget {
   @override
   State<MarvalActivity> createState() => _MarvalActivityState();
 }
+
 class _MarvalActivityState extends State<MarvalActivity> {
   bool _completed = false;
   @override
@@ -553,7 +588,6 @@ class _MarvalActivityState extends State<MarvalActivity> {
     );
   }
 }
-
 class MarvalActivityList extends StatelessWidget {
   const MarvalActivityList({Key? key}) : super(key: key);
 

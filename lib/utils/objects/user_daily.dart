@@ -20,7 +20,7 @@ class Daily{
       : id = day.iDay(),
         sleep = 0,
         weight = 0,
-        habits = List<String>.empty(),
+        habits = [],
         activities = {};
 
   Daily.fromJson(Map<String, dynamic> map)
