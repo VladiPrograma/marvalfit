@@ -1,42 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/colors.dart';
 import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/extensions.dart';
-import 'package:marvalfit/widgets/marval_snackbar.dart';
 import 'package:sizer/sizer.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 import '../config/custom_icons.dart';
 import '../constants/global_variables.dart';
-import '../constants/string.dart';
 import '../utils/decoration.dart';
-import '../utils/marval_arq.dart';
 import '../utils/objects/user.dart';
 import '../utils/objects/user_daily.dart';
-import '../widgets/marval_dialogs.dart';
 import '../widgets/marval_drawer.dart';
-import '../widgets/marval_textfield.dart';
 
 late Daily _daily;
 late ValueNotifier<int> _sleepNotifier;
-late double sleekMax, sleekMin, sleekInit, sleekWeight;
+late double _max, _min, _init, _perc; // Sleek Widget vars
 
-Future<Daily> _onNewDay(DateTime date) async{
-  if(user.dailys!.containsKey(date.iDay())){
-    return user.dailys![date.iDay()]!;
-  }
-  else if(await Daily.existsInDB(date)){
-    await user.getDaily(date);
-    return user.dailys![date.iDay()]!;
-  }else{
-    String key = date.iDay();
-    user.dailys![key] = Daily.create(day: date);
-    user.dailys![key]!.setInDB();
-    return user.dailys![key]!;
-  }
-}
+
 ///@TODO Main page Logic when is Logged but he doesnt complete de forms.
 ///@TODO The dataForm Page stay more time than expected uploading images and data to Firebase.
 ///@TODO Normalize names like "Name" or "Tittle".
@@ -57,13 +41,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState(){
     super.initState();
     dateNotifier = ValueNotifier(DateTime.now());
+     user = MarvalUser.create("", "", "", "", 0, 0);
     _daily = Daily.create(day: dateNotifier.value);
     _sleepNotifier = ValueNotifier(0);
-    user = MarvalUser.create("", "", "", "", 0, 0);
-    sleekInit=sleekWeight=50;
-    sleekMax=sleekInit+4;
-    sleekMin = sleekInit-4;
-  // Create anonymous function:
+    _init=0; _max=5; _min=-5; _perc=_init;
+    // Create anonymous function:
     () async {
   /** Using async methods to fetch Data */
         user = await MarvalUser.getFromDB(authUser!.uid);
@@ -72,10 +54,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
       _daily = await _onNewDay(dateNotifier.value);
       _sleepNotifier = ValueNotifier(_daily.sleep);
-      sleekInit= _daily.weight == 0 ? user.currWeight : _daily.weight;
-      sleekWeight = sleekInit;
-      sleekMax = sleekInit +4;
-      sleekMin = sleekInit -4;
+      _init = _daily.weight == 0 ? user.currWeight : _daily.weight;
+      _max=_init+2; _min=_init-2;  _perc=_init;
       setState(() {});
     }();
   }
@@ -104,147 +84,137 @@ class _HomeScreenState extends State<HomeScreen> {
                   Positioned(
                     top: 0,
                     child: Container(width: 100.w, height: 26.h,
-                      padding: EdgeInsets.all(4.w),
-                      decoration: BoxDecoration(
-                          color: kBlue,
-                          borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15.w)),
-                          boxShadow: [kMarvalBoxShadow]
-                      ),
-                      child: SafeArea(
-                        child:Column(
-                          children: [
-                            /// Calendar Arrows
-                            Row(children: [
-                              GestureDetector(
-                                  onTap: (){
-                                    dateNotifier.value = dateNotifier.value.add(Duration(days: -7));
-                                    setState(() {});
-                                  },
-                                  child:Container(
-                                      child: Row(children: [
-                                        Icon(Icons.arrow_back, color: kWhite, size: 6.w,),
-                                        TextH2(' Anterior', color: kWhite, size: 4,)
-                                      ]))),
-                              Spacer(),
-                              TextH1(dateNotifier.value.toStringMonth(), color: kWhite, size: 7.5,),
-                              Spacer(),
-                              GestureDetector(
-                                  onTap: (){
-                                      dateNotifier.value = dateNotifier.value.add(Duration(days: 7));
-                                      setState(() {});
-                                  },
-                                  child:Container(
-                                      child: Row(children: [
-                                        TextH2('Siguiente ', color: kWhite, size: 4,),
-                                        Icon(Icons.arrow_forward, color: kWhite, size: 6.w,),
-                                      ]))),
-                            ]),
-                            SizedBox(height: 1.h,),
-                            ValueListenableBuilder(
-                              valueListenable: dateNotifier,
-                              builder: (context, value, child) {
-                                return DateList(startDate: dateNotifier.value,);
-                              },
-                            )
+                     padding: EdgeInsets.all(4.w),
+                     decoration: BoxDecoration(
+                        color: kBlue,
+                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15.w)),
+                        boxShadow: [kMarvalBoxShadow]
+                     ),
+                        child: SafeArea(
+                        child:Column( children: [
+                  /// Calendar Arrows
+                  Row(children: [
+                    GestureDetector(
+                      onTap: () async{
+                        await _onDayChange(dateNotifier.value.add(const Duration(days: -7)));
+                      },
+                      child:Container(
+                          child: Row(children: [
+                            Icon(Icons.arrow_back, color: kWhite, size: 6.w,),
+                            TextH2(' Anterior', color: kWhite, size: 4,)
+                    ]))),
+                    Spacer(),
+                    TextH1(dateNotifier.value.toStringMonth(), color: kWhite, size: 7.5,),
+                    Spacer(),
+                    GestureDetector(
+                        onTap: ()async{
+                          await _onDayChange(dateNotifier.value.add(const Duration(days: 7)));
+                        },
+                        child:Container(
+                            child: Row(children: [
+                              TextH2('Siguiente ', color: kWhite, size: 4,),
+                              Icon(Icons.arrow_forward, color: kWhite, size: 6.w,),
+                            ]))),
+                  ]),
+                  SizedBox(height: 1.h,),
+                  ValueListenableBuilder(
+                    valueListenable: dateNotifier,
+                    builder: (context, value, child) {
+                      return DateList(startDate: dateNotifier.value,);
+                    },
+                  )
                           ],
                         ),
-                      )),),
+                      )),
+                  ),
                   /// Little Box to make blue Right Margin
                   Positioned(right: 0, top: 25.h,
-                      child: Container(width: 20.w, height: 10.h, color: kBlue
-                 )),
+                       child: Container(width: 20.w, height: 10.h, color: kBlue
+                    )),
                   Positioned(right: 0, top: 26.h,
-                      child: Container(width: 20.w, height: 50.h,
-                          decoration: BoxDecoration(
-                              color: kBlue,
-                              borderRadius: BorderRadius.only(topRight: Radius.circular(15.w))
-                          ),
-                          child: InnerShadow(
-                              color: kBlack.withOpacity(0.45),
-                              offset: Offset(0, 1.4.w),
-                              blur: 1.5.w,
-                              child: Container(
-                                  decoration:  BoxDecoration(
-                                    borderRadius: BorderRadius.only(topRight:  Radius.circular(12.w)),
-                                    color: kWhite,
-                                  ))))),
+                  child: Container(width: 20.w, height: 50.h,
+                    decoration: BoxDecoration(
+                      color: kBlue,
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(15.w))
+                  ),
+                  child: InnerShadow(
+                    color: kBlack.withOpacity(0.45),
+                    offset: Offset(0, 1.4.w),
+                    blur: 1.5.w,
+                    child:
+                  Container(
+                  decoration:  BoxDecoration(
+                    borderRadius: BorderRadius.only(topRight:  Radius.circular(12.w)),
+                    color: kWhite,
+                  )))
+                  )),
                   /// Weight & Sleep Widgets
-                  ValueListenableBuilder(
-                  valueListenable: dateNotifier,
-                  builder: (context, value, child) {
-                    return Stack(
-                      children: [
-                        Positioned(top: 28.h,
-                          child: Container(
-                            width: 100.w,
-                            height: 20.h,
-                            padding: EdgeInsets.symmetric(horizontal: 2.w),
-                            child: Row(
-                                children:[
-                                  Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Row( children: [
-                                          Icon(CustomIcons.fitness, size: 7.w, color: kGreen,),
-                                          TextH2("  Sueño y Peso", size: 4,),
-                                        ]),
-                                        MoonList(curr: _daily.sleep),
-                                      ]),
-                                  Spacer(),
-                                  MarvalWeight(initialValue: _daily.weight == 0 ? user.currWeight : _daily.weight ),
-                                ]),
-                          )),
-                        /// Habits Row
-                        Positioned(top: 44.h,
-                            child: MarvalHabitList(data: user.currenTraining?.habits!,)),
-                        /// Activities Row
-                        Positioned( top: 66.5.h,
-                            child: InnerShadow(
-                              color: Colors.black,
-                              offset: Offset(0, 1.4.w),
-                              blur: 1.5.w,
-                              child: Container( width: 100.w, height: 59.h,
-                                  padding: EdgeInsets.symmetric(horizontal: 4.w),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
-                                      color: kBlack
-                                  )),
+                  Positioned(top: 28.h, child:
+                  Container( width: 100.w, height: 20.h,
+                    padding: EdgeInsets.symmetric(horizontal: 2.w),
+                    child: Row( children:[
+                     Column(
+                     crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                       Row( children: [
+                       Icon(CustomIcons.fitness, size: 7.w, color: kGreen,),
+                       TextH2("  Sueño y Peso", size: 4,),
+                       ]),
+                       MoonList(curr: _daily.sleep),
+                     ]),
+                     Spacer(),
+                     ValueListenableBuilder(
+                     valueListenable: dateNotifier,
+                     builder: (context, value, child) {
+                       return MarvalWeight();
+                     })
+                    ]))),
+                  /// Habits Row
+                  Positioned(top: 44.h,
+                      child: MarvalHabitList(data: user.currenTraining?.habits!,)),
+                  /// Activities Row
+                  Positioned( top: 66.5.h,
+                      child: InnerShadow(
+                        color: Colors.black,
+                        offset: Offset(0, 1.4.w),
+                        blur: 1.5.w,
+                        child: Container( width: 100.w, height: 59.h,
+                            padding: EdgeInsets.symmetric(horizontal: 4.w),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
+                                color: kBlack
                             )),
-                        /// Activities Widget
-                        Positioned( top: 66.5.h,
-                            child: Container( width: 100.w, height: 34.5.h,
-                                padding: EdgeInsets.symmetric(horizontal: 4.w),
-                                child: MarvalActivityList()
-                            )),
-
-                        Positioned( top: 65.5.h, left: 6.w,
-                          child:  Container( width: 88.w, height: 1.3.h,
-                              padding: EdgeInsets.symmetric(horizontal: 4.w),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(topRight: Radius.circular(12.w), topLeft: Radius.circular(12.w)),
-                                  color: Colors.transparent,
-                                  boxShadow: [BoxShadow(
-                                    color: Colors.black.withOpacity(0.8),
-                                    offset: Offset(0, 4.w),
-                                    blurRadius: 4.w,
-                                  )]
-                              )),
-                        ),
-                      ]);
-                  }),
-
-
-            ])),
-          ],
-        )),
+                      )),
+                  /// Activities Widget
+                  Positioned( top: 66.5.h,
+                      child: Container( width: 100.w, height: 34.5.h,
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          child: MarvalActivityList()
+                      )),
+                  Positioned( top: 65.5.h, left: 6.w, child:
+                  Container( width: 88.w, height: 1.3.h,
+                        padding: EdgeInsets.symmetric(horizontal: 4.w),
+                        decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(12.w),
+                                topLeft:  Radius.circular(12.w)),
+                            boxShadow: [  BoxShadow(
+                              color: Colors.black.withOpacity(0.8),
+                              offset: Offset(0, 4.w),
+                              blurRadius: 4.w,
+                            )]
+                  ))),
+                ])
+            ),
+          ])),
     ));
   }
 }
 
 /// SLIDER WIDGET */
 class MarvalWeight extends StatefulWidget {
-  const MarvalWeight({required this.initialValue, Key? key}) : super(key: key);
-  final double initialValue;
+  const MarvalWeight({ Key? key}) : super(key: key);
   @override
   State<MarvalWeight> createState() => _MarvalWeightState();
 }
@@ -253,14 +223,6 @@ class _MarvalWeightState extends State<MarvalWeight>{
 
   @override
   Widget build(BuildContext context) {
-
-    () async{
-      sleekMax = _daily.weight+4;
-      sleekMin = _daily.weight-4;
-      logInfo("$sleekMax--$sleekMin");
-      setState(() { });
-    };
-
     return CircleAvatar(
         radius: 18.w,
         child:Container(
@@ -269,14 +231,23 @@ class _MarvalWeightState extends State<MarvalWeight>{
               borderRadius: BorderRadius.all(Radius.circular(100.w)),
               color: kBlack,
             ),
-            child: SleekCircularSlider(
-                min: sleekMin,
-                max: sleekMax,
-                initialValue: sleekInit,
-                onChangeEnd: (value) {
-                  sleekWeight  = double.parse(value.toStringAsPrecision(3));
-                  user.updateWeight(sleekWeight);
-                  _daily.updateWeight(sleekWeight);
+            child: SleekCircularSlider (
+                min: _min,
+                max: _max,
+                initialValue: _init,
+                onChangeEnd: (value) async{
+                  _perc = double.parse(value.toStringAsPrecision(3));
+                   logInfo(_perc.toString());
+                  _max+=_perc-_init;
+                  _min+=_perc-_init;
+                  ///* Setting Half Data For SetState x2 */
+                  setState(() { });
+                  await Future.delayed(Duration(milliseconds: 100));
+                  _init= (_max+_min)/2;
+                  setState(() {  });
+                  ///* Firebase Updates */
+                  user.updateWeight(_perc);
+                  _daily.updateWeight(_perc);
                 },
                 appearance: CircularSliderAppearance(
                     size: 38.w,
@@ -297,57 +268,14 @@ class _MarvalWeightState extends State<MarvalWeight>{
                 ),
                 innerWidget: (percentage) =>   Center(
                     child: TextH1(
-                      "${sleekWeight.toStringAsPrecision(3)}\nKg",
+                      "${_perc.toStringAsPrecision(3)}\nKg",
                       color: kWhite,
                       size: 5.5,
                       textAlign: TextAlign.center,
                     )
                 ),
                 onChange: (double value) {
-                  sleekWeight = value;
-                  if(value == widget.initialValue+4||value == widget.initialValue-4){
-                    RichText _richText = RichText(
-                      textAlign: TextAlign.justify,
-                      text: TextSpan(
-                        text: "No te preocupes si ganas o pierdes mucho peso de golpe, es un cambio temporal"
-                            " y no tardaras en volver a tu peso anterior.",
-                        style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
-                        children: const <TextSpan>[
-                          TextSpan(
-                              text:  " Recuerda",
-                              style: TextStyle(fontWeight: FontWeight.bold)
-                          ),
-                          TextSpan(
-                              text:" buscamos un cambio que perdure en el tiempo."
-                          ),
-                        ],
-                      ),
-                    );
-                    GlobalKey<FormState> _formKey = GlobalKey();
-                    Form _form = Form(
-                      key: _formKey,
-                      child: MarvalInputTextField(
-                        width: 43.w,
-                        prefixIcon: CustomIcons.weight,
-                        keyboardType: TextInputType.number,
-                        labelText: "Peso",
-                        hintText: user.currWeight.toString(),
-                        validator: (value) => validateNumber(value),
-                        onSaved: (value) => sleekWeight = toDouble(value)!,
-                      ),
-                    );
-                    MarvalDialogsInput(context,
-                        title: "Vaya Cambio!",
-                        height: 53,
-                        form: _form,
-                        richText: _richText,
-                        onSucess: (){
-                          user.updateWeight(sleekWeight);
-                          MarvalSnackBar(context, SNACKTYPE.success, title: "VAMOOSSSS", subtitle: "El peso ha sido actualizado con exito");
-                        }
-                    );
-
-                  }
+                  _perc = value;
                 }
             )));
   }
@@ -361,10 +289,7 @@ class DateCell extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () async{
-          _daily = await _onNewDay(date);
-          logInfo(_daily.day.iDay());
-          _sleepNotifier.value = _daily.sleep;
-          dateNotifier.value = date;
+          await _onDayChange(date);
         },
         child: Container(width: 11.w, height: 11.h,
           decoration: BoxDecoration(
@@ -404,6 +329,30 @@ class _DateListState extends State<DateList> {
               child: DateCell(date: _day));
         }));
   }
+}
+///* Date FUNCTIONS */
+Future<Daily> _onNewDay(DateTime date) async{
+  if(user.dailys!.containsKey(date.iDay())){
+    return user.dailys![date.iDay()]!;
+  }
+  else if(await Daily.existsInDB(date)){
+    await user.getDaily(date);
+    return user.dailys![date.iDay()]!;
+  }else{
+    String key = date.iDay();
+    user.dailys![key] = Daily.create(day: date);
+    user.dailys![key]!.setInDB();
+    return user.dailys![key]!;
+  }
+}
+Future<void> _onDayChange(DateTime date) async{
+  _daily = await _onNewDay(date);
+  logInfo("Day changed: ${_daily.day.iDay()}");
+
+  dateNotifier.value = date;
+  _sleepNotifier.value = _daily.sleep;
+  _init = _daily.weight == 0 ? user.currWeight : _daily.weight;
+  _max=_init+2; _min=_init-2;  _perc=_init;
 }
 
 /// Sleep WIDGETS */
@@ -494,10 +443,14 @@ class _MarvalHabitState extends State<MarvalHabit> {
                     color: kWhite
                   )
                 ),
-              child: CircleAvatar(
+              child: ValueListenableBuilder(
+              valueListenable: dateNotifier,
+              builder: (context, value, child) {
+              return CircleAvatar(
                 backgroundColor:  _daily.habits.contains(widget.name) ? kGreen : kGrey  ,
                 radius: 4.w,
-            )))
+              );
+             })))
           ])),
         );
   }

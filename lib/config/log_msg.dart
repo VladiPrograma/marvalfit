@@ -4,16 +4,16 @@ void logInfo(Object msg) {
 }
 
 // Green text
-void logSuccess(String msg) {
-  print('\x1B[32m$msg\x1B[0m');
+void logSuccess(Object msg) {
+  print('\x1B[32m$msg.toString()\x1B[0m');
 }
 
 // Yellow text
-void logWarning(String msg) {
-  print('\x1B[33m$msg\x1B[0m');
+void logWarning(Object msg) {
+  print('\x1B[33m$msg.toString()\x1B[0m');
 }
 
 // Red text
-void logError(String text) {
-  print('\x1B[31m$text\x1B[0m');
+void logError(Object msg) {
+  print('\x1B[31m$msg.toString()\x1B[0m');
 }
