@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:marvalfit/config/custom_icons.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
@@ -10,37 +11,81 @@ import '../../config/log_msg.dart';
 import '../../constants/colors.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
+import '../../utils/firebase/storage.dart';
 import '../../utils/marval_arq.dart';
+import '../../utils/objects/user_curr.dart';
 import 'form_screen.dart';
-import 'get_user_data_screen.dart';
 
-class GetUserMetricsScreen extends StatelessWidget {
-  const GetUserMetricsScreen({Key? key}) : super(key: key);
-  static String routeName = "/get_user_metrics";
+String? _phone;
+bool _upToBD = false;
+class GetUserDetails extends StatefulWidget {
+  const GetUserDetails({Key? key}) : super(key: key);
+  static String routeName = "/get_user_details";
+  @override
+  State<GetUserDetails> createState() => _GetUserDetailsState();
+}
 
+class _GetUserDetailsState extends State<GetUserDetails> {
+  @override
+  void initState() {
+    super.initState();
+  }
+  void updateToBD(XFile? image) async{
+    if(isNotNull(image)){
+      String? _urlImage = await uploadProfileImg(authUser!.uid, image!);
+      user.profileImage = _urlImage;
+    }
+      ///@TODO Dont let training param like now
+      CurrentUser training = CurrentUser.create(habits: ["Sol", "Frio", "Naturaleza"],steps: 10000,
+          activities: [
+            {"Descanso" :
+            { "icon": 'sleep', "label": 'Descanso', "type": 'rest', "id": 'ACT_001'}},
+            {"Medidas" :
+            { "icon": 'tap', "label": 'Medidas', "type": 'tap', "id": 'ACT_002'}},
+            {"Galeria" :
+            { "icon": 'gallery', "label": 'Galeria', "images": 'Sleep', "id": 'ACT_003'}},
+            {"RMs" :
+            { "icon": 'rms', "label": 'RMs', "type": 'table_01', "id": 'ACT_004'}},
+          ]);
+      training.setInDB();
+
+      logInfo(user);
+      user.setInDB();
+      user.currenTraining = training;
+
+      /// Update To Firebase User
+      authUser!.updateDisplayName(user.name);
+      authUser!.updatePhotoURL(user.profileImage);
+
+      _upToBD = true;
+  }
   @override
   Widget build(BuildContext context) {
+    final _arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+     XFile? _image = _arguments['image'];
+     _phone = _arguments['phone'];
+     if(!_upToBD){ updateToBD(_image);}
     return Scaffold(
         backgroundColor: kWhite,
         body: SafeArea(
             child: Container( width: 100.w, height: 100.h,
               child: SingleChildScrollView(
                 child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(height: 4.h,),
-                  Container( width: 100.w,
-                      child: TextH1("Ya casi esta !"),
-                      margin: EdgeInsets.symmetric(horizontal: 5.w)),
-                  Container( width: 100.w,
-                      child:TextH2("Necesito recopilar estos datos para trabajar de forma optima", color: kGrey,),
-                      margin: EdgeInsets.symmetric(horizontal: 5.w)
-                  ),
-                  SizedBox(height: 4.h,),
-                  _Form()
-                ],
-              ),
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(height: 4.h,),
+                    Container( width: 100.w,
+                        child: TextH1("Ya casi esta !"),
+                        margin: EdgeInsets.symmetric(horizontal: 5.w)),
+                    Container( width: 100.w,
+                        child:TextH2("Necesito recopilar estos datos para trabajar de forma optima", color: kGrey,),
+                        margin: EdgeInsets.symmetric(horizontal: 5.w)
+                    ),
+                    SizedBox(height: 4.h,),
+                    _Form()
+                  ],
+                ),
               ),
             )));
   }
@@ -168,13 +213,15 @@ class _Form extends StatelessWidget {
               onPressed: () async{
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  UserDetails details = UserDetails.create(_height!, _food!, _hobbie!, phone!, _city!, _birthDate!, _weight!);
+                  ///* Set details */
+                  UserDetails details = UserDetails.create(_height!, _food!, _hobbie!, _phone!, _city!, _birthDate!, _weight!);
                   details.setUserDetails();
                   logInfo(details.toString());
-                  user.updateWeight(_weight!);
+                  ///* Set Weight */
+                  user.updateWeight(weight: _weight!);
                   user.details = details;
                   logInfo(user.toString());
-                  Navigator.pushNamed(context, FormScreen.routeName);
+                  Navigator.popAndPushNamed(context, FormScreen.routeName);
                 }
               })
         ],

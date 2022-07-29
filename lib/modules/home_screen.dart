@@ -6,6 +6,7 @@ import 'package:marvalfit/constants/colors.dart';
 import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/extensions.dart';
+import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:sizer/sizer.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
@@ -96,7 +97,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(children: [
                     GestureDetector(
                       onTap: () async{
-                        await _onDayChange(dateNotifier.value.add(const Duration(days: -7)));
+                        DateTime _date = dateNotifier.value.add(const Duration(days: -7));
+                        await _onDayChange(_date);
                       },
                       child:Container(
                           child: Row(children: [
@@ -107,8 +109,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     TextH1(dateNotifier.value.toStringMonth(), color: kWhite, size: 7.5,),
                     Spacer(),
                     GestureDetector(
-                        onTap: ()async{
-                          await _onDayChange(dateNotifier.value.add(const Duration(days: 7)));
+                        onTap: () async{
+                          DateTime _date = dateNotifier.value.add(const Duration(days: 7));
+                          await _onDayChange(_date);
                         },
                         child:Container(
                             child: Row(children: [
@@ -166,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                      ValueListenableBuilder(
                      valueListenable: dateNotifier,
                      builder: (context, value, child) {
-                       return MarvalWeight();
+                       return  MarvalWeight();
                      })
                     ]))),
                   /// Habits Row
@@ -246,8 +249,14 @@ class _MarvalWeightState extends State<MarvalWeight>{
                   _init= (_max+_min)/2;
                   setState(() {  });
                   ///* Firebase Updates */
-                  user.updateWeight(_perc);
                   _daily.updateWeight(_perc);
+                  DateTime date = dateNotifier.value;
+                  if(user.update.isBefore(date)||user.update.isSameDate(date)){
+                    user.updateWeight(weight: _perc, date: date);
+                  }
+                  else if(user.lastUpdate.isBefore(date)||user.lastUpdate.isSameDate(date)){
+                    user.updateLastWeight(weight: _perc, date: date);
+                  }
                 },
                 appearance: CircularSliderAppearance(
                     size: 38.w,

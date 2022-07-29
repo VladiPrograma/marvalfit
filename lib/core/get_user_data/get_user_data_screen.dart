@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-import 'package:marvalfit/core/get_user_data/get_user_data_metrics.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
 import 'package:marvalfit/widgets/marval_textfield.dart';
 import 'package:marvalfit/widgets/marval_dialogs.dart';
@@ -12,20 +11,22 @@ import 'package:marvalfit/utils/firebase/storage.dart';
 import 'package:marvalfit/config/custom_icons.dart';
 import 'package:marvalfit/utils/objects/user.dart';
 
-import '../../config/log_msg.dart';
 import '../../constants/colors.dart';
 import '../../constants/global_variables.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
-import '../../utils/marval_arq.dart';
+import '../../utils/marval_arq.dart';import 'get_user_details_screen.dart';
 
-final ImagePicker _picker = ImagePicker();
+/// @TODO: do something with this variables, is really ugly to see
 /// @TODO Add const variables
+///
+
 class GetUserDataScreen extends StatelessWidget {
   const GetUserDataScreen({Key? key}) : super(key: key);
   static String routeName = "/get_user_data";
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       backgroundColor: kWhite,
       body: SafeArea(
@@ -50,8 +51,7 @@ class GetUserDataScreen extends StatelessWidget {
      )));
   }
 }
-/// @TODO: do something with this variables, is really ugly to see
-String? phone;
+
 class _Form extends StatelessWidget {
   const _Form({Key? key}) : super(key: key);
 
@@ -61,7 +61,7 @@ class _Form extends StatelessWidget {
     String? _name;
     String? _lastName;
     String? _job;
-
+    String? _phone;
     return Form(
       key: _formKey,
       child: Column(
@@ -127,7 +127,7 @@ class _Form extends StatelessWidget {
                 }
                 return null;
               },
-              onSaved: (value) { phone = value;}
+              onSaved: (value) { _phone = value;}
           ),
           SizedBox(height: 4.h,),
           MarvalElevatedButton(
@@ -136,8 +136,10 @@ class _Form extends StatelessWidget {
             if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
                   if(isNull(_backgroundImage)){
-                     MarvalDialogsAlert(context, type: MarvalDialogAlertType.ACCEPT, height: 37,
+                     MarvalDialogsAlert(context, type: MarvalDialogAlertType.ACCEPT, height: 30,
                         title: "Sube una foto de perfil!",
+                        acceptText: "continuar",
+                        cancelText: "volver",
                         richText: RichText(
                           textAlign: TextAlign.justify,
                           text: TextSpan(
@@ -145,48 +147,37 @@ class _Form extends StatelessWidget {
                             style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
                             children: const <TextSpan>[
                               TextSpan(
-                                  text:  " localizarte antes",
+                                  text:  " localizarte",
                                   style: TextStyle(fontWeight: FontWeight.bold)
                               ),
                               TextSpan(
-                                  text:" dentro de la App.\nVenga animate! Pulsa"
-                              ),
-                              TextSpan(
-                                  text:  " aceptar",
-                                  style: TextStyle(fontWeight: FontWeight.bold)
-                              ),
-                              TextSpan(
-                                  text:  " si no quieres subir la foto para continuar.",
+                                  text:" dentro de la App. Venga animate! "
                               ),
                             ],
                           ),
                         ),
-                        onAccept: () async {
+                        onAccept: (){
                           user = MarvalUser.create(_name!, _lastName!, _job!, null,  0, 0);
+                          ///@TODO Delete the next line and let Mario fix de VALUES
+                          Navigator.popAndPushNamed(context, GetUserDetails.routeName);
 
-                          logInfo(user.toString());
-                          await user.setInDB();
-
-                          /// Update To Firebase User
-                          authUser!.updateDisplayName("$_name");
-                          Navigator.pushNamed(context, GetUserMetricsScreen.routeName);
                        }
                     );
                   }else{
-                    String? _urlImage = await uploadProfileImg(authUser!.uid, _backgroundImage!);
-                    user = MarvalUser.create(_name!, _lastName!, _job!, _urlImage,  0, 0);
-                    await user.setInDB();
-                    authUser!.updatePhotoURL(_urlImage);
-                    authUser!.updateDisplayName("$_name");
-                    Navigator.pushNamed(context, GetUserMetricsScreen.routeName);
+                    Navigator.popAndPushNamed(context, GetUserDetails.routeName, arguments: {'image': _backgroundImage, 'phone': _phone});
+                    user = MarvalUser.create(_name!, _lastName!, _job!, null,  0, 0);
                   }
+
             }})
         ],
       ),
     );
   }
 }
+
 XFile? _backgroundImage;
+final ImagePicker _picker = ImagePicker();
+
 class ProfilePhoto extends StatefulWidget {
   const ProfilePhoto({Key? key}) : super(key: key);
 

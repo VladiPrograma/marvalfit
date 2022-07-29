@@ -5,7 +5,6 @@ import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/core/get_user_data/get_user_data_screen.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
 import 'package:marvalfit/modules/home_screen.dart';
-import 'package:marvalfit/test/sleek_change.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/user.dart';
@@ -13,7 +12,7 @@ import 'package:sizer/sizer.dart';
 import 'config/firebase_options.dart';
 import 'config/routes.dart';
 
-
+///* @TODO Change all the "Navigator.Push" with Navigator.pop&push
 bool _flag = false;
 void main() async{
     WidgetsFlutterBinding.ensureInitialized();

@@ -195,7 +195,7 @@ class _FormPageState extends State<FormPage> with SingleTickerProviderStateMixin
                   await FormItem.setUserResponse(completedForm);
                   logInfo(completedForm.toString());
                   logInfo(specify.toString());
-                  Navigator.pushNamed(context, HomeScreen.routeName);
+                  Navigator.popAndPushNamed(context, HomeScreen.routeName);
                 }else{
                 onTap(keyIndex, offset);
                 pointer++;

@@ -28,4 +28,12 @@ Future<String?> LogIn(String email, String password) async{
   return null;
 }
 
+bool LogOut() {
+  bool success = false;
+   FirebaseAuth.instance.signOut()
+      .whenComplete(() => success =  true)
+      .onError((error, stackTrace) => success = false);
+  return success;
+}
+
 User? getCurrUser(){  return FirebaseAuth.instance.currentUser; }

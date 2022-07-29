@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:marvalfit/core/get_user_data/get_user_data_metrics.dart';
 import 'package:marvalfit/modules/home_screen.dart';
 import 'package:marvalfit/test/sleek_change.dart';
 import 'package:marvalfit/test/snackbar_and_dialogs.dart';
@@ -9,6 +8,8 @@ import '../config/custom_icons.dart';
 import '../constants/colors.dart';
 import '../constants/global_variables.dart';
 import '../constants/theme.dart';
+import '../core/get_user_data/get_user_data_screen.dart';
+import '../core/get_user_data/get_user_details_screen.dart';
 import '../core/login/login_screen.dart';
 import '../utils/marval_arq.dart';
 
@@ -41,7 +42,7 @@ class MarvalDrawer extends StatelessWidget {
           GestureDetector(
             onTap: (){
               Navigator.pop(context);
-              Navigator.pushNamed(context, HomeScreen.routeName);},
+              Navigator.pushNamed(context, GetUserDataScreen.routeName);},
             child: ListTile(
               leading: Icon(Icons.home_rounded,color: name=="Home" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Home', size: 4, color: name=="Home" ? kGreen : kBlack),
@@ -59,7 +60,7 @@ class MarvalDrawer extends StatelessWidget {
           GestureDetector(
             onTap: (){
               Navigator.pop(context);
-              Navigator.pushNamed(context, GetUserMetricsScreen.routeName);},
+              Navigator.pushNamed(context, GetUserDetails.routeName);},
             child: ListTile(
               leading: Icon(Icons.run_circle_outlined,color: name=="Ejercicios" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Ejercicios', size: 4, color: name=="Ejercicios" ? kGreen : kBlack),

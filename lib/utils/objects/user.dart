@@ -17,16 +17,18 @@ class MarvalUser{
   String? profileImage;
   double lastWeight;
   double currWeight;
+  DateTime update;
   DateTime lastUpdate;
   UserDetails? details;
   CurrentUser? currenTraining;
   Map<String, Daily>? dailys;
 
-  MarvalUser({required this.id, required this.name, required this.lastName, required this.work,this.profileImage, required this.lastWeight ,required this.currWeight, required this.lastUpdate});
+  MarvalUser({required this.id, required this.name, required this.lastName, required this.work,this.profileImage, required this.lastWeight ,required this.currWeight, required this.update,  required this.lastUpdate});
 
   MarvalUser.create(this.name, this.lastName, this.work, this.profileImage, this.lastWeight, this.currWeight)
      : id = FirebaseAuth.instance.currentUser!.uid,
        dailys = <String, Daily>{},
+       update = DateTime.now(),
        lastUpdate = DateTime.now();
 
   MarvalUser.fromJson(Map<String, dynamic> map)
@@ -37,6 +39,7 @@ class MarvalUser{
     profileImage  = map["profile_image"],
     currWeight = map["curr_weight"],
     lastWeight = map["last_weight"],
+    update = map["update"].toDate(),
     lastUpdate = map["last_update"].toDate(),
     dailys = <String, Daily>{};
 
@@ -68,6 +71,7 @@ class MarvalUser{
       'profile_image': profileImage, // Programador
       'last_weight' : lastWeight, // 76.3
       'curr_weight' : currWeight, // 77.4
+      'update' : update, // 11/06/2021
       'last_update' : lastUpdate, // 11/07/2022
     })
         .then((value) => logSuccess("$logSuccessPrefix User Added"))
@@ -87,7 +91,7 @@ class MarvalUser{
         "\n Name: $name Last Name: $lastName"
         "\n Job: $work"
         "\n Curr: $currWeight Kg  Last: $lastWeight Kg "
-        "\n Last Update: $lastUpdate"
+        "\n Update: $update Last Update: $lastUpdate"
         "\n Profile image URL: $profileImage"
         "\n Details: ${details?.toString()}"
         "\n Current Training: ${currenTraining?.toString()}"
@@ -95,15 +99,26 @@ class MarvalUser{
 
   }
 
-  void updateWeight(double weight){
+  void updateWeight({required double weight, DateTime? date}){
     lastWeight = currWeight;
     currWeight = weight;
-    lastUpdate = DateTime.now();
+    lastUpdate = update;
+    update = date ?? DateTime.now();
     if(lastWeight == 0){ lastWeight = weight; }
     uploadInDB({
       "last_weight" : lastWeight,
       "curr_weight" : currWeight,
-      "last_update" : lastUpdate
+      "last_update" : lastUpdate,
+      "update" : update
+    });
+  }
+
+  void updateLastWeight({required double weight, required DateTime date}){
+    lastWeight = weight;
+    lastUpdate = date;
+    uploadInDB({
+      "last_weight" : lastWeight,
+      "last_update" : lastUpdate,
     });
   }
 

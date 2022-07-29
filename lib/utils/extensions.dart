@@ -42,7 +42,9 @@ extension DateFormat on DateTime{
     }
     return res;
   }
-
+  bool isSameDate(DateTime date){
+    return day == date.day && month == date.month && year == date.year;
+  }
 
 }
 

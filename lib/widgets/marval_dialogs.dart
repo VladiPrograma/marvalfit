@@ -53,24 +53,24 @@ enum MarvalDialogAlertType {
   ACCEPT,
   ACTIVATE
 }
-void MarvalDialogsAlert(BuildContext context, {required MarvalDialogAlertType type, String? title, required double height, RichText? richText, Function()? onAccept}){
+void MarvalDialogsAlert(BuildContext context, {required MarvalDialogAlertType type, String? title, String? acceptText, String?  cancelText, required double height, RichText? richText, Function()? onAccept}){
   late IconData _icon;
   late String _textButton;
   late Color _textColor;
   late Color _buttonColor;
   if(type == MarvalDialogAlertType.ACCEPT){
     _icon = CustomIcons.info;
-    _textButton = "Aceptar";
+    _textButton = acceptText ?? "Aceptar";
     _textColor = kBlue;
     _buttonColor = kBlueThi;
   }else if(type == MarvalDialogAlertType.DELETE){
     _icon = CustomIcons.alert;
-    _textButton = "Eliminar";
+    _textButton =acceptText ?? "Eliminar";
     _textColor = kRed;
     _buttonColor = kRedThi;
   }else{
     _icon = CustomIcons.info;
-    _textButton = "Activar";
+    _textButton = acceptText ?? "Activar";
     _textColor = kGreen;
     _buttonColor = kGreenThi;
   }
@@ -104,7 +104,7 @@ void MarvalDialogsAlert(BuildContext context, {required MarvalDialogAlertType ty
             Spacer(),
             Row(
               children: [
-                TextButton(onPressed: (){Navigator.pop(context);}, child: TextH2("Cancelar", size: 4, color: _textColor,)),
+                TextButton(onPressed: (){Navigator.pop(context);}, child: TextH2(cancelText ?? "Cancelar", size: 4, color: _textColor,)),
                 Spacer(),
                 TextButton(
                     onPressed: (){
