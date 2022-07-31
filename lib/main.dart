@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:marvalfit/core/get_user_data/get_user_data_screen.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
@@ -17,6 +16,12 @@ import 'package:sizer/sizer.dart';
 import 'config/routes.dart';
 
 ///* @TODO Change the Drawer Navigator Routes
+///* @TODO Drawer have to say "Bienvenido//Bienvenida"
+///* @TODO Complete full form data to Firebase"
+
+///* @TODO Add Splash Load Screen to IOS
+///  https://pub.dev/packages/flutter_native_splash/install
+
 bool _flag = false;
 void main() async{
     WidgetsFlutterBinding.ensureInitialized();
