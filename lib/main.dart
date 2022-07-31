@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 import 'package:marvalfit/core/get_user_data/get_user_data_screen.dart';
 import 'package:marvalfit/core/login/login_screen.dart';

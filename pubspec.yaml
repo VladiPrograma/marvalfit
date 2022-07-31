@@ -44,6 +44,7 @@ dependencies:
   image_picker: ^0.8.5+3
   firebase_storage: ^10.3.2
   sleek_circular_slider: ^2.0.1
+  flutter_native_splash: ^2.2.6
 
 dev_dependencies:
   flutter_test:
@@ -73,3 +74,9 @@ flutter:
     - family: CustomIcons
       fonts:
         - asset: assets/fonts/CustomIcons.ttf
+
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/images/marval_logo.png
+  color_dark: "#FFFFFF"

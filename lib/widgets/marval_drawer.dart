@@ -20,10 +20,11 @@ class MarvalDrawer extends StatelessWidget {
     final String userName = authUser!.displayName!;
     return Drawer(
       backgroundColor: kWhite,
-      child: ListView(
+      child: Container( height: 100.h,
+        child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 3.w),
         children:  <Widget>[
-          SizedBox(height: 44.h,
+          SizedBox(height: 39.h,
               child: DrawerHeader(
                 decoration: BoxDecoration( color: kWhite, border: Border.all(color: kWhite) ),
                 child: Column(
@@ -31,7 +32,7 @@ class MarvalDrawer extends StatelessWidget {
                     CircleAvatar(
                       backgroundImage: isNotNull(authUser!.photoURL) ? Image.network(authUser!.photoURL!).image : null,
                       backgroundColor: kBlack,
-                      radius: 19.w,
+                      radius: 9.h,
                       child: isNull(authUser!.photoURL) ? Icon(CustomIcons.person, color: kWhite, size: 13.w,): null,
                     ),
                     const TextH2('Bienvenido', color: kGrey, size: 6,),
@@ -84,10 +85,11 @@ class MarvalDrawer extends StatelessWidget {
               title: TextH2('Ajustes', size: 4, color: name=="Ajustes" ? kGreen : kBlack),
             ),
           ),
+          SizedBox(height: 10.h,),
           Container( height: 15.h,
             child: Image.asset('assets/images/marval_logo.png'),)
         ],
       ),
-    );
+    ));
   }
 }
