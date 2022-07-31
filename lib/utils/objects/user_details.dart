@@ -1,12 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 
 import '../../config/log_msg.dart';
 import '../../constants/string.dart';
 
 ///@TODO Check City implementation Works
-class UserDetails{
+class Details{
   static CollectionReference detailsDB = FirebaseFirestore.instance.collection("details");
   String id;
   String favoriteFood;
@@ -19,14 +20,14 @@ class UserDetails{
   double height;
   double initialWeight;
 
-  UserDetails(this.id, this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.email,  this.initialWeight, this.startDate,this.birthDate );
+  Details(this.id, this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.email,  this.initialWeight, this.startDate,this.birthDate );
 
-  UserDetails.create(this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.birthDate, this.initialWeight) :
+  Details.create(this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.birthDate, this.initialWeight) :
         id = FirebaseAuth.instance.currentUser!.uid,
         email = FirebaseAuth.instance.currentUser?.email ?? "",
         startDate = DateTime.now();
 
-  UserDetails.fromJson(Map<String, dynamic> map):
+  Details.fromJson(Map<String, dynamic> map):
         id = map["id"],
         phone = map["phone"],
         email = map["email"],
@@ -38,12 +39,12 @@ class UserDetails{
         initialWeight = map["initial_weight"],
         height = map["height"];
 
-  static Future<UserDetails> getFromDB(String uid) async {
+  static Future<Details> getFromDB(String uid) async {
     DocumentSnapshot doc = await detailsDB.doc(uid).get();
     Map<String, dynamic>? map  = toMap(doc);
-    return UserDetails.fromJson(map!);
+    return Details.fromJson(map!);
   }
-  Future<void> setUserDetails(){
+  Future<void> setDetails(){
     // Call the user's CollectionReference to add a new user
     return detailsDB
         .doc(id).set({
@@ -62,12 +63,18 @@ class UserDetails{
         .catchError((error) => logError("$logErrorPrefix Failed to add User Details: $error"));
   }
 
-  Future<void> uploadUserDetails(Map<String, Object> map){
+  Future<void> uploadDetails(Map<String, Object> map){
     // Call the user's CollectionReference to add a new user
     return detailsDB
         .doc(id).update(map)
         .then((value) => logSuccess("$logSuccessPrefix User Details Uploaded"))
         .catchError((error) => logError("$logErrorPrefix Failed to Upload User Details: $error"));
+  }
+
+  static Future<bool> existsInDB(String? uid) async{
+    if(isNull(uid)){ return false;}
+    DocumentSnapshot ds = await detailsDB.doc(uid).get();
+    return ds.exists;
   }
 
   @override
@@ -78,25 +85,11 @@ class UserDetails{
         "\n Favorite Food: $favoriteFood"
         "\n City: $city"
         "\n Birth Date: $birthDate"
+        "\n Age: $age"
         "\n Start Date: $startDate"
         "\n Initial Weight: $initialWeight Height: $height";
   }
 
-  int getAge(){
-    DateTime currentDate = DateTime.now();
-    int age = currentDate.year - birthDate.year;
-    int month1 = currentDate.month;
-    int month2 = birthDate.month;
-    if (month2 > month1) {
-      age--;
-    } else if (month1 == month2) {
-      int day1 = currentDate.day;
-      int day2 = birthDate.day;
-      if (day2 > day1) {
-        age--;
-      }
-    }
-    return age;
-  }
+  int get age => birthDate.fromBirthdayToAge();
 
 }

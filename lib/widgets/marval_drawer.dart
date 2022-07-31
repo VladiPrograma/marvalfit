@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:marvalfit/modules/home_screen.dart';
 import 'package:marvalfit/test/sleek_change.dart';
 import 'package:marvalfit/test/snackbar_and_dialogs.dart';
 import 'package:sizer/sizer.dart';
@@ -18,12 +17,13 @@ class MarvalDrawer extends StatelessWidget {
   final String name;
   @override
   Widget build(BuildContext context) {
+    final String userName = authUser!.displayName!;
     return Drawer(
       backgroundColor: kWhite,
       child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 3.w),
         children:  <Widget>[
-          SizedBox(height: 39.h,
+          SizedBox(height: 44.h,
               child: DrawerHeader(
                 decoration: BoxDecoration( color: kWhite, border: Border.all(color: kWhite) ),
                 child: Column(
@@ -35,7 +35,7 @@ class MarvalDrawer extends StatelessWidget {
                       child: isNull(authUser!.photoURL) ? Icon(CustomIcons.person, color: kWhite, size: 13.w,): null,
                     ),
                     const TextH2('Bienvenido', color: kGrey, size: 6,),
-                    TextH1(authUser!.displayName!, color: kBlack, size: 100/(authUser!.displayName!.length+7),),
+                    TextH1(userName.length<13 ? userName : userName.substring(0,13), color: kBlack, size: 8, textOverFlow: TextOverflow.clip ,),
                   ],
                 ),
               )),
@@ -84,7 +84,6 @@ class MarvalDrawer extends StatelessWidget {
               title: TextH2('Ajustes', size: 4, color: name=="Ajustes" ? kGreen : kBlack),
             ),
           ),
-          SizedBox(height: 7.h),
           Container( height: 15.h,
             child: Image.asset('assets/images/marval_logo.png'),)
         ],

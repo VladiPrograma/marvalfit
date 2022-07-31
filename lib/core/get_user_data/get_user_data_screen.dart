@@ -7,7 +7,6 @@ import 'package:sizer/sizer.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
 import 'package:marvalfit/widgets/marval_textfield.dart';
 import 'package:marvalfit/widgets/marval_dialogs.dart';
-import 'package:marvalfit/utils/firebase/storage.dart';
 import 'package:marvalfit/config/custom_icons.dart';
 import 'package:marvalfit/utils/objects/user.dart';
 
@@ -16,10 +15,6 @@ import '../../constants/global_variables.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
 import '../../utils/marval_arq.dart';import 'get_user_details_screen.dart';
-
-/// @TODO: do something with this variables, is really ugly to see
-/// @TODO Add const variables
-///
 
 class GetUserDataScreen extends StatelessWidget {
   const GetUserDataScreen({Key? key}) : super(key: key);
@@ -137,7 +132,7 @@ class _Form extends StatelessWidget {
                   _formKey.currentState!.save();
                   if(isNull(_backgroundImage)){
                      MarvalDialogsAlert(context, type: MarvalDialogAlertType.ACCEPT, height: 30,
-                        title: "Sube una foto de perfil!",
+                        title: "Sube una foto de perfil",
                         acceptText: "continuar",
                         cancelText: "volver",
                         richText: RichText(
@@ -158,7 +153,6 @@ class _Form extends StatelessWidget {
                         ),
                         onAccept: (){
                           user = MarvalUser.create(_name!, _lastName!, _job!, null,  0, 0);
-                          ///@TODO Delete the next line and let Mario fix de VALUES
                           Navigator.popAndPushNamed(context, GetUserDetails.routeName);
 
                        }

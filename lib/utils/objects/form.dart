@@ -5,7 +5,7 @@ import 'package:marvalfit/utils/marval_arq.dart';
 import '../../config/log_msg.dart';
 import '../../constants/string.dart';
 
-class FormItem {
+class MarvalForm {
   static CollectionReference formsDB = FirebaseFirestore.instance.collection("forms");
   static String docName = "current_form";
   String key;
@@ -13,10 +13,10 @@ class FormItem {
   List<String> answers;
   int number;
 
-  FormItem(this.key, this.question, this.answers, this.number);
+  MarvalForm(this.key, this.question, this.answers, this.number);
 
 
-  FormItem.fromJson(Map<String, dynamic> map)
+  MarvalForm.fromJson(Map<String, dynamic> map)
       : key = map["key"],
         question = map["question"],
         answers = List<String>.from(map["answers"]),
@@ -46,6 +46,12 @@ class FormItem {
         logError("$logErrorPrefix Failed to add form Item: $error"));
   }
 
+  static Future<bool> existsInDB(String? uid) async{
+    if(isNull(uid)){ return false;}
+    DocumentSnapshot ds = await formsDB.doc(uid).get();
+    return ds.exists;
+  }
+
   @override
   String toString() {
     int cont=0;
@@ -55,19 +61,19 @@ class FormItem {
     return res;
   }
 
-  static Future<List<FormItem>> getFromDB() async {
+  static Future<List<MarvalForm>> getFromDB() async {
     DocumentSnapshot doc = await formsDB.doc(docName).get();
     Map<String, dynamic>? map  = toMap(doc);
-    List<FormItem> formList = [];
+    List<MarvalForm> formList = [];
     map!.forEach((key, value) {
-      formList.add(FormItem.fromJson(value));
+      formList.add(MarvalForm.fromJson(value));
     });
     return formList;
   }
 }
 
 
-void completeForm(){
+void setForm(){
   List<String> questions = [
     '¿Padeces alguna enfermedad respiratoria o de corazón?',
     '¿Tienes lesiones o problemas musculares o articulares?',
@@ -86,8 +92,8 @@ void completeForm(){
   ];
   int cont =1;
   for (var element in questions) {
-    FormItem formItem = FormItem('page$cont', element, answers[cont-1], cont);
-    formItem.updateFormAnswer();
+    MarvalForm form = MarvalForm('page$cont', element, answers[cont-1], cont);
+    form.updateFormAnswer();
     cont++;
   }
 }

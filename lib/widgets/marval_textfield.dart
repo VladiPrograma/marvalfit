@@ -83,9 +83,7 @@ class _MarvalInputTextFieldState extends State<MarvalInputTextField> {
 
                             ),
                             validator: (value) {
-                              if (widget.validator == null) {
-                                return null;
-                              }
+                              if (widget.validator == null) {  return null;  }
                               return widget.validator!(value);
                             },
                             onSaved:(value){ isNotNull(widget.onSaved) ? widget.onSaved!(value) : null;},

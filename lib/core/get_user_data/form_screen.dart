@@ -17,9 +17,6 @@ class FormScreen extends StatefulWidget {
   @override
   State<FormScreen> createState() => _FormScreenState();
 }
-///@TODO Simplificar formulario (Hablar con Mario)
-///@TODO Añadir campo de Sexo / DNI? / Ciudad
-
 
 var completedForm = Map<String,String>();
 late String lastQuestion;
@@ -33,7 +30,7 @@ class _FormScreenState extends State<FormScreen> {
     // Create anonymous function:
         () async {
       /** Using async methods to fetch Data */
-          List<FormItem> formItems = await FormItem.getFromDB();
+          List<MarvalForm> formItems = await MarvalForm.getFromDB();
           for (var element in formItems) {
             pages.add(
                 FormPage(
@@ -192,7 +189,7 @@ class _FormPageState extends State<FormPage> with SingleTickerProviderStateMixin
                 }
                 completedForm[widget.question] = normalize(answer)!;
                 if(widget.question == lastQuestion){
-                  await FormItem.setUserResponse(completedForm);
+                  await MarvalForm.setUserResponse(completedForm);
                   logInfo(completedForm.toString());
                   logInfo(specify.toString());
                   Navigator.popAndPushNamed(context, HomeScreen.routeName);
@@ -398,7 +395,6 @@ class _OptionItemFieldState extends State<OptionItemField> {
                   hintMaxLines: 2,
                 ),
                 onChanged: (value){
-                  logInfo(pointer.toString()+" "+specify.length.toString());
                    specify[pointer] = value;
                   },
                 style: TextStyle(fontFamily: h2, color: kWhite, fontSize: 5.w),

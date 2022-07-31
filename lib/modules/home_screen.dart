@@ -22,10 +22,8 @@ late ValueNotifier<int> _sleepNotifier;
 late double _max, _min, _init, _perc; // Sleek Widget vars
 
 
-///@TODO Main page Logic when is Logged but he doesnt complete de forms.
-///@TODO The dataForm Page stay more time than expected uploading images and data to Firebase.
 ///@TODO Normalize names like "Name" or "Tittle".
-///
+
 final activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
 final activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
 
@@ -50,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
     () async {
   /** Using async methods to fetch Data */
         user = await MarvalUser.getFromDB(authUser!.uid);
-      /// @TODO Add the onCreate Current Training.
       await user.getCurrentTraining();
 
       _daily = await _onNewDay(dateNotifier.value);
@@ -70,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const MarvalDrawer(name: "Home",),
+      drawer: MarvalDrawer(name: "Home",),
       backgroundColor: kWhite,
       body:  SingleChildScrollView(
         physics: NeverScrollableScrollPhysics(),
@@ -142,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: InnerShadow(
                     color: kBlack.withOpacity(0.45),
-                    offset: Offset(0, 1.4.w),
+                    offset: Offset(0, 0.7.h),
                     blur: 1.5.w,
                     child:
                   Container(
@@ -179,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Positioned( top: 66.5.h,
                       child: InnerShadow(
                         color: Colors.black,
-                        offset: Offset(0, 1.4.w),
+                        offset: Offset(0, 0.7.h),
                         blur: 1.5.w,
                         child: Container( width: 100.w, height: 59.h,
                             padding: EdgeInsets.symmetric(horizontal: 4.w),
@@ -204,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 topLeft:  Radius.circular(12.w)),
                             boxShadow: [  BoxShadow(
                               color: Colors.black.withOpacity(0.8),
-                              offset: Offset(0, 4.w),
+                              offset: Offset(0, 0.2.h),
                               blurRadius: 4.w,
                             )]
                   ))),
@@ -227,7 +224,7 @@ class _MarvalWeightState extends State<MarvalWeight>{
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-        radius: 18.w,
+        radius: 17.w,
         child:Container(
             padding: EdgeInsets.all(1.w),
             decoration: BoxDecoration(
@@ -443,7 +440,7 @@ class _MarvalHabitState extends State<MarvalHabit> {
                 decoration: BoxDecoration(
                   boxShadow: [BoxShadow(
                     color: Colors.black.withOpacity(0.8),
-                    offset: Offset(0, 1.3.w),
+                    offset: Offset(0, 0.6.h),
                     blurRadius: 3.1.w,
                   )],
                   borderRadius: BorderRadius.circular(100.w),
@@ -496,9 +493,9 @@ class MarvalHabitList extends StatelessWidget {
  /// Activities WIDGET */
 
 class MarvalActivity extends StatefulWidget {
-  const MarvalActivity({required this.icon, required this.title, Key? key}) : super(key: key);
+  const MarvalActivity({required this.icon, required this.name, Key? key}) : super(key: key);
   final IconData icon;
-  final String title;
+  final String name;
   @override
   State<MarvalActivity> createState() => _MarvalActivityState();
 }
@@ -529,7 +526,7 @@ class _MarvalActivityState extends State<MarvalActivity> {
           ),
           child: Row(
             children: [
-              TextH2(widget.title, color: kWhite, size: 4.2,),
+              TextH2(widget.name, color: kWhite, size: 4.2,),
               Spacer(),
               Container(
               decoration: BoxDecoration(
@@ -579,7 +576,7 @@ class MarvalActivityList extends StatelessWidget {
          }
          return Container(
              margin: EdgeInsets.only(bottom: 1.5.h),
-             child: MarvalActivity(title: activities[index-1], icon: activities_icons[index-1],));
+             child: MarvalActivity(name: activities[index-1], icon: activities_icons[index-1],));
        });
   }
 }

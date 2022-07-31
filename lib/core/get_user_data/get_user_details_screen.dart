@@ -35,7 +35,7 @@ class _GetUserDetailsState extends State<GetUserDetails> {
       String? _urlImage = await uploadProfileImg(authUser!.uid, image!);
       user.profileImage = _urlImage;
     }
-      ///@TODO Dont let training param like now
+      ///@TODO Create Custom class for new traning state
       CurrentUser training = CurrentUser.create(habits: ["Sol", "Frio", "Naturaleza"],steps: 10000,
           activities: [
             {"Descanso" :
@@ -214,8 +214,8 @@ class _Form extends StatelessWidget {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
                   ///* Set details */
-                  UserDetails details = UserDetails.create(_height!, _food!, _hobbie!, _phone!, _city!, _birthDate!, _weight!);
-                  details.setUserDetails();
+                  Details details = Details.create(_height!, _food!, _hobbie!, _phone!, _city!, _birthDate!, _weight!);
+                  details.setDetails();
                   logInfo(details.toString());
                   ///* Set Weight */
                   user.updateWeight(weight: _weight!);

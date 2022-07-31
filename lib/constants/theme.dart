@@ -14,7 +14,8 @@ class TextH1 extends StatelessWidget {
   final double? size;
   final Color? color;
   final TextAlign? textAlign;
-  const TextH1(String this.text,{Key? key, this.size, this.color, this.textAlign}) : super(key: key);
+  final TextOverflow? textOverFlow;
+  const TextH1(String this.text,{Key? key, this.size, this.color, this.textAlign, this.textOverFlow}) : super(key: key);
 
   Widget build(BuildContext context) {
     return Text(
@@ -23,6 +24,7 @@ class TextH1 extends StatelessWidget {
       style: TextStyle(
       fontFamily: h1,
       fontSize: size?.w ?? 9.w,
+      overflow: textOverFlow,
       color: color ?? kBlack,
       ),
     );

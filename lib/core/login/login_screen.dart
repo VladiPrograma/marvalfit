@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:marvalfit/modules/home_screen.dart';
 
 import 'package:sizer/sizer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,11 +14,11 @@ import '../../constants/colors.dart';
 import '../../constants/string.dart';
 import '../../constants/global_variables.dart';
 import '../../utils/firebase/auth.dart';
+import '../../utils/objects/form.dart';
 import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_textfield.dart';
 
-/// FIXME: Pop and push when login.
-/// TODO Configure in Firebase Reset Password Email
+/// TODO Configure in Firebase The Reset Password Email
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -110,13 +111,18 @@ class _LogInForm extends StatelessWidget {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
                   print('Email: $_email\nPassword: $_password');
+
                   /// We try to LogIn
                   _loginErrors = await LogIn(_email, _password);
                   _formKey.currentState!.validate();
+
                   if(isNull(_loginErrors)&&isNotNull(FirebaseAuth.instance.currentUser)){
                     authUser = FirebaseAuth.instance.currentUser!;
-                    /** PANTALLA TEST */
-                    Navigator.pushNamed(context, GetUserDataScreen.routeName);
+                    if(await MarvalForm.existsInDB(authUser?.uid)){
+                      Navigator.popAndPushNamed(context, HomeScreen.routeName);
+                    }else{
+                      Navigator.popAndPushNamed(context, GetUserDataScreen.routeName);
+                    }
                   }
                 }
               },

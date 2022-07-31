@@ -19,7 +19,7 @@ class MarvalUser{
   double currWeight;
   DateTime update;
   DateTime lastUpdate;
-  UserDetails? details;
+  Details? details;
   CurrentUser? currenTraining;
   Map<String, Daily>? dailys;
 
@@ -43,7 +43,7 @@ class MarvalUser{
     lastUpdate = map["last_update"].toDate(),
     dailys = <String, Daily>{};
 
-  Future<void> getDetails() async => details = await UserDetails.getFromDB(id);
+  Future<void> getDetails() async => details = await Details.getFromDB(id);
 
   Future<void> getCurrentTraining() async => currenTraining = await CurrentUser.getFromBD(id);
 
@@ -53,7 +53,6 @@ class MarvalUser{
     if(isNull(uid)){ return false;}
     DocumentSnapshot ds = await usersDB.doc(uid).get();
     return ds.exists;
-
   }
   static Future<MarvalUser> getFromDB(String uid) async {
     DocumentSnapshot doc = await usersDB.doc(uid).get();
