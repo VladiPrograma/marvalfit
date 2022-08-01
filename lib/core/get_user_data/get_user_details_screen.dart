@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marvalfit/config/custom_icons.dart';
 import 'package:marvalfit/constants/global_variables.dart';
+import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
 import 'package:marvalfit/widgets/marval_textfield.dart';
@@ -56,7 +57,7 @@ class _GetUserDetailsState extends State<GetUserDetails> {
       /// Update To Firebase User
       authUser!.updateDisplayName(user.name);
       authUser!.updatePhotoURL(user.profileImage);
-
+      authUser = getCurrUser();
       _upToBD = true;
   }
   @override
