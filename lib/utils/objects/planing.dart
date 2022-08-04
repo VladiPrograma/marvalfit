@@ -4,21 +4,21 @@ import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/string.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 
-class CurrentUser{
-  static CollectionReference currentUserDB = FirebaseFirestore.instance.collection("users_curr");
+class Planing{
+  static CollectionReference planingDB = FirebaseFirestore.instance.collection("users_curr");
   String id;
   int? steps;
   List<String>? habits;
   List<dynamic>? activities;
   DateTime lastUpdate;
 
-  CurrentUser({required this.id, this.habits, this.steps, this.activities,required this.lastUpdate});
+  Planing({required this.id, this.habits, this.steps, this.activities,required this.lastUpdate});
 
-  CurrentUser.create({this.habits, this.steps, this.activities})
+  Planing.create({this.habits, this.steps, this.activities})
       : id = FirebaseAuth.instance.currentUser!.uid,
         lastUpdate = DateTime.now();
 
-  CurrentUser.fromJson(Map<String, dynamic> map)
+  Planing.fromJson(Map<String, dynamic> map)
       : id = map["id"],
         habits = List<String>.from(map["habits"]),
         steps = map["steps"],
@@ -26,24 +26,24 @@ class CurrentUser{
         lastUpdate = map["last_update"].toDate();
 
 
-  static Future<bool> currentUserExists(String? uid) async{
+  static Future<bool> PlaningExists(String? uid) async{
     if(isNull(uid)){ return false;}
-    DocumentSnapshot ds = await currentUserDB.doc(uid).get();
+    DocumentSnapshot ds = await planingDB.doc(uid).get();
     return ds.exists;
 
   }
 
 
 
-  static Future<CurrentUser> getFromBD(String uid) async {
-    DocumentSnapshot doc = await currentUserDB.doc(uid).get();
+  static Future<Planing> getFromBD(String uid) async {
+    DocumentSnapshot doc = await planingDB.doc(uid).get();
     Map<String, dynamic>? map  = toMap(doc);
-    return CurrentUser.fromJson(map!);
+    return Planing.fromJson(map!);
   }
 
   Future<void> setInDB(){
     // Call the user's CollectionReference to add a new user
-    return currentUserDB
+    return planingDB
         .doc(id).set({
       'id': id, // UID
       'steps': steps, // 1012
@@ -55,9 +55,9 @@ class CurrentUser{
         .catchError((error) => logError("$logErrorPrefix Failed to Add User Current Training: $error"));
   }
 
-  Future<void> uploadCurrentUser(Map<String, Object> map){
+  Future<void> uploadPlaning(Map<String, Object> map){
     // Call the user's CollectionReference to add a new user
-    return currentUserDB
+    return planingDB
         .doc(id).update(map)
         .then((value) => logSuccess("$logSuccessPrefix User Current Training Uploaded"))
         .catchError((error) => logError("$logErrorPrefix Failed to Upload User Current Training: $error"));

@@ -152,14 +152,15 @@ class _Form extends StatelessWidget {
                           ),
                         ),
                         onAccept: (){
-                          user = MarvalUser.create(_name!, _lastName!, _job!, null,  0, 0);
+                          user.updateBasics(name: _name!, lastName: _lastName!, work: _job!);
                           Navigator.popAndPushNamed(context, GetUserDetails.routeName);
 
                        }
                     );
                   }else{
+                    user.updateBasics(name: _name!, lastName: _lastName!, work: _job!);
                     Navigator.popAndPushNamed(context, GetUserDetails.routeName, arguments: {'image': _backgroundImage, 'phone': _phone});
-                    user = MarvalUser.create(_name!, _lastName!, _job!, null,  0, 0);
+
                   }
 
             }})

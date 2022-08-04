@@ -14,7 +14,7 @@ import '../../constants/string.dart';
 import '../../constants/theme.dart';
 import '../../utils/firebase/storage.dart';
 import '../../utils/marval_arq.dart';
-import '../../utils/objects/user_curr.dart';
+import '../../utils/objects/planing.dart';
 import 'form_screen.dart';
 
 String? _phone;
@@ -37,7 +37,7 @@ class _GetUserDetailsState extends State<GetUserDetails> {
       user.profileImage = _urlImage;
     }
       ///@TODO Create Custom class for new traning state
-      CurrentUser training = CurrentUser.create(habits: ["Sol", "Frio", "Naturaleza"],steps: 10000,
+      Planing training = Planing.create(habits: ["Sol", "Frio", "Naturaleza"],steps: 10000,
           activities: [
             {"Descanso" :
             { "icon": 'sleep', "label": 'Descanso', "type": 'rest', "id": 'ACT_001'}},
@@ -55,8 +55,9 @@ class _GetUserDetailsState extends State<GetUserDetails> {
       user.currenTraining = training;
 
       /// Update To Firebase User
-      authUser!.updateDisplayName(user.name);
-      authUser!.updatePhotoURL(user.profileImage);
+      await authUser!.updateDisplayName(user.name);
+      await authUser!.updatePhotoURL(user.profileImage);
+      ///@TODO Test drawer works after creating new user
       authUser = getCurrUser();
       _upToBD = true;
   }
@@ -215,11 +216,12 @@ class _Form extends StatelessWidget {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
                   ///* Set details */
-                  Details details = Details.create(_height!, _food!, _hobbie!, _phone!, _city!, _birthDate!, _weight!);
+                  Details details = Details.create(_height!, _food!, _phone!, _city!,_birthDate!, _weight!);
                   details.setDetails();
                   logInfo(details.toString());
                   ///* Set Weight */
                   user.updateWeight(weight: _weight!);
+                  user.updateHobbie(hobbie: _hobbie!);
                   user.details = details;
                   logInfo(user.toString());
                   Navigator.popAndPushNamed(context, FormScreen.routeName);

@@ -5,6 +5,7 @@ import 'package:marvalfit/constants/string.dart';
 import 'package:sizer/sizer.dart';
 
 import '../config/custom_icons.dart';
+import '../utils/firebase/auth.dart';
 import '../utils/marval_arq.dart';
 
 import '../widgets/marval_dialogs.dart';
@@ -48,12 +49,12 @@ class TestComponentScreen extends StatelessWidget {
                 );}),
               SizedBox(height: 3.h,),
               MarvalElevatedButton("Snack Fail", onPressed: (){
+                LogOut();
                 MarvalSnackBar(
                     context,
                     SNACKTYPE.alert,
                     title: "Titulo de ejemplo",
                     subtitle: "Por favor recuerda mirar la información introducida antes de enviar tus datos."
-
                 );}),
               SizedBox(height: 3.h,),
               MarvalElevatedButton(

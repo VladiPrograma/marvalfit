@@ -6,7 +6,6 @@ import 'package:marvalfit/constants/colors.dart';
 import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/extensions.dart';
-import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:sizer/sizer.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
@@ -40,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState(){
     super.initState();
     dateNotifier = ValueNotifier(DateTime.now());
-     user = MarvalUser.create("", "", "", "", 0, 0);
+     user = MarvalUser.create("", "", "", "");
     _daily = Daily.create(day: dateNotifier.value);
     _sleepNotifier = ValueNotifier(0);
     _init=0; _max=5; _min=-5; _perc=_init;

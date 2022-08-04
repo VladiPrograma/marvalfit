@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:marvalfit/modules/home_screen.dart';
+import 'package:marvalfit/widgets/marval_snackbar.dart';
 
 import 'package:sizer/sizer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,6 +16,7 @@ import '../../constants/string.dart';
 import '../../constants/global_variables.dart';
 import '../../utils/firebase/auth.dart';
 import '../../utils/objects/form.dart';
+import '../../utils/objects/user.dart';
 import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_textfield.dart';
 
@@ -118,6 +120,7 @@ class _LogInForm extends StatelessWidget {
 
                   if(isNull(_loginErrors)&&isNotNull(FirebaseAuth.instance.currentUser)){
                     authUser = FirebaseAuth.instance.currentUser!;
+                    user = await MarvalUser.getFromDB(authUser!.uid);
                     if(await MarvalForm.existsInDB(authUser?.uid)){
                       Navigator.popAndPushNamed(context, HomeScreen.routeName);
                     }else{

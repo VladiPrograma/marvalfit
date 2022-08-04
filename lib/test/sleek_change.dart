@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/colors.dart';
 import 'package:marvalfit/constants/string.dart';
+import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:sizer/sizer.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
@@ -89,6 +90,7 @@ class _SleekState extends State<Sleek> {
                 )
             ),
             onChange: (double value) {
+              LogOut();
               perc = double.parse(value.toStringAsPrecision(3));
               logInfo(perc.toStringAsPrecision(3));
             }

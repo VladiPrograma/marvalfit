@@ -22,6 +22,8 @@ import 'config/routes.dart';
 ///* @TODO Add Splash Load Screen to IOS
 ///  https://pub.dev/packages/flutter_native_splash/install
 
+///@TODO when restart the BD change 'users_curr' name.
+
 bool _flag = false;
 void main() async{
     WidgetsFlutterBinding.ensureInitialized();

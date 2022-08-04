@@ -11,27 +11,22 @@ class Details{
   static CollectionReference detailsDB = FirebaseFirestore.instance.collection("details");
   String id;
   String favoriteFood;
-  String hobbie;
   String phone;
-  String email;
   String city;
   DateTime birthDate;
   DateTime startDate;
   double height;
   double initialWeight;
 
-  Details(this.id, this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.email,  this.initialWeight, this.startDate,this.birthDate );
+  Details(this.id, this.height, this.favoriteFood,  this.phone, this.city,  this.initialWeight, this.startDate,this.birthDate );
 
-  Details.create(this.height, this.favoriteFood, this.hobbie, this.phone, this.city, this.birthDate, this.initialWeight) :
+  Details.create(this.height, this.favoriteFood,  this.phone, this.city, this.birthDate, this.initialWeight) :
         id = FirebaseAuth.instance.currentUser!.uid,
-        email = FirebaseAuth.instance.currentUser?.email ?? "",
         startDate = DateTime.now();
 
   Details.fromJson(Map<String, dynamic> map):
         id = map["id"],
         phone = map["phone"],
-        email = map["email"],
-        hobbie = map['hobbie'],
         city = map['city'],
         favoriteFood = map["favorite_food"],
         birthDate = map["birth_date"].toDate(),
@@ -50,8 +45,6 @@ class Details{
         .doc(id).set({
       'id': id, // UID
       'phone': phone, // Vlad
-      'email': email, // Dumitru
-      'hobbie': hobbie, // Programador
       'city': city, // Programador
       'favorite_food' : favoriteFood, // 76.3
       'birth_date' : birthDate, // 77.4
@@ -80,8 +73,6 @@ class Details{
   @override
   String toString() {
     return " ID: $id"
-        "\n Email: $email Phone: $phone"
-        "\n Hobbie: $hobbie"
         "\n Favorite Food: $favoriteFood"
         "\n City: $city"
         "\n Birth Date: $birthDate"
