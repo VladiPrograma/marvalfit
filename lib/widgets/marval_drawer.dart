@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:marvalfit/test/sleek_change.dart';
 import 'package:marvalfit/test/snackbar_and_dialogs.dart';
 import 'package:sizer/sizer.dart';
 
@@ -7,9 +6,10 @@ import '../config/custom_icons.dart';
 import '../constants/colors.dart';
 import '../constants/global_variables.dart';
 import '../constants/theme.dart';
-import '../core/get_user_data/get_user_data_screen.dart';
 import '../core/get_user_data/get_user_details_screen.dart';
 import '../core/login/login_screen.dart';
+import '../modules/chat/chat_screen.dart';
+import '../modules/home_screen.dart';
 import '../utils/marval_arq.dart';
 
 class MarvalDrawer extends StatelessWidget {
@@ -43,7 +43,7 @@ class MarvalDrawer extends StatelessWidget {
           GestureDetector(
             onTap: (){
               Navigator.pop(context);
-              Navigator.pushNamed(context, GetUserDataScreen.routeName);},
+              Navigator.pushNamed(context, HomeScreen.routeName);},
             child: ListTile(
               leading: Icon(Icons.home_rounded,color: name=="Home" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Home', size: 4, color: name=="Home" ? kGreen : kBlack),
@@ -52,7 +52,7 @@ class MarvalDrawer extends StatelessWidget {
           GestureDetector(
             onTap: (){
               Navigator.pop(context);
-              Navigator.pushNamed(context, TestSleekScreen.routeName);},
+              Navigator.pushNamed(context, ChatScreen.routeName);},
             child: ListTile(
               leading: Icon(Icons.message_outlined,color: name=="Chat" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Chat', size: 4, color: name=="Chat" ? kGreen : kBlack),

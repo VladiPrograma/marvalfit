@@ -152,13 +152,13 @@ class _Form extends StatelessWidget {
                           ),
                         ),
                         onAccept: (){
-                          user.updateBasics(name: _name!, lastName: _lastName!, work: _job!);
+                          user.updateData(name: _name!, lastName: _lastName!, work: _job!);
                           Navigator.popAndPushNamed(context, GetUserDetails.routeName);
 
                        }
                     );
                   }else{
-                    user.updateBasics(name: _name!, lastName: _lastName!, work: _job!);
+                    user.updateData(name: _name!, lastName: _lastName!, work: _job!);
                     Navigator.popAndPushNamed(context, GetUserDetails.routeName, arguments: {'image': _backgroundImage, 'phone': _phone});
 
                   }

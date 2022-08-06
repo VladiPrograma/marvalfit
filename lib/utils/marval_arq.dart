@@ -75,3 +75,11 @@ Map<String, dynamic>? toMap(DocumentSnapshot doc){
     logError("DocumentSnapshot fails in cast to Map<String, dynamic):\n $E");
   }
 }
+
+Map<String, dynamic>? queryToMap(QueryDocumentSnapshot query){
+  try{
+    return query.data() as Map<String, dynamic>;
+  }catch(E){
+    logError("DocumentSnapshot fails in cast to Map<String, dynamic):\n $E");
+  }
+}

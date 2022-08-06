@@ -78,6 +78,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.16.0"
+  creator:
+    dependency: "direct main"
+    description:
+      name: creator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.7"
+  creator_core:
+    dependency: transitive
+    description:
+      name: creator_core
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.7"
   cross_file:
     dependency: transitive
     description:

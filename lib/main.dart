@@ -1,3 +1,4 @@
+import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:marvalfit/core/get_user_data/get_user_data_screen.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
 import 'package:marvalfit/constants/global_variables.dart';
+import 'package:marvalfit/modules/chat/chat_screen.dart';
 
 import 'package:marvalfit/modules/home_screen.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
@@ -32,7 +34,7 @@ void main() async{
   );
   authUser = getCurrUser();
   _flag = await MarvalForm.existsInDB(authUser?.uid);
-  runApp(MyApp());
+  runApp(CreatorGraph(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

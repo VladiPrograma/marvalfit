@@ -21,7 +21,6 @@ late ValueNotifier<int> _sleepNotifier;
 late double _max, _min, _init, _perc; // Sleek Widget vars
 
 
-///@TODO Normalize names like "Name" or "Tittle".
 
 final activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
 final activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];

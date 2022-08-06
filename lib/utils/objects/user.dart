@@ -8,6 +8,10 @@ import 'package:marvalfit/utils/objects/planing.dart';
 import 'package:marvalfit/utils/objects/user_daily.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 
+import 'message.dart';
+
+///@TODO Make this variables Finals when its the case.
+///@TODO Organice data i want to use from where. Like UserAuth for names and photos or MarvalUser data.
 class MarvalUser{
   static CollectionReference usersDB = FirebaseFirestore.instance.collection("users");
   String id;
@@ -26,6 +30,7 @@ class MarvalUser{
   Details? details;
   Planing? currenTraining;
   Map<String, Daily>? dailys;
+  List<Message>? chat;
 
   MarvalUser({required this.id, required this.name, required this.lastName,required this.email,required this.active, required this.objective, required this.hobbie, required this.work,this.profileImage, required this.lastWeight ,required this.currWeight, required this.update,  required this.lastUpdate});
 
@@ -39,6 +44,7 @@ class MarvalUser{
         lastWeight = 0,
         currWeight = 0,
         dailys = <String, Daily>{},
+        chat = <Message>[],
         update = DateTime.now(),
         lastUpdate = DateTime.now();
 
@@ -57,6 +63,21 @@ class MarvalUser{
         update = map["update"].toDate(),
         lastUpdate = map["last_update"].toDate(),
         dailys = <String, Daily>{};
+
+
+  MarvalUser.empty()
+      : id = "",
+        email = "",
+        name = "",
+        lastName = "",
+        work = "",
+        hobbie = "",
+        active = true,
+        lastWeight = 0,
+        currWeight = 0,
+        dailys = <String, Daily>{},
+        update = DateTime.now(),
+        lastUpdate = DateTime.now();
 
   Future<void> getDetails() async => details = await Details.getFromDB(id);
 
@@ -124,7 +145,7 @@ class MarvalUser{
         "\n Dailys: \n${dailys.toString()}";
 
   }
-  void updateBasics({required String name,required String lastName,required String work}){
+  void updateData({required String name,required String lastName,required String work}){
     this.name = name;
     this.lastName = lastName;
     this.work = work;
@@ -155,7 +176,6 @@ class MarvalUser{
       "last_update" : lastUpdate,
     });
   }
-
   void updateHobbie({required String hobbie}){
     this.hobbie = hobbie;
     uploadInDB({
