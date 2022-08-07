@@ -7,6 +7,7 @@ import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/utils/decoration.dart';
+import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:sizer/sizer.dart';
 
@@ -27,6 +28,21 @@ final userCreator = Emitter.stream((ref) async {
       authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
   return FirebaseFirestore.instance.collection('users').doc(authId).snapshots();
 });
+final chatCreator = Emitter.stream((ref) async {
+  final authId = await ref.watch(
+      authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
+  return FirebaseFirestore.instance.collection('users/$authId/chat').orderBy('date',descending: true).snapshots();
+});
+
+List<Message>? getMsg(Ref ref){
+  final query = ref.watch(chatCreator.asyncData).data;
+  if(isNull(query)||query!.size==0){ return null; }
+  List<Message> list = [];
+  for (var element in [...query.docs]){
+    list.add(Message.fromJson(element.data()));
+  }
+  return list;
+}
 
 final _counter = Creator.value(<Message>[]);
 
@@ -85,24 +101,42 @@ class ChatScreen extends StatelessWidget {
                       ),
                       ///* Chat Messages
                       Positioned( top: 23.h,
-                        child:  Container(width: 100.w, height: 77.h,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(topLeft: Radius.circular(15.w), topRight: Radius.circular(15.w)),
-                              ),
-                              child: Watcher((context, ref, child) {
-                                logInfo('Rebuildeao');
-                                final data = counter(ref);
-                                return ListView.builder(
-                                  itemCount: data.length,
-                                  itemBuilder: (context, index){
-                                    Message msg = data[index];
-                                    if(msg.user == authUser!.uid){
-                                      return TextH2(msg.message, color: kWhite, size: 4,);
-                                    }
-                                    return TextH2('Que pedo');
-                                  });
-                              },)
-                            )),
+                        child:  Container(width: 100.w, height: 67.h,
+                        padding: EdgeInsets.only( bottom: MediaQuery.of(context).viewInsets.bottom),
+                         child: ClipRRect(
+                         borderRadius: BorderRadius.vertical(top: Radius.circular(15.w)),
+                         child: Watcher((context, ref, child) {
+                          logInfo('Rebuildeao');
+                          final data = getMsg(ref);
+                          if(isNull(data)||data!.isEmpty){
+                            return CircularProgressIndicator();
+                          }
+                          DateTime firstDate = data.first.date;
+                          return ListView.separated(
+                            reverse: true,
+                            itemCount: data.length,
+                            separatorBuilder: (context, index) {
+                              if(isNotNull(data[index+1])&& firstDate.day != data[index+1].date.day){
+                                firstDate = data[index+1].date;
+                                return Container(
+                                  padding: EdgeInsets.only(bottom: 1.h),
+                                  child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(width: 30.w, height: 0.5.w, color: kGrey, ),
+                                    TextP2(' ${firstDate.toFormatStringDate()} ', color: kGrey,),
+                                    Container(width: 30.w, height: 0.5.w, color: kGrey, )
+                                  ],
+                                ));
+                              }
+                              return SizedBox();
+                            },
+                            itemBuilder: (context, index){
+                              Message msg = data[index];
+                              return MessageBox(msg: msg);
+                            });
+
+                       })))),
                       /// TextField
                       Positioned(bottom: 3.w, left: 5.w,
                       child: SizedBox( width: 90.w,
@@ -121,7 +155,6 @@ class ChatScreen extends StatelessWidget {
                               suffixIcon: GestureDetector(
                                 onTap:(){
                                     if(isNotEmpty(_controller.text)){
-                                      logInfo('Khe');
                                       Message newMsg = Message.create(_controller.text, MessageType.text);
                                       newMsg.setInDB();
                                       addMessage(context.ref, newMsg);
@@ -172,5 +205,47 @@ class BoxUserData extends StatelessWidget {
         )
       ],
     );
+  }
+}
+
+class MessageBox extends StatelessWidget {
+  const MessageBox({required this.msg, Key? key}) : super(key: key);
+  final Message msg;
+  int getMarginSize(){
+    const List<int> sizes = [0, 4, 8, 12, 16, 20];
+    const List<int> margins = [77,77,66,55,42,29];
+    int labelSize = 0;
+    for (var element in sizes) {
+      if(msg.message.length>=element) labelSize++;
+    }
+    return margins[labelSize-1];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bool fromUser = msg.user != authUser!.uid;
+
+    return Column(
+      crossAxisAlignment: fromUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+      children:[ Container(
+      padding: EdgeInsets.all(3.w),
+      margin: EdgeInsets.only(
+          right: fromUser ? getMarginSize().w : 4.w,
+          left : fromUser ? 4.w : getMarginSize().w
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.only(
+          topRight:  fromUser ? Radius.circular(2.w) : Radius.zero,
+          topLeft : !fromUser ? Radius.circular(2.w) : Radius.zero,
+          bottomLeft: Radius.circular(2.w),
+          bottomRight: Radius.circular(2.w),
+        ),
+        color: fromUser ? kBlack : kBlue,
+      ),
+      child: TextH2(msg.message, color: kWhite, size: 4,textAlign: TextAlign.start),
+    ),
+    Padding(padding: EdgeInsets.only(left: 4.w, right: 4  .w, bottom: 1.h,),
+        child: TextP2(msg.date.toFormatStringHour(), color: kGrey,))
+    ]);
   }
 }

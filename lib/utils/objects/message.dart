@@ -25,7 +25,7 @@ Message.create(this.message, this.type):
 Message.fromJson(Map<String, dynamic> map)
     : user = map["user"],
       message = map["message"],
-      type = map["type"],
+      type = MessageType.values.byName(map["type"]),
       date = map["date"].toDate();
 
 Future<void> setInDB(){

@@ -28,6 +28,9 @@ extension DateFormat on DateTime{
       default : return "";
     }
   }
+  String toFormatStringDate(){ return '$day-$month-$year';}
+  String toFormatStringHour(){ return '$hour:${minute>10 ? minute : '0$minute'} ${hour<12? 'am' : 'pm'}';}
+
   String iDay(){
     String dayValue = day.toString();
     if(dayValue.length == 1){
