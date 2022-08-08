@@ -13,11 +13,9 @@ import 'colors.dart';
   offset: Offset(0, 1.3.w),
   blurRadius: 1.5.w,
 );
-/* boxShadow: [
-    BoxShadow(
-      color: Colors.purple[200],
-      spreadRadius: -8,
-      blurRadius: 10.0,
-    ),
-  ],
-*/
+
+BoxShadow kDarkShadow =  BoxShadow(
+ color: kBlack.withOpacity(0.85),
+ offset: Offset(0, 1.3.w),
+ blurRadius: 2.1.w,
+);

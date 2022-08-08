@@ -65,4 +65,12 @@ extension DateFormat on DateTime{
     return age;
   }
 }
-
+///@TODO Add MaxLenght to all text labels with overflow risk.
+extension StringFormat on String{
+  String maxLength(int num){
+    if(length>num){
+      return substring(0, num);
+    }
+    return this;
+  }
+}

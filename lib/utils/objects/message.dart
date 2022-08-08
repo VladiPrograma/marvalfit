@@ -48,7 +48,6 @@ String toString() {
       "\n Message: $message "
       "\n Type: ${type.name}"
       "\n Date: ${date.toFormatStringDate} - ${date.toFormatStringHour()}";
-
 }
 
 

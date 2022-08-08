@@ -62,11 +62,10 @@ ScrollController returnController(Ref ref){
 }
 
 
-
+///@TODO Remove TEXTH1 "Waiting Conexion"
 class ChatScreen extends StatelessWidget {
   const ChatScreen({Key? key}) : super(key: key);
   static String routeName = '/chat';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,15 +111,15 @@ class ChatScreen extends StatelessWidget {
                         ))),
                       ),
                       ///* Chat Messages
-                      Positioned( top: 23.h,
-                        child:  Container(width: 100.w, height: 67.h,
+                      Positioned( top: 18.h,
+                        child:  Container(width: 100.w, height: 72.h,
                         padding: EdgeInsets.only( bottom: MediaQuery.of(context).viewInsets.bottom),
                          child: ClipRRect(
                          borderRadius: BorderRadius.vertical(top: Radius.circular(15.w)),
                          child: Watcher((context, ref, child) {
                           final data = getMsg(ref);
                           if(isNull(data)||data!.isEmpty){
-                            return TextH1('Waiting Conexion');
+                            return SizedBox();
                           }
                           DateTime firstDate = data.first.date;
                           return ListView.separated(
@@ -152,9 +151,6 @@ class ChatScreen extends StatelessWidget {
                       Positioned(bottom: 3.w, left: 5.w,
                       child: SizedBox( width: 90.w,
                         child: TextField(
-                          onTap: () {
-                            fetchMore(context.ref);
-                          },
                           controller: _controller,
                           decoration: InputDecoration(
                               fillColor: kWhite,
