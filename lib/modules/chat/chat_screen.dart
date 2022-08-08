@@ -77,19 +77,19 @@ class ChatScreen extends StatelessWidget {
                     children: [
                       /// Grass Image
                       Positioned( top: 0,
-                          child: Container(width: 100.w, height: 18.h,
+                          child: Container(width: 100.w, height: 12.h,
                               child: Image.asset('assets/images/grass.png', fit: BoxFit.cover))
                       ),
                       ///White Container
-                      Positioned( top: 12.h,
-                          child: Container(width: 100.w, height: 20.h,
+                      Positioned( top: 8.h,
+                          child: Container(width: 100.w, height: 10.h,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.only(topLeft: Radius.circular(10.w), topRight: Radius.circular(10.w)),
                                   color: kWhite
                               ))),
                       /// Marval Trainer Data
-                      Positioned(  top: 9.5.h, left: 8.w,
-                        child: Watcher((context, ref, _) {
+                      Positioned(  top: 1.h, left: 8.w,
+                        child: SafeArea(child: Watcher((context, ref, _) {
                           final query = ref.watch(trainerCreator.asyncData).data;
                           if(isNull(query)||query!.size==0){
                             return BoxUserData(user: MarvalUser.empty());
@@ -98,14 +98,14 @@ class ChatScreen extends StatelessWidget {
                           final MarvalUser user = MarvalUser.fromJson(map);
                           return BoxUserData(user: user);
                         }),
-                      ),
+                      )),
                       /// Chat Container
-                      Positioned( top: 23.h,
+                      Positioned( top: 18.h,
                         child:  InnerShadow(
                             color: Colors.black,
                             blur: 10,
                             offset: Offset(0,2.w),
-                            child: Container(width: 100.w, height: 77.h,
+                            child: Container(width: 100.w, height: 82.h,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.only(topLeft: Radius.circular(15.w), topRight: Radius.circular(15.w)),
                                   color: kBlack.withOpacity(0.85)
@@ -211,8 +211,8 @@ class BoxUserData extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 2.h,),
-            TextH2(user.name, size: 4),
+            SizedBox(height: 3.h,),
+            TextH2('${user.name} ${user.lastName}', size: 4),
             TextH2(user.work, size: 3, color: kGrey,),
           ],
         )
