@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:marvalfit/constants/global_variables.dart';
+import 'package:marvalfit/utils/extensions.dart';
 
 import '../../config/log_msg.dart';
 import '../../constants/string.dart';
@@ -41,6 +42,14 @@ Future<void> setInDB(){
       .catchError((error) => logError("$logErrorPrefix Message to add user: $error"));
 }
 
+@override
+String toString() {
+  return " User_ID: $user"
+      "\n Message: $message "
+      "\n Type: ${type.name}"
+      "\n Date: ${date.toFormatStringDate} - ${date.toFormatStringHour()}";
+
+}
 
 
 }

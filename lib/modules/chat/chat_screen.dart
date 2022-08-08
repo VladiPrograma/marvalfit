@@ -21,20 +21,22 @@ import '../../widgets/marval_drawer.dart';
 final trainerCreator = Emitter.stream((ref) async {
   return  FirebaseFirestore.instance.collection('users').where('email', isEqualTo: 'marval@gmail.com').snapshots();
 });
-
-final authEmitter = Emitter.stream((p0) => FirebaseAuth.instance.authStateChanges());
 final userCreator = Emitter.stream((ref) async {
   final authId = await ref.watch(
       authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
   return FirebaseFirestore.instance.collection('users').doc(authId).snapshots();
 });
+final authEmitter = Emitter.stream((n) => FirebaseAuth.instance.authStateChanges());
+
+
+
 final chatCreator = Emitter.stream((ref) async {
+  /// This piece of code waits and only returns when AuthEmitter has UID data avalaible.
   final authId = await ref.watch(
       authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
-  return FirebaseFirestore.instance.collection('users/$authId/chat').orderBy('date',descending: true).snapshots();
+  return FirebaseFirestore.instance.collection('users/$authId/chat').orderBy('date',descending: true).limit(5).snapshots();
 });
-
-List<Message>? getMsg(Ref ref){
+List<Message>? initialChatData(Ref ref){
   final query = ref.watch(chatCreator.asyncData).data;
   if(isNull(query)||query!.size==0){ return null; }
   List<Message> list = [];
@@ -44,10 +46,50 @@ List<Message>? getMsg(Ref ref){
   return list;
 }
 
-final _counter = Creator.value(<Message>[]);
+///* -_-_-_- NEW UPDATES -_-_-_-
+final lastTimestampCreator = Creator.value(DateTime.now());
+void  updateTimestamp(Ref ref, DateTime date) => ref.update(lastTimestampCreator, (d) => date);
 
-List<Message> counter(Ref ref)=> ref.watch(_counter);
-void addMessage(Ref ref, Message msg) => ref.update<List<Message>>(_counter , (n)=> [...n, msg]);
+final firstTimestampCreator = Creator.value(DateTime.now());
+void  updateFirstTimestamp(Ref ref, DateTime date) => ref.update(firstTimestampCreator, (d) => date);
+
+List<Message> messages = <Message>[];
+final chat = Creator.value(messages);
+
+List<Message> getChatMessages(Ref ref)=> ref.watch(chat);
+void addMessage(Ref ref, Message msg) => ref.update<List<Message>>(chat , (n)=> [msg, ...n]);
+void loadMessages(Ref ref, List<Message> msgs) =>ref.update<List<Message>>(chat , (n)=> [...n, ...msgs]);
+
+final chatEmitter = Emitter.stream((ref) async {
+  final authId = await ref.watch(
+      authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
+  return  FirebaseFirestore.instance.collection('users/$authId/chat')
+      .where(  'date', isGreaterThan: ref.watch(firstTimestampCreator))
+      .where(  'user', isNotEqualTo : authId)
+      .orderBy('date', descending   : true)
+      .limit(10).snapshots();
+});
+
+final fromUserEmitter = Emitter.stream((ref) async {
+  final authId = await ref.watch(
+      authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
+  return  FirebaseFirestore.instance.collection('users/$authId/chat')
+      .where('date', isGreaterThan: ref.watch(lastTimestampCreator))
+      .orderBy('date',descending: true)
+      .limit(10).snapshots();
+});
+
+Future<void> fetchMessage(Ref ref) async{
+  final query = ref.watch(chatEmitter.asyncData).data;
+  if(isNull(query)||query!.size==0){ return; }
+  List<Message> list = [];
+   for (var element in [...query.docs]){
+     list.add(Message.fromJson(element.data()));
+  }
+   logError('wait khe');
+  updateTimestamp(ref, list.last.date);
+  loadMessages(ref, list);
+}
 
 final TextEditingController _controller = TextEditingController();
 
@@ -107,8 +149,8 @@ class ChatScreen extends StatelessWidget {
                          borderRadius: BorderRadius.vertical(top: Radius.circular(15.w)),
                          child: Watcher((context, ref, child) {
                           logInfo('Rebuildeao');
-                          final data = getMsg(ref);
-                          if(isNull(data)||data!.isEmpty){
+                          final data = getChatMessages(ref);
+                          if(isNull(data)||data.isEmpty){
                             return CircularProgressIndicator();
                           }
                           DateTime firstDate = data.first.date;
@@ -135,12 +177,14 @@ class ChatScreen extends StatelessWidget {
                               Message msg = data[index];
                               return MessageBox(msg: msg);
                             });
-
                        })))),
                       /// TextField
                       Positioned(bottom: 3.w, left: 5.w,
                       child: SizedBox( width: 90.w,
                         child: TextField(
+                          onTap: () async{
+                             fetchMessage(context.ref);
+                          },
                           controller: _controller,
                           decoration: InputDecoration(
                               fillColor: kWhite,
@@ -213,7 +257,7 @@ class MessageBox extends StatelessWidget {
   final Message msg;
   int getMarginSize(){
     const List<int> sizes = [0, 4, 8, 12, 16, 20];
-    const List<int> margins = [77,77,66,55,42,29];
+    const List<int> margins = [77,70,61,53,42,29];
     int labelSize = 0;
     for (var element in sizes) {
       if(msg.message.length>=element) labelSize++;
