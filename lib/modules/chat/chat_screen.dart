@@ -6,7 +6,6 @@ import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/constants/theme.dart';
-import 'package:marvalfit/modules/chat/state_management.dart';
 import 'package:marvalfit/utils/decoration.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
@@ -32,23 +31,37 @@ final authEmitter = Emitter.stream((n) => FirebaseAuth.instance.authStateChanges
 final _page = Creator.value(1);
 void fetchMore(Ref ref) => ref.update<int>(_page, (n) => n + 1);
 
-Future<List<Message>> fetchNews(Ref ref, int page) async {
+final chatCreator = Emitter.stream((ref) async {
   final authId = await ref.watch(
       authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
-
-  final query = await FirebaseFirestore.instance.collection('users/$authId/chat')
+  return FirebaseFirestore.instance.collection('users/$authId/chat')
       .orderBy('date',descending: true)
-      .limit(10 * page).snapshots().toList();
-  logInfo(query.length);
+      .limit(10*ref.watch(_page))
+      .snapshots();
+});
+List<Message>? getMsg(Ref ref){
+  final query = ref.watch(chatCreator.asyncData).data;
+  if(isNull(query)||query!.size==0){ return null; }
   List<Message> list = [];
-  for (var element in [...query.first.docs]){
+  for (var element in [...query.docs]){
     list.add(Message.fromJson(element.data()));
   }
-  list.forEach((element) {logInfo(element);});
   return list;
 }
 
 final TextEditingController _controller = TextEditingController();
+
+ScrollController returnController(Ref ref){
+  ScrollController  res = ScrollController();
+  res.addListener((){
+    if(res.position.maxScrollExtent==res.offset){
+      fetchMore(ref);
+    }
+  });
+  return res;
+}
+
+
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -105,14 +118,14 @@ class ChatScreen extends StatelessWidget {
                          child: ClipRRect(
                          borderRadius: BorderRadius.vertical(top: Radius.circular(15.w)),
                          child: Watcher((context, ref, child) {
-                          logInfo('Rebuildeao');
-                          final data = getChatMessages(ref);
-                          if(isNull(data)||data.isEmpty){
-                            return CircularProgressIndicator();
+                          final data = getMsg(ref);
+                          if(isNull(data)||data!.isEmpty){
+                            return TextH1('Waiting Conexion');
                           }
                           DateTime firstDate = data.first.date;
                           return ListView.separated(
                             reverse: true,
+                            controller: returnController(ref),
                             itemCount: data.length,
                             separatorBuilder: (context, index) {
                               if(isNotNull(data[index+1])&& firstDate.day != data[index+1].date.day){
@@ -140,7 +153,7 @@ class ChatScreen extends StatelessWidget {
                       child: SizedBox( width: 90.w,
                         child: TextField(
                           onTap: () {
-                             fetchNews(context.ref, context.ref.watch(_page));
+                            fetchMore(context.ref);
                           },
                           controller: _controller,
                           decoration: InputDecoration(
@@ -158,7 +171,6 @@ class ChatScreen extends StatelessWidget {
                                     if(isNotEmpty(_controller.text)){
                                       Message newMsg = Message.create(_controller.text, MessageType.text);
                                       newMsg.setInDB();
-                                      addMessage(context.ref, newMsg);
                                     }
                                   _controller.text="";
                                 },
