@@ -6,6 +6,7 @@ import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/constants/theme.dart';
+import 'package:marvalfit/modules/chat/state_management.dart';
 import 'package:marvalfit/utils/decoration.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
@@ -28,67 +29,23 @@ final userCreator = Emitter.stream((ref) async {
 });
 final authEmitter = Emitter.stream((n) => FirebaseAuth.instance.authStateChanges());
 
+final _page = Creator.value(1);
+void fetchMore(Ref ref) => ref.update<int>(_page, (n) => n + 1);
 
-
-final chatCreator = Emitter.stream((ref) async {
-  /// This piece of code waits and only returns when AuthEmitter has UID data avalaible.
+Future<List<Message>> fetchNews(Ref ref, int page) async {
   final authId = await ref.watch(
       authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
-  return FirebaseFirestore.instance.collection('users/$authId/chat').orderBy('date',descending: true).limit(5).snapshots();
-});
-List<Message>? initialChatData(Ref ref){
-  final query = ref.watch(chatCreator.asyncData).data;
-  if(isNull(query)||query!.size==0){ return null; }
+
+  final query = await FirebaseFirestore.instance.collection('users/$authId/chat')
+      .orderBy('date',descending: true)
+      .limit(10 * page).snapshots().toList();
+  logInfo(query.length);
   List<Message> list = [];
-  for (var element in [...query.docs]){
+  for (var element in [...query.first.docs]){
     list.add(Message.fromJson(element.data()));
   }
+  list.forEach((element) {logInfo(element);});
   return list;
-}
-
-///* -_-_-_- NEW UPDATES -_-_-_-
-final lastTimestampCreator = Creator.value(DateTime.now());
-void  updateTimestamp(Ref ref, DateTime date) => ref.update(lastTimestampCreator, (d) => date);
-
-final firstTimestampCreator = Creator.value(DateTime.now());
-void  updateFirstTimestamp(Ref ref, DateTime date) => ref.update(firstTimestampCreator, (d) => date);
-
-List<Message> messages = <Message>[];
-final chat = Creator.value(messages);
-
-List<Message> getChatMessages(Ref ref)=> ref.watch(chat);
-void addMessage(Ref ref, Message msg) => ref.update<List<Message>>(chat , (n)=> [msg, ...n]);
-void loadMessages(Ref ref, List<Message> msgs) =>ref.update<List<Message>>(chat , (n)=> [...n, ...msgs]);
-
-final chatEmitter = Emitter.stream((ref) async {
-  final authId = await ref.watch(
-      authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
-  return  FirebaseFirestore.instance.collection('users/$authId/chat')
-      .where(  'date', isGreaterThan: ref.watch(firstTimestampCreator))
-      .where(  'user', isNotEqualTo : authId)
-      .orderBy('date', descending   : true)
-      .limit(10).snapshots();
-});
-
-final fromUserEmitter = Emitter.stream((ref) async {
-  final authId = await ref.watch(
-      authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
-  return  FirebaseFirestore.instance.collection('users/$authId/chat')
-      .where('date', isGreaterThan: ref.watch(lastTimestampCreator))
-      .orderBy('date',descending: true)
-      .limit(10).snapshots();
-});
-
-Future<void> fetchMessage(Ref ref) async{
-  final query = ref.watch(chatEmitter.asyncData).data;
-  if(isNull(query)||query!.size==0){ return; }
-  List<Message> list = [];
-   for (var element in [...query.docs]){
-     list.add(Message.fromJson(element.data()));
-  }
-   logError('wait khe');
-  updateTimestamp(ref, list.last.date);
-  loadMessages(ref, list);
 }
 
 final TextEditingController _controller = TextEditingController();
@@ -182,8 +139,8 @@ class ChatScreen extends StatelessWidget {
                       Positioned(bottom: 3.w, left: 5.w,
                       child: SizedBox( width: 90.w,
                         child: TextField(
-                          onTap: () async{
-                             fetchMessage(context.ref);
+                          onTap: () {
+                             fetchNews(context.ref, context.ref.watch(_page));
                           },
                           controller: _controller,
                           decoration: InputDecoration(
