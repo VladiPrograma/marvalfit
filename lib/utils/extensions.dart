@@ -1,3 +1,36 @@
+import 'package:flutter/material.dart';
+
+extension StringFormat on String{
+
+  String maxLength(int num){
+    if(length>num){
+      return substring(0, num);
+    }
+    return this;
+  }
+
+  String normalize(){
+    String res = toLowerCase();
+    res = res.replaceFirst(res.characters.first, res.characters.first.toUpperCase());
+    return res;
+  }
+
+  String toCamellCase(){
+    List<String> _list = toLowerCase().split(" ");
+    String res = "";
+    for(String x in _list){
+      res+= x.replaceFirst(x.characters.first, x.characters.first.toUpperCase());
+      res+=" ";
+    }
+    return res.trim();
+  }
+
+  double? toDouble(){
+    try{  return  double.parse(replaceAll(',', '.')); }
+    catch(E){ return null;  }
+  }
+}
+
 extension DateFormat on DateTime{
   String toStringMonth(){
     switch(month){
@@ -31,17 +64,12 @@ extension DateFormat on DateTime{
   String toFormatStringDate(){ return '$day-$month-$year';}
   String toFormatStringHour(){ return '$hour:${minute>10 ? minute : '0$minute'} ${hour<12? 'am' : 'pm'}';}
 
-  String iDay(){
-    String dayValue = day.toString();
-    if(dayValue.length == 1){
-      dayValue = '0$day';
-    }
-    return '$dayValue-$month-$year';
-  }
+  get id => '${day<10 ? '0$day' : '$day'}-$month-$year';
+
   DateTime lastMonday(){
     DateTime res = this;
     while(res.weekday!=1){
-      res= res.add(Duration(days: -1));
+      res= res.add(const Duration(days: -1));
     }
     return res;
   }
@@ -65,12 +93,4 @@ extension DateFormat on DateTime{
     return age;
   }
 }
-///@TODO Add MaxLenght to all text labels with overflow risk.
-extension StringFormat on String{
-  String maxLength(int num){
-    if(length>num){
-      return substring(0, num);
-    }
-    return this;
-  }
-}
+

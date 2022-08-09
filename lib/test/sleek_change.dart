@@ -1,15 +1,11 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/colors.dart';
-import 'package:marvalfit/constants/string.dart';
-import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:sizer/sizer.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
-import '../config/custom_icons.dart';
 import '../constants/theme.dart';
-import '../utils/marval_arq.dart';
+import '../utils/firebase/auth.dart';
 
 
 
@@ -90,7 +86,7 @@ class _SleekState extends State<Sleek> {
                 )
             ),
             onChange: (double value) {
-              LogOut();
+              logOut();
               perc = double.parse(value.toStringAsPrecision(3));
               logInfo(perc.toStringAsPrecision(3));
             }

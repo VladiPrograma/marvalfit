@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/string.dart';
 import 'package:marvalfit/constants/theme.dart';
-import 'package:marvalfit/modules/home_screen.dart';
-import 'package:marvalfit/utils/marval_arq.dart';
+import 'package:marvalfit/modules/home/home_screen.dart';
+import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../config/custom_icons.dart';
@@ -18,13 +18,15 @@ class FormScreen extends StatefulWidget {
   State<FormScreen> createState() => _FormScreenState();
 }
 
-var completedForm = Map<String,String>();
-late String lastQuestion;
-int pointer = 0;
-List<String> specify = [""];
+Map<String,String> _completedForm = {};
+late String _lastQuestion;
+int _pointer = 0;
+List<String> _specify = [""];
+
 class _FormScreenState extends State<FormScreen> {
   List<Widget> pages = List.empty(growable: true);
   int pageNumber = 1;
+  @override
   void initState(){
     super.initState();
     // Create anonymous function:
@@ -45,7 +47,7 @@ class _FormScreenState extends State<FormScreen> {
             );
           }
           pages = pages.reversed.toList();
-          lastQuestion = formItems.first.question;
+          _lastQuestion = formItems.first.question;
           setState(() { });
     }();
 
@@ -59,7 +61,7 @@ class _FormScreenState extends State<FormScreen> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-          child: Container(width: 100.w, height: 100.h,
+          child: SizedBox(width: 100.w, height: 100.h,
           child: Stack(
           children: [
             Positioned(
@@ -68,12 +70,12 @@ class _FormScreenState extends State<FormScreen> {
                 child: Column(
                   children: [
                     GestureDetector(
-                      onTap: (){setState(() { if(pageNumber<pages.length&&pageNumber<completedForm.length+1){  pageNumber++; pointer++;  }});},
+                      onTap: (){setState(() { if(pageNumber<pages.length&&pageNumber<_completedForm.length+1){  pageNumber++; _pointer++;  }});},
                       child:Icon(Icons.arrow_upward_rounded, color: kWhite, size: 8.w,),
                     ),
                     SizedBox(height: 2.h,),
               GestureDetector(
-                onTap: (){setState(() { if(pageNumber>1){ pageNumber--; pointer--;} });},
+                onTap: (){setState(() { if(pageNumber>1){ pageNumber--; _pointer--;} });},
                 child: Icon(Icons.arrow_downward_rounded, color: kWhite, size: 8.w,)),
              ])), // Arrows
             const Bicyclet(),
@@ -90,11 +92,6 @@ class _FormScreenState extends State<FormScreen> {
     );
   }
 }
-
-
-
-
-
 
 class FormPage extends StatefulWidget {
   final int number;
@@ -165,7 +162,7 @@ class _FormPageState extends State<FormPage> with SingleTickerProviderStateMixin
           key: keys[1],
           child:  StepQuestion(question: widget.question),
         ),
-        Spacer(),
+        const Spacer(),
         ...widget.answers.map((String answer) {
           int answerIndex = widget.answers.indexOf(answer);
           int keyIndex = answerIndex + 2;
@@ -185,17 +182,17 @@ class _FormPageState extends State<FormPage> with SingleTickerProviderStateMixin
               onTap: (offset) async{
 
                 if(answer==widget.answers.first&&widget.answers.last.contains('Especifica')){
-                  answer+= '. ${specify[pointer]}';
+                  answer+= '. ${_specify[_pointer]}';
                 }
-                completedForm[widget.question] = normalize(answer)!;
-                if(widget.question == lastQuestion){
-                  await MarvalForm.setUserResponse(completedForm);
-                  logInfo(completedForm.toString());
-                  logInfo(specify.toString());
+                _completedForm[widget.question] = answer.normalize();
+                if(widget.question == _lastQuestion){
+                  await MarvalForm.setUserResponse(_completedForm);
+                  logInfo(_completedForm.toString());
+                  logInfo(_specify.toString());
                   Navigator.popAndPushNamed(context, HomeScreen.routeName);
                 }else{
                 onTap(keyIndex, offset);
-                pointer++;
+                _pointer++;
                 }
               },
               showDot: selectedOptionKeyIndex != keyIndex,
@@ -334,8 +331,8 @@ class OptionItem extends StatefulWidget {
 class _OptionItemState extends State<OptionItem> {
   @override
   Widget build(BuildContext context) {
-    if(specify.length==pointer){
-      specify.add("");
+    if(_specify.length==_pointer){
+      _specify.add("");
     }
     return InkWell(
       onTap: () {
@@ -376,8 +373,8 @@ class OptionItemField extends StatefulWidget {
 class _OptionItemFieldState extends State<OptionItemField> {
   @override
   Widget build(BuildContext context) {
-    if(specify.length==pointer){
-      specify.add("");
+    if(_specify.length==_pointer){
+      _specify.add("");
     }
     return  Padding(
         padding:  EdgeInsets.symmetric(vertical: 4.w),
@@ -395,7 +392,7 @@ class _OptionItemFieldState extends State<OptionItemField> {
                   hintMaxLines: 2,
                 ),
                 onChanged: (value){
-                   specify[pointer] = value;
+                   _specify[_pointer] = value;
                   },
                 style: TextStyle(fontFamily: h2, color: kWhite, fontSize: 5.w),
                 maxLines: 2,

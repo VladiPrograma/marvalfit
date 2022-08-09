@@ -1,5 +1,9 @@
+import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
+import 'package:marvalfit/config/log_msg.dart';
+import 'package:marvalfit/modules/chat/chat_logic.dart';
 import 'package:marvalfit/test/snackbar_and_dialogs.dart';
+import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:sizer/sizer.dart';
 
 import '../config/custom_icons.dart';
@@ -9,7 +13,7 @@ import '../constants/theme.dart';
 import '../core/get_user_data/get_user_details_screen.dart';
 import '../core/login/login_screen.dart';
 import '../modules/chat/chat_screen.dart';
-import '../modules/home_screen.dart';
+import '../modules/home/home_screen.dart';
 import '../utils/marval_arq.dart';
 
 class MarvalDrawer extends StatelessWidget {
@@ -20,7 +24,7 @@ class MarvalDrawer extends StatelessWidget {
     final String userName = authUser!.displayName!;
     return Drawer(
       backgroundColor: kWhite,
-      child: Container( height: 100.h,
+      child: SizedBox( height: 100.h,
         child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 3.w),
         children:  <Widget>[
@@ -54,8 +58,20 @@ class MarvalDrawer extends StatelessWidget {
               Navigator.pop(context);
               Navigator.pushNamed(context, ChatScreen.routeName);},
             child: ListTile(
-              leading: Icon(Icons.message_outlined,color: name=="Chat" ? kGreen : kBlack, size: 6.w,),
-              title: TextH2('Chat', size: 4, color: name=="Chat" ? kGreen : kBlack),
+              leading: Icon(Icons.chat_rounded, color: name=="Chat" ? kGreen : kBlack, size: 6.w,),
+              title: Watcher((context, ref, _) {
+                int notifications = 0;
+                final data = getLoadMessages(ref);
+                notifications = data?.where((element) => element.user!=authUser!.uid && !element.read).length ?? 0;
+                return Row( children: [
+                  TextH2('Chat', size: 4, color: name == "Chat" ? kGreen : kBlack),
+                  SizedBox(width: 3.w,),
+                  notifications == 0 ?
+                  const SizedBox()
+                      :
+                  CircleAvatar( radius: 2.w, backgroundColor: kRed, child: TextH1('$notifications', color: kWhite, size: 2,),)
+                ]);
+              }),
             ),
           ),
           GestureDetector(
@@ -69,11 +85,11 @@ class MarvalDrawer extends StatelessWidget {
           ),
           GestureDetector(
             onTap: (){
-              Navigator.pop(context);
-              Navigator.pushNamed(context, LoginScreen.routeName);},
+              logOut();
+              Navigator.popAndPushNamed(context, LoginScreen.routeName);},
             child: ListTile(
-              leading: Icon(CustomIcons.person ,color: name=="Perfil" ? kGreen : kBlack, size: 6.w,),
-              title: TextH2('Perfil', size: 4, color: name=="Perfil" ? kGreen : kBlack),
+              leading: Icon(CustomIcons.person ,color: name == "Perfil" ? kGreen : kBlack, size: 6.w,),
+              title: TextH2('Perfil', size: 4, color:  name == "Perfil" ? kGreen : kBlack),
             ),
           ),
           GestureDetector(
@@ -86,8 +102,7 @@ class MarvalDrawer extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10.h,),
-          Container( height: 15.h,
-            child: Image.asset('assets/images/marval_logo.png'),)
+          SizedBox( height: 15.h, child: Image.asset('assets/images/marval_logo.png'),)
         ],
       ),
     ));

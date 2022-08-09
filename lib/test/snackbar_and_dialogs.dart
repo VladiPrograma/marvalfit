@@ -49,7 +49,7 @@ class TestComponentScreen extends StatelessWidget {
                 );}),
               SizedBox(height: 3.h,),
               MarvalElevatedButton("Snack Fail", onPressed: (){
-                LogOut();
+                logOut();
                 MarvalSnackBar(
                     context,
                     SNACKTYPE.alert,
@@ -141,9 +141,9 @@ class TestComponentScreen extends StatelessWidget {
                         keyboardType: TextInputType.emailAddress,
                         validator: (value){
                           if(isNullOrEmpty(value)){
-                            return kInputErrorEmptyValue;
+                            return kEmptyValue;
                           }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
-                            return kInputErrorEmailMissmatch;
+                            return kEmailMissmatch;
                           }
                           return null;
                         },

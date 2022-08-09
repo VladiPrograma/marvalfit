@@ -9,12 +9,12 @@ import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
-import '../config/custom_icons.dart';
-import '../constants/global_variables.dart';
-import '../utils/decoration.dart';
-import '../utils/objects/user.dart';
-import '../utils/objects/user_daily.dart';
-import '../widgets/marval_drawer.dart';
+import '../../config/custom_icons.dart';
+import '../../constants/global_variables.dart';
+import '../../utils/decoration.dart';
+import '../../utils/objects/user.dart';
+import '../../utils/objects/user_daily.dart';
+import '../../widgets/marval_drawer.dart';
 
 late Daily _daily;
 late ValueNotifier<int> _sleepNotifier;
@@ -22,8 +22,8 @@ late double _max, _min, _init, _perc; // Sleek Widget vars
 
 
 
-final activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
-final activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
+const activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
+const activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -38,8 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState(){
     super.initState();
     dateNotifier = ValueNotifier(DateTime.now());
-     user = MarvalUser.create("", "", "", "");
-    _daily = Daily.create(day: dateNotifier.value);
+     user = MarvalUser.empty();
+    _daily = Daily.create(date: dateNotifier.value);
     _sleepNotifier = ValueNotifier(0);
     _init=0; _max=5; _min=-5; _perc=_init;
     // Create anonymous function:
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     GestureDetector(
                       onTap: () async{
                         DateTime _date = dateNotifier.value.add(const Duration(days: -7));
-                        await _onDayChange(_date);
+                        await _onDayChange(_date.lastMonday());
                       },
                       child:Container(
                           child: Row(children: [
@@ -106,7 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     GestureDetector(
                         onTap: () async{
                           DateTime _date = dateNotifier.value.add(const Duration(days: 7));
-                          await _onDayChange(_date);
+                          await _onDayChange(_date.lastMonday());
                         },
                         child:Container(
                             child: Row(children: [
@@ -336,24 +336,22 @@ class _DateListState extends State<DateList> {
 }
 ///* Date FUNCTIONS */
 Future<Daily> _onNewDay(DateTime date) async{
-  if(user.dailys!.containsKey(date.iDay())){
-    return user.dailys![date.iDay()]!;
+  if(user.dailys!.containsKey(date.id)){
+    return user.dailys![date.id]!;
   }
   else if(await Daily.existsInDB(date)){
     await user.getDaily(date);
-    return user.dailys![date.iDay()]!;
+    return user.dailys![date.id]!;
   }else{
-    String key = date.iDay();
-    user.dailys![key] = Daily.create(day: date);
+    String key = date.id;
+    user.dailys![key] = Daily.create(date: date);
     user.dailys![key]!.setInDB();
     return user.dailys![key]!;
   }
 }
 Future<void> _onDayChange(DateTime date) async{
   _daily = await _onNewDay(date);
-  logInfo("Day changed: ${_daily.day.iDay()}");
-
-  dateNotifier.value = date;
+   dateNotifier.value = date;
   _sleepNotifier.value = _daily.sleep;
   _init = _daily.weight == 0 ? user.currWeight : _daily.weight;
   _max=_init+2; _min=_init-2;  _perc=_init;
@@ -431,7 +429,7 @@ class _MarvalHabitState extends State<MarvalHabit> {
             GestureDetector(
               onTap:() => setState(() {
                 _daily.updateHabits(widget.name);
-                 logInfo(user.dailys![dateNotifier.value.iDay()]!.habits.toString());
+                 logInfo(user.dailys![dateNotifier.value.id]!.habits.toString());
 
               }),
               child: Container(

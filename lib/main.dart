@@ -8,7 +8,7 @@ import 'package:marvalfit/core/login/login_screen.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/modules/chat/chat_screen.dart';
 
-import 'package:marvalfit/modules/home_screen.dart';
+import 'package:marvalfit/modules/home/home_screen.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/form.dart';

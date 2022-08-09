@@ -1,63 +1,32 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:creator/creator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:marvalfit/config/log_msg.dart';
-import 'package:marvalfit/constants/components.dart';
-import 'package:marvalfit/constants/global_variables.dart';
-import 'package:marvalfit/constants/theme.dart';
-import 'package:marvalfit/utils/decoration.dart';
-import 'package:marvalfit/utils/extensions.dart';
-import 'package:marvalfit/utils/marval_arq.dart';
+import 'package:creator/creator.dart' ;
 import 'package:sizer/sizer.dart';
 
-import '../../config/custom_icons.dart';
+
+import '../../constants/theme.dart' ;
 import '../../constants/colors.dart';
 import '../../constants/string.dart';
-import '../../utils/objects/message.dart';
+import '../../constants/components.dart';
+import '../../constants/global_variables.dart';
+
+import '../../utils/decoration.dart';
+import '../../utils/extensions.dart';
+import '../../utils/marval_arq.dart';
 import '../../utils/objects/user.dart';
+import '../../utils/objects/message.dart';
+
+import '../../config/custom_icons.dart';
 import '../../widgets/marval_drawer.dart';
 
-final trainerCreator = Emitter.stream((ref) async {
-  return  FirebaseFirestore.instance.collection('users').where('email', isEqualTo: 'marval@gmail.com').snapshots();
-});
-final userCreator = Emitter.stream((ref) async {
-  final authId = await ref.watch(
-      authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
-  return FirebaseFirestore.instance.collection('users').doc(authId).snapshots();
-});
-final authEmitter = Emitter.stream((n) => FirebaseAuth.instance.authStateChanges());
+import 'chat_logic.dart';
 
-final _page = Creator.value(1);
-void fetchMore(Ref ref) => ref.update<int>(_page, (n) => n + 1);
 
-final chatCreator = Emitter.stream((ref) async {
-  final authId = await ref.watch(
-      authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
-  return FirebaseFirestore.instance.collection('users/$authId/chat')
-      .orderBy('date',descending: true)
-      .limit(10*ref.watch(_page))
-      .snapshots();
-});
-List<Message>? getMsg(Ref ref){
-  final query = ref.watch(chatCreator.asyncData).data;
-  if(isNull(query)||query!.size==0){ return null; }
-  List<Message> list = [];
-  for (var element in [...query.docs]){
-    list.add(Message.fromJson(element.data()));
-  }
-  return list;
-}
 
 final TextEditingController _controller = TextEditingController();
 
 ScrollController returnController(Ref ref){
   ScrollController  res = ScrollController();
-  res.addListener((){
-    if(res.position.maxScrollExtent==res.offset){
-      fetchMore(ref);
-    }
-  });
+  res.addListener((){ if(res.position.maxScrollExtent==res.offset){ fetchMoreMessages(ref); }});
   return res;
 }
 
@@ -117,11 +86,12 @@ class ChatScreen extends StatelessWidget {
                          child: ClipRRect(
                          borderRadius: BorderRadius.vertical(top: Radius.circular(15.w)),
                          child: Watcher((context, ref, child) {
-                          final data = getMsg(ref);
-                          if(isNull(data)||data!.isEmpty){
-                            return SizedBox();
-                          }
+                          final data = getLoadMessages(ref);
+                          if(isNull(data)||data!.isEmpty){  return const SizedBox();}
+                          readMessages(data);
+
                           DateTime firstDate = data.first.date;
+
                           return ListView.separated(
                             reverse: true,
                             controller: returnController(ref),
@@ -143,15 +113,17 @@ class ChatScreen extends StatelessWidget {
                               return SizedBox();
                             },
                             itemBuilder: (context, index){
-                              Message msg = data[index];
-                              return MessageBox(msg: msg);
+                              Message message = data[index];
+                              return MessageBox(message: message);
                             });
                        })))),
                       /// TextField
                       Positioned(bottom: 3.w, left: 5.w,
                       child: SizedBox( width: 90.w,
                         child: TextField(
+                          cursorColor: kGreen,
                           controller: _controller,
+                          style: TextStyle(fontSize: 4.w, fontFamily: p2, color: kBlack),
                           decoration: InputDecoration(
                               fillColor: kWhite,
                               filled: true,
@@ -165,17 +137,16 @@ class ChatScreen extends StatelessWidget {
                               suffixIcon: GestureDetector(
                                 onTap:(){
                                     if(isNotEmpty(_controller.text)){
-                                      Message newMsg = Message.create(_controller.text, MessageType.text);
-                                      newMsg.setInDB();
+                                      Message newMessage = Message.create(
+                                        message:_controller.text,
+                                        type: MessageType.text
+                                      );
+                                      newMessage.setInDB();
                                     }
                                   _controller.text="";
                                 },
                                 child: Icon(Icons.send_rounded, color: kBlack, size: 7.w,),
-                              )
-
-                          ),
-                          style: TextStyle(fontSize: 4.w, fontFamily: p2, color: kBlack),
-                          cursorColor: kGreen,
+                              )),
                         ),
                       ),)
                     ])),
@@ -191,56 +162,49 @@ class BoxUserData extends StatelessWidget {
     return Row(
       children: [
         Container(
-            decoration: BoxDecoration(
-              boxShadow: [kMarvalHardShadow],
-              borderRadius: BorderRadius.all(Radius.circular(100.w)),
-            ),
-            child: CircleAvatar(
-                backgroundColor: kBlack,
-                radius: 6.h,
-                backgroundImage:  isNullOrEmpty(user.profileImage) ?
-                  null
-                    :
-                  Image.network(user.profileImage!, fit: BoxFit.fitHeight).image
-            )),
+         decoration: BoxDecoration(
+           boxShadow: [kMarvalHardShadow],
+           borderRadius: BorderRadius.all(Radius.circular(100.w)),
+         ),
+         child: CircleAvatar(
+             backgroundColor: kBlack,
+             radius: 6.h,
+             backgroundImage:  isNullOrEmpty(user.profileImage) ?
+               null
+                 :
+               Image.network(user.profileImage!, fit: BoxFit.fitHeight).image
+         )),
         SizedBox(width: 2.w),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 3.h,),
-            TextH2('${user.name} ${user.lastName}', size: 4),
-            TextH2(user.work, size: 3, color: kGrey,),
-          ],
-        )
-      ],
-    );
+        Column(crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 3.h,),
+          TextH2('${user.name} ${user.lastName}', size: 4),
+          TextH2(user.work, size: 3, color: kGrey,),
+        ])
+      ]);
   }
 }
+const List<int> _sizes = [0, 4, 8, 12, 16, 20];
+const List<int> _margins = [77,65,53,41,29,15];
 
+int _getMarginSize(Message message){
+  int labelSize = 0;
+  _sizes.where((size) => message.message.length>=size).forEach((element)=> labelSize++);
+  return _margins[labelSize-1];
+}
 class MessageBox extends StatelessWidget {
-  const MessageBox({required this.msg, Key? key}) : super(key: key);
-  final Message msg;
-  int getMarginSize(){
-    const List<int> sizes = [0, 4, 8, 12, 16, 20];
-    const List<int> margins = [77,70,61,53,42,29];
-    int labelSize = 0;
-    for (var element in sizes) {
-      if(msg.message.length>=element) labelSize++;
-    }
-    return margins[labelSize-1];
-  }
-
+  const MessageBox({required this.message, Key? key}) : super(key: key);
+  final Message message;
   @override
   Widget build(BuildContext context) {
-    final bool fromUser = msg.user != authUser!.uid;
-
+    final bool fromUser = message.user != authUser!.uid;
     return Column(
       crossAxisAlignment: fromUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
       children:[ Container(
       padding: EdgeInsets.all(3.w),
       margin: EdgeInsets.only(
-          right: fromUser ? getMarginSize().w : 4.w,
-          left : fromUser ? 4.w : getMarginSize().w
+          right: fromUser ? _getMarginSize(message).w : 4.w,
+          left : fromUser ? 4.w : _getMarginSize(message).w
       ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -251,10 +215,10 @@ class MessageBox extends StatelessWidget {
         ),
         color: fromUser ? kBlack : kBlue,
       ),
-      child: TextH2(msg.message, color: kWhite, size: 4,textAlign: TextAlign.start),
+      child: TextH2(message.message, color: kWhite, size: 4,textAlign: TextAlign.start),
     ),
     Padding(padding: EdgeInsets.only(left: 4.w, right: 4  .w, bottom: 1.h,),
-        child: TextP2(msg.date.toFormatStringHour(), color: kGrey,))
+        child: TextP2(message.date.toFormatStringHour(), color: kGrey,))
     ]);
   }
 }

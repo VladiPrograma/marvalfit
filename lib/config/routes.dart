@@ -9,7 +9,7 @@ import '../test/snackbar_and_dialogs.dart';
 import '../core/login/login_screen.dart';
 import '../core/get_user_data/get_user_data_screen.dart';
 import '../core/get_user_data/get_user_details_screen.dart';
-import 'package:marvalfit/modules/home_screen.dart';
+import 'package:marvalfit/modules/home/home_screen.dart';
 
 
 final Map<String, WidgetBuilder> routes = {

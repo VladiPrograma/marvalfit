@@ -1,49 +1,45 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:marvalfit/utils/marval_arq.dart';
 
-import '../../config/log_msg.dart';
+import '../../constants/global_variables.dart';
 import '../../constants/string.dart';
+import '../../config/log_msg.dart';
+import '../marval_arq.dart';
 
 class MarvalForm {
   static CollectionReference formsDB = FirebaseFirestore.instance.collection("forms");
   static String docName = "current_form";
-  String key;
-  String question;
+  final String key;
+  final String question;
   List<String> answers;
   int number;
 
-  MarvalForm(this.key, this.question, this.answers, this.number);
+  MarvalForm({required this.key, required this.question, required this.answers, required this.number});
 
 
   MarvalForm.fromJson(Map<String, dynamic> map)
-      : key = map["key"],
+      : key      = map["key"],
         question = map["question"],
-        answers = List<String>.from(map["answers"]),
-        number = map["number"];
+        number   = map["number"],
+        answers  = List<String>.from(map["answers"]);
 
   static Future<void> setUserResponse(Map<String, Object> map) async{
-    String uid = FirebaseAuth.instance.currentUser!.uid;
-    return formsDB
-        .doc(uid).set(map)
+
+    return formsDB.doc(authUser!.uid).set(map)
         .then((value) => logSuccess("$logSuccessPrefix Form Response Added"))
-        .catchError((error) =>
-        logError("$logErrorPrefix Failed to add Form Response: $error"));
+        .catchError((error) => logError("$logErrorPrefix Failed to add Form Response: $error"));
   }
   Future<void> updateFormAnswer() {
     // Call the user's CollectionReference to add a new user
-    return formsDB
-        .doc(docName).update({
+    return formsDB.doc(docName).update({
       key: {
         'key': key, // page1
         'question': question, // Que?
         'answers': answers, // [mek, si, tu padre, no]
         'number': number, // 1
       }
-    })
-        .then((value) => logSuccess("$logSuccessPrefix Form Item Added"))
-        .catchError((error) =>
-        logError("$logErrorPrefix Failed to add form Item: $error"));
+    }).then((value) => logSuccess("$logSuccessPrefix Form Item Added"))
+        .catchError((error) => logError("$logErrorPrefix Failed to add form Item: $error"));
   }
 
   static Future<bool> existsInDB(String? uid) async{
@@ -55,9 +51,11 @@ class MarvalForm {
   @override
   String toString() {
     int cont=0;
-    String res = "\n Key: $key Number: $number"
-                 "\n $question";
-    for (var element in answers) {  res+="\n $cont) $element"; cont++;}
+    String res = "\n Key: $key Number: $number \n $question";
+    for (var answer in answers) {
+      res+="\n $cont) $answer";
+      cont++;
+    }
     return res;
   }
 
@@ -91,8 +89,13 @@ void setForm(){
     ['Si', 'No', kSpecifyText],
   ];
   int cont =1;
-  for (var element in questions) {
-    MarvalForm form = MarvalForm('page$cont', element, answers[cont-1], cont);
+  for (var question in questions) {
+    MarvalForm form = MarvalForm(
+        key: 'page$cont',
+        question: question,
+        answers: answers[cont-1],
+        number: cont
+    );
     form.updateFormAnswer();
     cont++;
   }

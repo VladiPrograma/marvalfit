@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marvalfit/config/custom_icons.dart';
 import 'package:marvalfit/constants/global_variables.dart';
+import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
@@ -38,16 +39,16 @@ class _GetUserDetailsState extends State<GetUserDetails> {
     }
       ///@TODO Create Custom class for new traning state
       Planing training = Planing.create(habits: ["Sol", "Frio", "Naturaleza"],steps: 10000,
-          activities: [
-            {"Descanso" :
-            { "icon": 'sleep', "label": 'Descanso', "type": 'rest', "id": 'ACT_001'}},
-            {"Medidas" :
-            { "icon": 'tap', "label": 'Medidas', "type": 'tap', "id": 'ACT_002'}},
-            {"Galeria" :
-            { "icon": 'gallery', "label": 'Galeria', "images": 'Sleep', "id": 'ACT_003'}},
-            {"RMs" :
-            { "icon": 'rms', "label": 'RMs', "type": 'table_01', "id": 'ACT_004'}},
-          ]);
+       activities: [
+         {"Descanso" :
+         { "icon": 'sleep', "label": 'Descanso', "type": 'rest', "id": 'ACT_001'}},
+         {"Medidas" :
+         { "icon": 'tap', "label": 'Medidas', "type": 'tap', "id": 'ACT_002'}},
+         {"Galeria" :
+         { "icon": 'gallery', "label": 'Galeria', "images": 'Sleep', "id": 'ACT_003'}},
+         {"RMs" :
+         { "icon": 'rms', "label": 'RMs', "type": 'table_01', "id": 'ACT_004'}},
+       ]);
       training.setInDB();
 
       logInfo(user);
@@ -114,45 +115,36 @@ class _Form extends StatelessWidget {
               prefixIcon: CustomIcons.person,
               labelText: "Hobbie Favorito",
               hintText: "Ir en Bicicleta",
+              onSaved: (value) => _hobbie = value!.normalize(),
               validator: (value){
-                if(isNullOrEmpty(value)){
-                  return kInputErrorEmptyValue;
-                }if(value!.length>50){
-                  return kInputErrorToLong;
-                }
+                if(isNullOrEmpty(value)){ return kEmptyValue; }
+                if(value!.length>50)    { return kToLong;     }
                 return null;
               },
-              onSaved: (value) => _hobbie = normalize(value)!
           ),
           SizedBox(height: 3.h,),
           MarvalInputTextField(
               prefixIcon: CustomIcons.food,
               labelText: "Comida Favorita",
               hintText: "Macarrones con tomate",
+              onSaved: (value) => _food = value!.normalize(),
               validator: (value){
-                if(isNullOrEmpty(value)){
-                  return kInputErrorEmptyValue;
-                }if(value!.length>50){
-                  return kInputErrorToLong;
-                }
+                if(isNullOrEmpty(value)){ return kEmptyValue;}
+                if(value!.length>50)    { return kToLong;    }
                 return null;
               },
-              onSaved: (value) => _food = normalize(value)!
           ),
           SizedBox(height: 3.h,),
           MarvalInputTextField(
               prefixIcon: Icons.location_city,
               labelText: "Localidad",
               hintText: "Zaragoza",
+              onSaved: (value) => _city = value!.normalize(),
               validator: (value){
-                if(isNullOrEmpty(value)){
-                  return kInputErrorEmptyValue;
-                }if(value!.length>50){
-                  return kInputErrorToLong;
-                }
+                if(isNullOrEmpty(value)){ return kEmptyValue; }
+                if(value!.length>50)    { return kToLong;     }
                 return null;
               },
-              onSaved: (value) => _city = normalize(value)!
           ),
           SizedBox(height: 3.h,),
           MarvalInputTextField(
@@ -165,22 +157,19 @@ class _Form extends StatelessWidget {
               onTap: () async {
                 _birthDate = await pickDate(context);
                 if(isNotNull(_birthDate)){
-                String dateToText = "${_birthDate!.day}/${_birthDate!.month}/${_birthDate!.year}";
-                _textController.text = dateToText;
+                  _textController.text =  _birthDate!.id;
                 }
               },
               validator: (value){
-                if(isNullOrEmpty(value)){
-                  return kInputErrorEmptyValue;
-                }
+                if(isNullOrEmpty(value)){ return kEmptyValue;  }
                 return null;
               },
           ),
           SizedBox(height: 3.h,),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               MarvalInputTextField(
                 width: 33.w,
                 prefixIcon: CustomIcons.weight,
@@ -188,7 +177,7 @@ class _Form extends StatelessWidget {
                 labelText: "Peso",
                 hintText: "79.5",
                 validator: (value) => validateNumber(value),
-                onSaved: (value) => _weight = toDouble(value),
+                onSaved: (value) => _weight = value!.toDouble(),
               ),
               SizedBox(width: 4.w,),
               MarvalInputTextField(
@@ -199,16 +188,15 @@ class _Form extends StatelessWidget {
                   hintText: "1.89",
                   validator: (value) => validateNumber(value),
                   onSaved: (value){
-                    double? _curr = toDouble(value);
+                    double? _curr = value!.toDouble();
                     if(_curr!>3){
-                      String _newValue = value!.replaceFirst(value.characters.first, value.characters.first+'.');
-                      _height = toDouble(_newValue);
-                      return;
+                      String _newValue = value.replaceFirst(value.characters.first, value.characters.first+'.');
+                      return _newValue.toDouble();
                     }
                     _height = _curr;
                   }
               ),
-            ],),
+          ]),
           SizedBox(height: 6.h,),
           MarvalElevatedButton(
               "Continuar",
@@ -216,7 +204,15 @@ class _Form extends StatelessWidget {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
                   ///* Set details */
-                  Details details = Details.create(_height!, _food!, _phone!, _city!,_birthDate!, _weight!);
+                  Details details = Details.create(
+                      height: _height!,
+                      favoriteFood: _food!,
+                      phone: _phone!,
+                      city: _city!,
+                      birthDate: _birthDate!,
+                      initialWeight: _weight!,
+                      hobbie: ''
+                  );
                   details.setDetails();
                   logInfo(details.toString());
                   ///* Set Weight */
@@ -224,11 +220,11 @@ class _Form extends StatelessWidget {
                   user.updateHobbie(hobbie: _hobbie!);
                   user.details = details;
                   logInfo(user.toString());
+
                   Navigator.popAndPushNamed(context, FormScreen.routeName);
                 }
               })
-        ],
-      ),
+      ]),
     );
   }
 
@@ -253,10 +249,7 @@ Future<DateTime?> pickDate(BuildContext context) => showDatePicker(
             style: TextButton.styleFrom(
               primary: kBlack,
               textStyle: TextStyle(fontSize: 3.3.w, fontFamily: h2, color: kBlack)
-            ),
-
-          ),
-        ),
+          ))),
         child: child!,
       );
     },

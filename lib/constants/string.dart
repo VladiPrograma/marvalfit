@@ -7,17 +7,17 @@ const String p2 = 'RedHatRegular';
 
 
 /// Error message displayed on InputFields
-const String kInputErrorEmptyValue = 'Campo requerido.';
-const String kInputErrorEmailMissmatch ='El correo indicado no existe.';
-const String kInputErrorEmail ='El correo no ha sido dado de alta.';
+const String kEmptyValue = 'Campo requerido.';
+const String kEmailMissmatch ='El correo indicado no existe.';
+const String kEmail ='El correo no ha sido dado de alta.';
 
-const String kInputErrorToLong ='Maximo de caracteres alcanzado.';
-const String kInputErrorPhone ='El telefono no existe.';
-const String kInputErrorNotNum ='Introduzca un numero valido.';
+const String kToLong ='Maximo de caracteres alcanzado.';
+const String kPhone ='El telefono no existe.';
+const String kNotNum ='Introduzca un numero valido.';
 
-const String kInputErrorPassword ='Contraseña Incorrecta. Vuelve a intentarlo.';
-const String kInputErrorMin8 ='Debe tener un minimo de 8 caracteres.';
-const String kInputErrorContainsDigit ='Debe contener al menos 1 digito.';
+const String kPassword ='Contraseña Incorrecta. Vuelve a intentarlo.';
+const String kMin8 ='Debe tener un minimo de 8 caracteres.';
+const String kContainsDigit ='Debe contener al menos 1 digito.';
 
 
 /// Reset Password Messages
@@ -47,3 +47,4 @@ class ErrorText{
   }
 
 }
+

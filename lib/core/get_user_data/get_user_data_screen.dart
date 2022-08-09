@@ -1,27 +1,28 @@
 import 'dart:io';
 
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
-import 'package:marvalfit/widgets/marval_elevated_button.dart';
-import 'package:marvalfit/widgets/marval_textfield.dart';
-import 'package:marvalfit/widgets/marval_dialogs.dart';
-import 'package:marvalfit/config/custom_icons.dart';
-import 'package:marvalfit/utils/objects/user.dart';
+import '../../widgets/marval_elevated_button.dart';
+import '../../widgets/marval_textfield.dart';
+import '../../widgets/marval_dialogs.dart';
+
+import '../../utils/marval_arq.dart';
+import '../../utils/extensions.dart';
+import '../../config/custom_icons.dart';
 
 import '../../constants/colors.dart';
 import '../../constants/global_variables.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
-import '../../utils/marval_arq.dart';import 'get_user_details_screen.dart';
+import 'get_user_details_screen.dart';
 
 class GetUserDataScreen extends StatelessWidget {
   const GetUserDataScreen({Key? key}) : super(key: key);
   static String routeName = "/get_user_data";
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: kWhite,
       body: SafeArea(
@@ -49,14 +50,13 @@ class GetUserDataScreen extends StatelessWidget {
 
 class _Form extends StatelessWidget {
   const _Form({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
     String? _name;
     String? _lastName;
-    String? _job;
     String? _phone;
+    String? _job;
     return Form(
       key: _formKey,
       child: Column(
@@ -64,31 +64,25 @@ class _Form extends StatelessWidget {
           MarvalInputTextField(
             prefixIcon: CustomIcons.person,
             labelText: "Nombre",
-            hintText: "Mario",
+            hintText:  "Mario" ,
+            onSaved: (value) => _name = value!.toCamellCase(),
             validator: (value){
-              if(isNullOrEmpty(value)){
-                return kInputErrorEmptyValue;
-              }if(value!.length>25){
-                return kInputErrorToLong;
-              }
+              if(isNullOrEmpty(value)){ return kEmptyValue;}
+              if(value!.length>25)    { return kToLong    ;}
               return null;
             },
-            onSaved: (value) => _name = toCamellCase(value)!
           ),
           SizedBox(height: 3.h,),
           MarvalInputTextField(
             prefixIcon: CustomIcons.person,
             labelText: "Apellido",
             hintText: "Valgañon",
+            onSaved: (value) => _lastName = value!.toCamellCase(),
             validator: (value){
-              if(isNullOrEmpty(value)){
-                return kInputErrorEmptyValue;
-              }if(value!.length>25){
-                return kInputErrorToLong;
-              }
+              if(isNullOrEmpty(value)){ return kEmptyValue; }
+              if(value!.length>25)    { return kToLong;     }
               return null;
             },
-            onSaved: (value) => _lastName = toCamellCase(value)!
           ),
           SizedBox(height: 3.h,),
           MarvalInputTextField(
@@ -96,11 +90,8 @@ class _Form extends StatelessWidget {
             labelText: "Trabajo",
             hintText: "Entrenador",
             validator: (value){
-              if(isNullOrEmpty(value)){
-                return kInputErrorEmptyValue;
-              }if(value!.length>50){
-                return kInputErrorToLong;
-              }
+              if(isNullOrEmpty(value)){ return kEmptyValue; }
+              if(value!.length>50)    { return kToLong;  }
               return null;
             },
             onSaved: (value) {
@@ -116,9 +107,9 @@ class _Form extends StatelessWidget {
               hintText: "622427441",
               validator: (value){
                 if(isNullOrEmpty(value)){
-                  return kInputErrorEmptyValue;
+                  return kEmptyValue;
                 }if(value!.length!=9){
-                  return kInputErrorPhone;
+                  return kPhone;
                 }
                 return null;
               },
@@ -152,13 +143,13 @@ class _Form extends StatelessWidget {
                           ),
                         ),
                         onAccept: (){
-                          user.updateData(name: _name!, lastName: _lastName!, work: _job!);
+                          user.updateBasicData(name: _name!, lastName: _lastName!, work: _job!);
                           Navigator.popAndPushNamed(context, GetUserDetails.routeName);
 
                        }
                     );
                   }else{
-                    user.updateData(name: _name!, lastName: _lastName!, work: _job!);
+                    user.updateBasicData(name: _name!, lastName: _lastName!, work: _job!);
                     Navigator.popAndPushNamed(context, GetUserDetails.routeName, arguments: {'image': _backgroundImage, 'phone': _phone});
 
                   }
@@ -173,6 +164,7 @@ class _Form extends StatelessWidget {
 XFile? _backgroundImage;
 final ImagePicker _picker = ImagePicker();
 
+///@TODO Add Watcher here instead of StatefulWidget
 class ProfilePhoto extends StatefulWidget {
   const ProfilePhoto({Key? key}) : super(key: key);
 
@@ -182,18 +174,20 @@ class ProfilePhoto extends StatefulWidget {
 class _ProfilePhotoState extends State<ProfilePhoto> {
   @override
   Widget build(BuildContext context) {
-    return  Stack(
-      children: [
+    return  Stack( children: [
         GestureDetector(
-            onTap: () async{
-              _backgroundImage = await _picker.pickImage(source: ImageSource.gallery);
-              setState(() { });
-            },
-            child: CircleAvatar(
-              backgroundColor: kBlack,
-              backgroundImage: isNotNull(_backgroundImage) ? Image.file(File(_backgroundImage!.path)).image : null,
-              radius: 23.w,
-              child: isNull(_backgroundImage) ? Icon(CustomIcons.person, color: kWhite, size: 17.w,): null,
+         onTap: () async{
+           _backgroundImage = await _picker.pickImage(source: ImageSource.gallery);
+           setState(() { });
+         },
+         child: CircleAvatar(
+           backgroundColor: kBlack,
+           backgroundImage: isNotNull(_backgroundImage) ? Image.file(File(_backgroundImage!.path)).image : null,
+           radius: 23.w,
+           child: isNull(_backgroundImage) ?
+           Icon(CustomIcons.person, color : kWhite, size: 17.w,)
+           :
+           const SizedBox(),
         )),
         Positioned(
           bottom: 1.w,
