@@ -207,6 +207,13 @@ class MarvalUser {
     });
   }
 
+  void updateEmail({required String email}) {
+    this.email = email;
+    uploadInDB({
+      "email": email,
+    });
+  }
+
   void updateBasicData({required String name, required String lastName, required String work}) {
     this.name = name;
     this.lastName = lastName;

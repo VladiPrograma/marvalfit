@@ -20,6 +20,7 @@ import 'form_screen.dart';
 
 String? _phone;
 bool _upToBD = false;
+
 class GetUserDetails extends StatefulWidget {
   const GetUserDetails({Key? key}) : super(key: key);
   static String routeName = "/get_user_details";
@@ -191,7 +192,7 @@ class _Form extends StatelessWidget {
                     double? _curr = value!.toDouble();
                     if(_curr!>3){
                       String _newValue = value.replaceFirst(value.characters.first, value.characters.first+'.');
-                      return _newValue.toDouble();
+                      _height = _newValue.toDouble();
                     }
                     _height = _curr;
                   }
@@ -211,7 +212,6 @@ class _Form extends StatelessWidget {
                       city: _city!,
                       birthDate: _birthDate!,
                       initialWeight: _weight!,
-                      hobbie: ''
                   );
                   details.setDetails();
                   logInfo(details.toString());

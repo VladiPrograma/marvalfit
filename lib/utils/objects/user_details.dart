@@ -14,9 +14,7 @@ class Details {
 
   String id;
   String favoriteFood;
-  String hobbie;
   String phone;
-  String email;
   String city;
   DateTime birthDate;
   DateTime startDate;
@@ -27,10 +25,8 @@ class Details {
     required this.id,
     required this.height,
     required this.favoriteFood,
-    required this.hobbie,
     required this.phone,
     required this.city,
-    required this.email,
     required this.initialWeight,
     required this.startDate,
     required this.birthDate
@@ -39,21 +35,17 @@ class Details {
   Details.create({
     required this.height,
     required this.favoriteFood,
-    required this.hobbie,
     required this.phone,
     required this.city,
     required this.birthDate,
     required this.initialWeight})
       : id = FirebaseAuth.instance.currentUser!.uid,
-        email = FirebaseAuth.instance.currentUser?.email ?? "",
         startDate = DateTime.now();
 
   Details.fromJson(Map<String, dynamic> map)
       : id = map["id"],
         city = map['city'],
         phone = map["phone"],
-        email = map["email"],
-        hobbie = map['hobbie'],
         height = map["height"],
         favoriteFood = map["favorite_food"],
         initialWeight = map["initial_weight"],
@@ -62,13 +54,9 @@ class Details {
 
   Future<void> setDetails() {
     // Call the user's CollectionReference to add a new user
-    return detailsDB
-        .doc(id)
-        .set({
+    return detailsDB.doc(id).set({
       'id': id, // UID
       'phone': phone, // Vlad
-      'email': email, // Dumitru
-      'hobbie': hobbie, // Programador
       'city': city, // Programador
       'favorite_food': favoriteFood, // 76.3
       'birth_date': birthDate, // 77.4
@@ -107,8 +95,6 @@ class Details {
   @override
   String toString() {
     return " ID: $id"
-        "\n Email: $email Phone: $phone"
-        "\n Hobbie: $hobbie"
         "\n Favorite Food: $favoriteFood"
         "\n City: $city"
         "\n Birth Date: $birthDate"

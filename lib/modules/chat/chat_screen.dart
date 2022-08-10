@@ -40,12 +40,12 @@ class ChatScreen extends StatelessWidget {
     return Scaffold(
         backgroundColor: kWhite,
         drawer: const MarvalDrawer(name: 'Chat',),
-        body:  Container( width: 100.w, height: 100.h,
+        body:  SizedBox( width: 100.w, height: 100.h,
             child: Stack(
                     children: [
                       /// Grass Image
                       Positioned( top: 0,
-                          child: Container(width: 100.w, height: 12.h,
+                          child: SizedBox(width: 100.w, height: 12.h,
                               child: Image.asset('assets/images/grass.png', fit: BoxFit.cover))
                       ),
                       ///White Container

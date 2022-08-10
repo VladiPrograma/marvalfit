@@ -20,11 +20,12 @@ late Daily _daily;
 late ValueNotifier<int> _sleepNotifier;
 late double _max, _min, _init, _perc; // Sleek Widget vars
 
+const _activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
+const _activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
 
 
-const activities = ["Descanso", "Medidas", "Galeria", "Push", "Pull", "Pierna I", "Pierna II"];
-const activities_icons = [CustomIcons.bed, CustomIcons.tape, CustomIcons.camera, CustomIcons.lifting, CustomIcons.lifting_2, CustomIcons.leg, CustomIcons.leg];
-
+///* @TODO Make the hole page using CREATOR
+///* @TODO Add info icon to habits and display info Dialog on Tap.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
   static String routeName = "/home";
@@ -69,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: kWhite,
       body:  SingleChildScrollView(
         physics: NeverScrollableScrollPhysics(),
-        child: Container( width: 100.w, height: 124.h,
+        child: SizedBox( width: 100.w, height: 124.h,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -170,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   /// Habits Row
                   Positioned(top: 44.h,
                       child: MarvalHabitList(data: user.currenTraining?.habits!,)),
-                  /// Activities Row
+                  /// _activities Row
                   Positioned( top: 66.5.h,
                       child: InnerShadow(
                         color: Colors.black,
@@ -183,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: kBlack
                             )),
                       )),
-                  /// Activities Widget
+                  /// _activities Widget
                   Positioned( top: 66.5.h,
                       child: Container( width: 100.w, height: 34.5.h,
                           padding: EdgeInsets.symmetric(horizontal: 4.w),
@@ -321,7 +322,7 @@ class _DateListState extends State<DateList> {
   @override
   Widget build(BuildContext context) {
      DateTime _lastMonday = widget.startDate.lastMonday();
-    return  Container(width: 100.w, height: 10.h, child:
+    return  SizedBox(width: 100.w, height: 10.h, child:
     ListView.builder(
         itemCount: 7,
         scrollDirection: Axis.horizontal,
@@ -390,7 +391,7 @@ class _MoonListState extends State<MoonList> {
     return ValueListenableBuilder(
         valueListenable: _sleepNotifier,
         builder: (context, value, child) {
-          return Container(width: 55.w, height: 10.h, child:
+          return SizedBox(width: 55.w, height: 10.h, child:
           ListView.builder(
               itemCount: 5,
               scrollDirection: Axis.horizontal,
@@ -472,7 +473,7 @@ class MarvalHabitList extends StatelessWidget {
            TextH2("  Innegociables", size: 4,),
          ]),
          SizedBox(height: 2.h,),
-         Container(width: 100.w, height: 16.h,
+         SizedBox(width: 100.w, height: 16.h,
            child: ListView.builder(
                itemCount: data?.length ?? 0,
                scrollDirection: Axis.horizontal,
@@ -486,7 +487,7 @@ class MarvalHabitList extends StatelessWidget {
    }
  }
 
- /// Activities WIDGET */
+ /// _activities WIDGET */
 
 class MarvalActivity extends StatefulWidget {
   const MarvalActivity({required this.icon, required this.name, Key? key}) : super(key: key);
@@ -572,7 +573,7 @@ class MarvalActivityList extends StatelessWidget {
          }
          return Container(
              margin: EdgeInsets.only(bottom: 1.5.h),
-             child: MarvalActivity(name: activities[index-1], icon: activities_icons[index-1],));
+             child: MarvalActivity(name: _activities[index-1], icon: _activities_icons[index-1],));
        });
   }
 }

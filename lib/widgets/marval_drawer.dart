@@ -12,6 +12,7 @@ import '../constants/global_variables.dart';
 import '../constants/theme.dart';
 import '../core/get_user_data/get_user_details_screen.dart';
 import '../core/login/login_screen.dart';
+import '../modules/ajustes/settings_screen.dart';
 import '../modules/chat/chat_screen.dart';
 import '../modules/home/home_screen.dart';
 import '../utils/marval_arq.dart';
@@ -28,6 +29,7 @@ class MarvalDrawer extends StatelessWidget {
         child: ListView(
         padding: EdgeInsets.symmetric(horizontal: 3.w),
         children:  <Widget>[
+          ///* HEADER
           SizedBox(height: 39.h,
               child: DrawerHeader(
                 decoration: BoxDecoration( color: kWhite, border: Border.all(color: kWhite) ),
@@ -45,18 +47,14 @@ class MarvalDrawer extends StatelessWidget {
                 ),
               )),
           GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-              Navigator.pushNamed(context, HomeScreen.routeName);},
+            onTap: () => Navigator.popAndPushNamed(context, HomeScreen.routeName),
             child: ListTile(
               leading: Icon(Icons.home_rounded,color: name=="Home" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Home', size: 4, color: name=="Home" ? kGreen : kBlack),
             ),
           ),
           GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-              Navigator.pushNamed(context, ChatScreen.routeName);},
+            onTap: () => Navigator.popAndPushNamed(context, ChatScreen.routeName),
             child: ListTile(
               leading: Icon(Icons.chat_rounded, color: name=="Chat" ? kGreen : kBlack, size: 6.w,),
               title: Watcher((context, ref, _) {
@@ -75,9 +73,7 @@ class MarvalDrawer extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-              Navigator.pushNamed(context, GetUserDetails.routeName);},
+            onTap: () => Navigator.popAndPushNamed(context, TestComponentScreen.routeName),
             child: ListTile(
               leading: Icon(Icons.run_circle_outlined,color: name=="Ejercicios" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Ejercicios', size: 4, color: name=="Ejercicios" ? kGreen : kBlack),
@@ -93,9 +89,7 @@ class MarvalDrawer extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: (){
-              Navigator.pop(context);
-              Navigator.pushNamed(context, TestComponentScreen.routeName);},
+            onTap: () => Navigator.popAndPushNamed(context, SettingScreen.routeName),
             child: ListTile(
               leading: Icon(Icons.settings_rounded,color: name=="Ajustes" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Ajustes', size: 4, color: name=="Ajustes" ? kGreen : kBlack),

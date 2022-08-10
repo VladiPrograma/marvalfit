@@ -5,7 +5,7 @@ import '../../constants/string.dart';
 import '../marval_arq.dart';
 
 class Planing{
-  static CollectionReference planingDB = FirebaseFirestore.instance.collection("users_curr");
+  static CollectionReference planingDB = FirebaseFirestore.instance.collection("trainings");
   String id;
   int? steps;
   DateTime lastUpdate;

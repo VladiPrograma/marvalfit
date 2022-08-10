@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../utils/objects/user.dart';
 import '../../widgets/marval_elevated_button.dart';
 import '../../widgets/marval_textfield.dart';
 import '../../widgets/marval_dialogs.dart';
@@ -121,6 +122,7 @@ class _Form extends StatelessWidget {
               onPressed: () async{
             if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
+                  user = await MarvalUser.getFromDB(authUser!.uid);
                   if(isNull(_backgroundImage)){
                      MarvalDialogsAlert(context, type: MarvalDialogAlertType.ACCEPT, height: 30,
                         title: "Sube una foto de perfil",

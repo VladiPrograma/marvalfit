@@ -40,8 +40,6 @@ bool logOut() {
 
 User? getCurrUser(){  return FirebaseAuth.instance.currentUser; }
 
-/// Only MarvalTrainer
-///@TODO Try to change this method with one more logical and clean
 Future<String?> signUp(String email, String password) async{
   FirebaseApp app = await Firebase.initializeApp(
       name: 'Secondary', options: Firebase.app().options);
