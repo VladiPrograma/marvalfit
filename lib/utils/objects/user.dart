@@ -133,9 +133,7 @@ class MarvalUser {
       dailys![date.id] = await Daily.getFromDB(date);
 
   static Future<bool> existsInDB(String? uid) async {
-    if (isNull(uid)) {
-      return false;
-    }
+    if (isNull(uid)) { return false;  }
     DocumentSnapshot ds = await usersDB.doc(uid).get();
     return ds.exists;
   }

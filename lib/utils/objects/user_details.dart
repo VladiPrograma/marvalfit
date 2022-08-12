@@ -71,9 +71,7 @@ class Details {
 
   Future<void> uploadDetails(Map<String, Object> map) {
     // Call the user's CollectionReference to add a new user
-    return detailsDB
-        .doc(id)
-        .update(map)
+    return detailsDB.doc(id).update(map)
         .then((value) => logSuccess("$logSuccessPrefix User Details Uploaded"))
         .catchError((error) => logError("$logErrorPrefix Failed to Upload User Details: $error"));
   }

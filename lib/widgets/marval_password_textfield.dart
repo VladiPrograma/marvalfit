@@ -47,7 +47,7 @@ class _PasswordTextFieldState extends State<PasswordTextField> {
                   if(isNullOrEmpty(value)){ return kEmptyValue; }
                   if(value!.length<8)     { return 'Debe tener al menos 8 caracteres'; }
                   if(isNotNull(widget.loginErrors)){
-                    return watch(context.ref);
+                    return context.ref.watch(widget.loginErrors!);
                   }
                   return null;
                 },

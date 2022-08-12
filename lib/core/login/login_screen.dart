@@ -33,13 +33,13 @@ class LoginScreen extends StatelessWidget {
       backgroundColor: kWhite,
       body: SafeArea(child:
       Container( width: 100.w, height: 100.h,
-        padding: EdgeInsets.only(top: 6.h),
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(height: 6.h,),
                   Image.asset("assets/images/logo.png"),
                   Container(width: 70.w,
                       margin: EdgeInsets.only(right: 10.w),
@@ -65,7 +65,7 @@ String _password= "";
 Creator<String?> _loginErrors = Creator.value(null);
 void _clear(Ref ref) => ref.update(_loginErrors, (t) => null);
 void _update(Ref ref, String? text) => ref.update(_loginErrors, (t) => text);
-String? watch(Ref ref) => ref.watch(_loginErrors);
+String? _watch(Ref ref) => ref.watch(_loginErrors);
 
 class _LogInForm extends StatelessWidget {
   const _LogInForm({Key? key}) : super(key: key);
@@ -111,12 +111,12 @@ class _LogInForm extends StatelessWidget {
                   print('Email: $_email\nPassword: $_password');
 
                   /// We try to LogIn
-                  String? error = await signIn(_email, _password);
+                   String? error = await signIn(_email, _password);
+                   logInfo('ERROR: $error');
                   _update(context.ref, error);
                   _formKey.currentState!.validate();
 
-                  final data = watch(context.ref);
-                  if(isNull(data)&&isNotNull(FirebaseAuth.instance.currentUser)){
+                  if(isNull(_watch(context.ref)) && isNotNull(FirebaseAuth.instance.currentUser)){
                     authUser = FirebaseAuth.instance.currentUser!;
                     bool _flag = await MarvalForm.existsInDB(authUser?.uid);
                     _flag ?

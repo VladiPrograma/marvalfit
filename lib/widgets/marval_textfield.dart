@@ -11,10 +11,11 @@ import '../utils/marval_arq.dart';
 /// Custom TextField
 
 class MarvalInputTextField extends StatelessWidget {
-  const MarvalInputTextField({Key? key,this.controller, this.readOnly, this.width, this.labelText,this.onTap, this.validator, this.onSaved, this.onChanged, this.hintText, this.keyboardType, this.prefixIcon, this.obscureText, this.suffixIcon}) : super(key: key);
+  const MarvalInputTextField({Key? key,this.controller, this.initialValue, this.readOnly, this.width, this.labelText,this.onTap, this.validator, this.onSaved, this.onChanged, this.hintText, this.keyboardType, this.prefixIcon, this.obscureText, this.suffixIcon}) : super(key: key);
   final double? width;
   final String? labelText;
   final String? hintText;
+  final String? initialValue;
   final TextInputType? keyboardType;
   final IconData? prefixIcon;
   final Widget? suffixIcon;
@@ -38,6 +39,7 @@ class MarvalInputTextField extends StatelessWidget {
                   Container(
                       width: width ?? 70.w,
                       child:  TextFormField(
+                        initialValue: initialValue,
                         controller: controller,
                         readOnly: readOnly ?? false,
                         cursorColor: kWhite,

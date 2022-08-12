@@ -66,6 +66,7 @@ class _Form extends StatelessWidget {
             prefixIcon: CustomIcons.person,
             labelText: "Nombre",
             hintText:  "Mario" ,
+            initialValue: isNotEmpty(user.id) ? user.name : null,
             onSaved: (value) => _name = value!.toCamellCase(),
             validator: (value){
               if(isNullOrEmpty(value)){ return kEmptyValue;}
@@ -78,6 +79,7 @@ class _Form extends StatelessWidget {
             prefixIcon: CustomIcons.person,
             labelText: "Apellido",
             hintText: "Valgañon",
+            initialValue: isNotEmpty(user.id) ? user.lastName : null,
             onSaved: (value) => _lastName = value!.toCamellCase(),
             validator: (value){
               if(isNullOrEmpty(value)){ return kEmptyValue; }
@@ -90,6 +92,7 @@ class _Form extends StatelessWidget {
             prefixIcon: Icons.settings,
             labelText: "Trabajo",
             hintText: "Entrenador",
+            initialValue: isNotEmpty(user.id) ? user.work : null,
             validator: (value){
               if(isNullOrEmpty(value)){ return kEmptyValue; }
               if(value!.length>50)    { return kToLong;  }
@@ -106,6 +109,7 @@ class _Form extends StatelessWidget {
               keyboardType: TextInputType.number,
               labelText: "Telefono",
               hintText: "622427441",
+              initialValue: isNotEmpty(user.id) ? user.details!.phone : null,
               validator: (value){
                 if(isNullOrEmpty(value)){
                   return kEmptyValue;
@@ -122,43 +126,66 @@ class _Form extends StatelessWidget {
               onPressed: () async{
             if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  user = await MarvalUser.getFromDB(authUser!.uid);
-                  if(isNull(_backgroundImage)){
-                     MarvalDialogsAlert(context, type: MarvalDialogAlertType.ACCEPT, height: 30,
-                        title: "Sube una foto de perfil",
-                        acceptText: "continuar",
-                        cancelText: "volver",
-                        richText: RichText(
-                          textAlign: TextAlign.justify,
-                          text: TextSpan(
-                            text: "No es obligatorio subir una foto de perfil pero me ayuda a la hora de",
-                            style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack),
-                            children: const <TextSpan>[
-                              TextSpan(
-                                  text:  " localizarte",
-                                  style: TextStyle(fontWeight: FontWeight.bold)
-                              ),
-                              TextSpan(
-                                  text:" dentro de la App. Venga animate! "
-                              ),
-                            ],
-                          ),
-                        ),
-                        onAccept: (){
-                          user.updateBasicData(name: _name!, lastName: _lastName!, work: _job!);
-                          Navigator.popAndPushNamed(context, GetUserDetails.routeName);
-
-                       }
-                    );
-                  }else{
+                  if(isNotEmpty(user.id)){
                     user.updateBasicData(name: _name!, lastName: _lastName!, work: _job!);
-                    Navigator.popAndPushNamed(context, GetUserDetails.routeName, arguments: {'image': _backgroundImage, 'phone': _phone});
+                    user.details!.uploadDetails({ "phone" : _phone! });
+                    authUser!.updateDisplayName(user.name);
+                    authUser!.updatePhotoURL(user.profileImage);
 
+                    Navigator.popAndPushNamed(context, GetUserDetails.routeName);
                   }
-
-            }})
-        ],
-      ),
+                  else {
+                    user = await MarvalUser.getFromDB(authUser!.uid);
+                    if (isNull(_backgroundImage) && isNull(user.profileImage)) {
+                      MarvalDialogsAlert(
+                          context, type: MarvalDialogAlertType.ACCEPT,
+                          height: 30,
+                          title: "Sube una foto de perfil",
+                          acceptText: "continuar",
+                          cancelText: "volver",
+                          richText: RichText(
+                            textAlign: TextAlign.justify,
+                            text: TextSpan(
+                              text: "No es obligatorio subir una foto de perfil pero me ayuda a la hora de",
+                              style: TextStyle(fontFamily: p2,
+                                  fontSize: 4.5.w,
+                                  color: kBlack),
+                              children: const <TextSpan>[
+                                TextSpan(
+                                    text: " localizarte",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold)
+                                ),
+                                TextSpan(
+                                    text: " dentro de la App. Venga animate! "
+                                ),
+                              ],
+                            ),
+                          ),
+                          onAccept: () {
+                            user.updateBasicData(name: _name!,
+                                lastName: _lastName!,
+                                work: _job!);
+                            Navigator.popAndPushNamed(
+                                context, GetUserDetails.routeName, arguments: {
+                              'image': _backgroundImage,
+                              'phone': _phone
+                            });
+                          }
+                      );
+                    }
+                    else {
+                      user.updateBasicData( name: _name!, lastName: _lastName!, work: _job!);
+                      Navigator.popAndPushNamed(context,
+                          GetUserDetails.routeName,
+                          arguments: {
+                          'image': _backgroundImage,
+                          'phone': _phone
+                      });
+                    }
+                  }
+       }})
+     ]),
     );
   }
 }
@@ -167,6 +194,7 @@ XFile? _backgroundImage;
 final ImagePicker _picker = ImagePicker();
 
 ///@TODO Add Watcher here instead of StatefulWidget
+///@TODO Check if works without profile image loaded
 class ProfilePhoto extends StatefulWidget {
   const ProfilePhoto({Key? key}) : super(key: key);
 
@@ -184,9 +212,16 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
          },
          child: CircleAvatar(
            backgroundColor: kBlack,
-           backgroundImage: isNotNull(_backgroundImage) ? Image.file(File(_backgroundImage!.path)).image : null,
+           backgroundImage:
+           isNotNull(_backgroundImage) ?
+           Image.file(File(_backgroundImage!.path)).image
+               :
+           isNotEmpty(user.id) ?
+           Image.network(user.profileImage ?? '').image
+           :
+           null,
            radius: 23.w,
-           child: isNull(_backgroundImage) ?
+           child: isNull(_backgroundImage) && isEmpty(user.id) && isNull(user.profileImage) ?
            Icon(CustomIcons.person, color : kWhite, size: 17.w,)
            :
            const SizedBox(),

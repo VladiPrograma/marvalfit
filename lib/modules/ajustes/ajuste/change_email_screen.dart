@@ -25,13 +25,13 @@ class ResetEmailScreen extends StatelessWidget {
       backgroundColor: kWhite,
       body: SafeArea(child:
       Container( width: 100.w, height: 100.h,
-        padding: EdgeInsets.only(top: 6.h),
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(height: 6.h,),
                   Image.asset("assets/images/logo.png"),
                   Container(width: 70.w,
                       margin: EdgeInsets.only(right: 10.w),

@@ -4,7 +4,7 @@ import '../utils/objects/user.dart';
 
 /// - - - FIREBASE AUTH - - -  */
  User? authUser;
- late MarvalUser user;
+ MarvalUser user = MarvalUser.empty();
 
 /// HOME VARIABLES */
 late ValueNotifier<DateTime> dateNotifier;

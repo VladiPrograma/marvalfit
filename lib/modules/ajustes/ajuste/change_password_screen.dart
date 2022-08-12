@@ -26,13 +26,13 @@ class ResetPasswordScreen extends StatelessWidget {
       backgroundColor: kWhite,
       body: SafeArea(child:
       Container( width: 100.w, height: 100.h,
-        padding: EdgeInsets.only(top: 6.h),
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  SizedBox(height: 6.h,),
                   Image.asset("assets/images/logo.png"),
                   Container(width: 86.w,
                       margin: EdgeInsets.only(left: 5.w),
@@ -55,6 +55,7 @@ class ResetPasswordScreen extends StatelessWidget {
 
   String _password= "";
   String _newPassword= "";
+
   Creator<String?> _loginErrors = Creator.value(null);
   void _clear(Ref ref) => ref.update(_loginErrors, (t) => null);
   void _update(Ref ref, String? text) => ref.update(_loginErrors, (t) => text);
@@ -91,29 +92,30 @@ class _LogInForm extends StatelessWidget {
                 _clear(context.ref);
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  String? checkUser = await  signIn(authUser!.email!, _password);
-                  logInfo(checkUser ?? ' Ta nulo');
+                  /// We try to LogIn
+                   String? logErrors = await signIn(authUser!.email!, _password);
+                  _update(context.ref, logErrors);
+                  _formKey.currentState!.validate();
 
-                  if(isNotNull(authUser) && isNull(checkUser)){
+                  logInfo(logErrors ?? 'Null');
+                  logInfo('Work pls');
+
+                  if(isNull(_watch(context.ref))){
+                    bool _error = false;
                     await authUser!.updatePassword(_newPassword)
                       .onError((error, stackTrace){
+                      _error = true;
                       MarvalSnackBar(context, SNACKTYPE.alert,
-                          title: 'Error al actualizar',
-                          subtitle: 'Porfavor espera unos minutos antes de volver a intentarlo');
-                      })
-                      .then((value) {
-                      MarvalSnackBar(context, SNACKTYPE.success,
-                          title: 'Contraseña cambiada!',
-                          subtitle: 'Evita cambiar mucho la contraseña');
+                      title: 'Error al actualizar',
+                      subtitle: 'Porfavor espera unos minutos antes de volver a intentarlo');
                     });
+                    if(!_error){
+                      MarvalSnackBar(context, SNACKTYPE.success,
+                          title: 'Contraseña Actualizada !',
+                          subtitle: 'Evita cambiar la contraseña siempre que sea posible es una operacion delicada.');
+                    }
                     Navigator.pop(context);
-                  }
-                  if( isNotNull( checkUser)){
-                    _update(context.ref, kPassword);
-                    _formKey.currentState!.validate();
-                  }
-                }
-              },
+               }}},
             ),
             SizedBox(height: 5.h,),
           ],

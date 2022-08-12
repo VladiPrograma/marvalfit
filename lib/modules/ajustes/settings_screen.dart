@@ -1,23 +1,23 @@
-import 'dart:async';
-
-import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
-import 'package:marvalfit/config/log_msg.dart';
-import 'package:marvalfit/constants/colors.dart';
-import 'package:marvalfit/constants/components.dart';
-import 'package:marvalfit/constants/theme.dart';
-import 'package:marvalfit/core/login/login_screen.dart';
-import 'package:marvalfit/modules/ajustes/ajuste/change_email_screen.dart';
-import 'package:marvalfit/utils/extensions.dart';
-import 'package:marvalfit/widgets/marval_dialogs.dart';
 import 'package:sizer/sizer.dart';
-import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
+import '../../config/log_msg.dart';
 import '../../config/custom_icons.dart';
-import '../../constants/global_variables.dart';
-import '../../constants/string.dart';
 import '../../utils/firebase/auth.dart';
+import '../../modules/ajustes/ajuste/change_email_screen.dart';
+
+import '../../constants/theme.dart';
+import '../../constants/string.dart';
+import '../../constants/colors.dart';
+import '../../constants/global_variables.dart';
+
+import '../../core/login/login_screen.dart';
+import '../../core/get_user_data/form_screen.dart';
+import '../../core/get_user_data/get_user_data_screen.dart';
+
 import '../../widgets/marval_drawer.dart';
+import '../../widgets/marval_dialogs.dart';
+
 import '../chat/chat_screen.dart';
 import 'ajuste/change_password_screen.dart';
 
@@ -82,10 +82,15 @@ class SettingScreen extends StatelessWidget {
                 separatorBuilder: (context, index) => SizedBox(height: 2.h,),
                 itemBuilder: (context, index) {
                 return SettingTile(name: _settings[index], iconData: _settings_icons[index],
-                onTap: (){
+                onTap: () async{
                   logSuccess(_settings[index]);
                   if(_settings[index] == 'Cambio de Contraseña') Navigator.pushNamed(context, ResetPasswordScreen.routeName);
                   if(_settings[index] == 'Cambio de Correo') Navigator.pushNamed(context, ResetEmailScreen.routeName);
+                  if(_settings[index] == 'Actualizar Formulario') Navigator.pushNamed(context, FormScreen.routeName);
+                  if(_settings[index] == 'Actualizar Datos'){
+                    await user.getDetails();
+                    Navigator.pushNamed(context, GetUserDataScreen.routeName);
+                  }
                   if(_settings[index]=='Salir'){
                     MarvalDialogsAlert(context, type: MarvalDialogAlertType.DELETE, height: 30,
                     title: '¿ Salir de MarvalFit ? ',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marvalfit/config/custom_icons.dart';
 import 'package:marvalfit/constants/global_variables.dart';
+import 'package:marvalfit/modules/ajustes/settings_screen.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/objects/user_details.dart';
@@ -29,10 +30,7 @@ class GetUserDetails extends StatefulWidget {
 }
 
 class _GetUserDetailsState extends State<GetUserDetails> {
-  @override
-  void initState() {
-    super.initState();
-  }
+
   void updateToBD(XFile? image) async{
     if(isNotNull(image)){
       String? _urlImage = await uploadProfileImg(authUser!.uid, image!);
@@ -68,11 +66,11 @@ class _GetUserDetailsState extends State<GetUserDetails> {
     final _arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
      XFile? _image = _arguments['image'];
      _phone = _arguments['phone'];
-     if(!_upToBD){ updateToBD(_image);}
+     if(!_upToBD&&isNull(user.details)){ updateToBD(_image);}
     return Scaffold(
         backgroundColor: kWhite,
         body: SafeArea(
-            child: Container( width: 100.w, height: 100.h,
+            child: SizedBox( width: 100.w, height: 100.h,
               child: SingleChildScrollView(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -80,10 +78,10 @@ class _GetUserDetailsState extends State<GetUserDetails> {
                   children: <Widget>[
                     SizedBox(height: 4.h,),
                     Container( width: 100.w,
-                        child: TextH1("Ya casi esta !"),
+                        child: const TextH1("Ya casi esta !"),
                         margin: EdgeInsets.symmetric(horizontal: 5.w)),
                     Container( width: 100.w,
-                        child:TextH2("Necesito recopilar estos datos para trabajar de forma optima", color: kGrey,),
+                        child: const TextH2("Necesito recopilar estos datos para trabajar de forma optima", color: kGrey,),
                         margin: EdgeInsets.symmetric(horizontal: 5.w)
                     ),
                     SizedBox(height: 4.h,),
@@ -107,7 +105,12 @@ class _Form extends StatelessWidget {
     DateTime? _birthDate;
     double? _height;
     double? _weight;
-    TextEditingController _textController = TextEditingController();
+    TextEditingController _textController = TextEditingController(
+                                            text: isNotNull(user.details) ?
+                                            user.details!.birthDate.toFormatStringDate()
+                                                :
+                                            null
+                                          );
     return Form(
       key: _formKey,
       child: Column(
@@ -116,6 +119,7 @@ class _Form extends StatelessWidget {
               prefixIcon: CustomIcons.person,
               labelText: "Hobbie Favorito",
               hintText: "Ir en Bicicleta",
+              initialValue: isNotNullOrEmpty(user.hobbie) ? user.hobbie : null,
               onSaved: (value) => _hobbie = value!.normalize(),
               validator: (value){
                 if(isNullOrEmpty(value)){ return kEmptyValue; }
@@ -128,6 +132,7 @@ class _Form extends StatelessWidget {
               prefixIcon: CustomIcons.food,
               labelText: "Comida Favorita",
               hintText: "Macarrones con tomate",
+              initialValue: isNotNull(user.details) ? user.details?.favoriteFood : null,
               onSaved: (value) => _food = value!.normalize(),
               validator: (value){
                 if(isNullOrEmpty(value)){ return kEmptyValue;}
@@ -137,10 +142,11 @@ class _Form extends StatelessWidget {
           ),
           SizedBox(height: 3.h,),
           MarvalInputTextField(
-              prefixIcon: Icons.location_city,
-              labelText: "Localidad",
-              hintText: "Zaragoza",
-              onSaved: (value) => _city = value!.normalize(),
+            prefixIcon: Icons.location_city,
+            labelText: "Localidad",
+            hintText: "Zaragoza",
+            initialValue: isNotNull(user.details) ? user.details?.city : null,
+            onSaved: (value) => _city = value!.normalize(),
               validator: (value){
                 if(isNullOrEmpty(value)){ return kEmptyValue; }
                 if(value!.length>50)    { return kToLong;     }
@@ -177,6 +183,7 @@ class _Form extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 labelText: "Peso",
                 hintText: "79.5",
+                initialValue: isNotNull(user.details) ? user.details?.initialWeight.toString() : null,
                 validator: (value) => validateNumber(value),
                 onSaved: (value) => _weight = value!.toDouble(),
               ),
@@ -187,6 +194,7 @@ class _Form extends StatelessWidget {
                   prefixIcon: CustomIcons.size,
                   labelText: "Altura",
                   hintText: "1.89",
+                  initialValue: isNotNull(user.details) ? user.details?.height.toStringAsFixed(0) : null,
                   validator: (value) => validateNumber(value),
                   onSaved: (value){
                     double? _curr = value!.toDouble();
@@ -204,6 +212,9 @@ class _Form extends StatelessWidget {
               onPressed: () async{
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
+                  bool _fromSettings = isNotNull(user.details);
+                  if(isNull(_birthDate)){_birthDate = user.details!.birthDate;}
+                  if(isNull(_phone)){_phone = user.details!.phone;}
                   ///* Set details */
                   Details details = Details.create(
                       height: _height!,
@@ -220,7 +231,8 @@ class _Form extends StatelessWidget {
                   user.updateHobbie(hobbie: _hobbie!);
                   user.details = details;
                   logInfo(user.toString());
-
+                  _fromSettings ? Navigator.popAndPushNamed(context, SettingScreen.routeName)
+                      :
                   Navigator.popAndPushNamed(context, FormScreen.routeName);
                 }
               })
