@@ -129,13 +129,13 @@ class _Form extends StatelessWidget {
                   if(isNotEmpty(user.id)){
                     user.updateBasicData(name: _name!, lastName: _lastName!, work: _job!);
                     user.details!.uploadDetails({ "phone" : _phone! });
-                    authUser!.updateDisplayName(user.name);
-                    authUser!.updatePhotoURL(user.profileImage);
+                    authUser.updateDisplayName(user.name);
+                    authUser.updatePhotoURL(user.profileImage);
 
                     Navigator.popAndPushNamed(context, GetUserDetails.routeName);
                   }
                   else {
-                    user = await MarvalUser.getFromDB(authUser!.uid);
+                    user = await MarvalUser.getFromDB(authUser.uid);
                     if (isNull(_backgroundImage) && isNull(user.profileImage)) {
                       MarvalDialogsAlert(
                           context, type: MarvalDialogAlertType.ACCEPT,

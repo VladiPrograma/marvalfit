@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/colors.dart';
@@ -46,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Create anonymous function:
     () async {
   /** Using async methods to fetch Data */
-        user = await MarvalUser.getFromDB(authUser!.uid);
+        user = await MarvalUser.getFromDB(authUser.uid);
       await user.getCurrentTraining();
 
       _daily = await _onNewDay(dateNotifier.value);
@@ -66,14 +67,18 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: MarvalDrawer(name: "Home",),
+      drawer: const MarvalDrawer(name: "Home",),
       backgroundColor: kWhite,
       body:  SingleChildScrollView(
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         child: SizedBox( width: 100.w, height: 124.h,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            Watcher((context, ref, child) {
+              watchUser(context, ref);
+              return const SizedBox();
+            }),
              Container(width: 100.w, height: 124.h, color: kWhite,
               child:  Stack(
                 children: [
@@ -83,12 +88,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Container(width: 100.w, height: 26.h,
                      padding: EdgeInsets.all(4.w),
                      decoration: BoxDecoration(
-                        color: kBlue,
-                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15.w)),
-                        boxShadow: [kMarvalBoxShadow]
+                         color: kBlue,
+                         boxShadow: [kMarvalBoxShadow],
+                         borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15.w)),
                      ),
-                        child: SafeArea(
-                        child:Column( children: [
+                   child: SafeArea(
+                   child:Column( children: [
                   /// Calendar Arrows
                   Row(children: [
                     GestureDetector(
@@ -241,7 +246,7 @@ class _MarvalWeightState extends State<MarvalWeight>{
                   _min+=_perc-_init;
                   ///* Setting Half Data For SetState x2 */
                   setState(() { });
-                  await Future.delayed(Duration(milliseconds: 100));
+                  await Future.delayed(const Duration(milliseconds: 100));
                   _init= (_max+_min)/2;
                   setState(() {  });
                   ///* Firebase Updates */

@@ -21,7 +21,7 @@ class Planing{
   });
 
   Planing.create({this.habits, this.steps, this.activities})
-      : id = authUser!.uid,
+      : id = authUser.uid,
         lastUpdate = DateTime.now();
 
   Planing.fromJson(Map<String, dynamic> map)

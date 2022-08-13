@@ -33,7 +33,7 @@ class _GetUserDetailsState extends State<GetUserDetails> {
 
   void updateToBD(XFile? image) async{
     if(isNotNull(image)){
-      String? _urlImage = await uploadProfileImg(authUser!.uid, image!);
+      String? _urlImage = await uploadProfileImg(authUser.uid, image!);
       user.profileImage = _urlImage;
     }
       ///@TODO Create Custom class for new traning state
@@ -55,10 +55,10 @@ class _GetUserDetailsState extends State<GetUserDetails> {
       user.currenTraining = training;
 
       /// Update To Firebase User
-      await authUser!.updateDisplayName(user.name);
-      await authUser!.updatePhotoURL(user.profileImage);
+      await authUser.updateDisplayName(user.name);
+      await authUser.updatePhotoURL(user.profileImage);
       ///@TODO Test drawer works after creating new user
-      authUser = getCurrUser();
+      authUser = getCurrUser()!;
       _upToBD = true;
   }
   @override

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:creator/creator.dart';
+import 'package:marvalfit/config/log_msg.dart';
 
 import '../../constants/global_variables.dart';
 import '../../utils/marval_arq.dart';
@@ -11,16 +11,17 @@ final trainerCreator = Emitter.stream((ref) async {
           .where('email', isEqualTo: 'marval@gmail.com').snapshots();
 });
 
-final authEmitter = Emitter.stream((n) => FirebaseAuth.instance.authStateChanges());
-final userCreator = Emitter.stream((ref) async {
-  final authId = await ref.watch(
-      authEmitter.where((auth) => auth!=null).map((auth) => auth!.uid));
-  return FirebaseFirestore.instance.collection('users').doc(authId).snapshots();
-});
-
 final _page = Creator.value(1);
 void fetchMoreMessages(Ref ref) => ref.update<int>(_page, (n) => n + 1);
 
+Creator<int> notifyCreator = Creator.value(0);
+
+Emitter<int> notifications = Emitter((ref, emit){
+    final List<Message>? list = getLoadMessages(ref);
+    logError('Charging data again');
+    final notif = list?.where((element) => element.user!=authUser.uid && !element.read).length ?? 0;
+    ref.update(notifyCreator, (p0) => notif);
+});
 
 List<Message>? getLoadMessages(Ref ref){
   final query = ref.watch(_chatCreator.asyncData).data;
@@ -31,7 +32,7 @@ List<Message>? getLoadMessages(Ref ref){
   return list;
 }
 void readMessages(List<Message> data){
-  data.where((element) => element.user!=authUser!.uid && !element.read)
+  data.where((element) => element.user!=authUser.uid && !element.read)
   .forEach((element) { element.updateRead(); });
 }
 

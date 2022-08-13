@@ -197,7 +197,7 @@ class MessageBox extends StatelessWidget {
   final Message message;
   @override
   Widget build(BuildContext context) {
-    final bool fromUser = message.user != authUser!.uid;
+    final bool fromUser = message.user != authUser.uid;
     return Column(
       crossAxisAlignment: fromUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
       children:[ Container(

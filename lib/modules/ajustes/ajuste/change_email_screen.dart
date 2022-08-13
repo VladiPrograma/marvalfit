@@ -76,7 +76,7 @@ class _LogInForm extends StatelessWidget {
                   return kEmptyValue;
                 }if(!RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(value!)){
                   return kEmailMissmatch;
-                }if(authUser!.email!=value) return 'El correo indicado no es el actual';
+                }if(authUser.email!=value) return 'El correo indicado no es el actual';
                 return null;
               },
               onSaved: (value){_email = value!;},
@@ -105,7 +105,7 @@ class _LogInForm extends StatelessWidget {
                   _formKey.currentState!.save();
                   if(isNotNull(authUser)){
 
-                    await authUser?.updateEmail(_newEmail)
+                    await authUser.updateEmail(_newEmail)
                         .onError((error, stackTrace){
                           MarvalSnackBar(context, SNACKTYPE.alert,
                           title: 'Error al actualizar',

@@ -93,7 +93,7 @@ class _LogInForm extends StatelessWidget {
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
                   /// We try to LogIn
-                   String? logErrors = await signIn(authUser!.email!, _password);
+                   String? logErrors = await signIn(authUser.email!, _password);
                   _update(context.ref, logErrors);
                   _formKey.currentState!.validate();
 
@@ -102,7 +102,7 @@ class _LogInForm extends StatelessWidget {
 
                   if(isNull(_watch(context.ref))){
                     bool _error = false;
-                    await authUser!.updatePassword(_newPassword)
+                    await authUser.updatePassword(_newPassword)
                       .onError((error, stackTrace){
                       _error = true;
                       MarvalSnackBar(context, SNACKTYPE.alert,

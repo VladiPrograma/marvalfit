@@ -25,7 +25,7 @@ class MarvalForm {
 
   static Future<void> setUserResponse(Map<String, Object> map) async{
 
-    return formsDB.doc(authUser!.uid).set(map)
+    return formsDB.doc(authUser.uid).set(map)
         .then((value) => logSuccess("$logSuccessPrefix Form Response Added"))
         .catchError((error) => logError("$logErrorPrefix Failed to add Form Response: $error"));
   }

@@ -11,7 +11,7 @@
 ///      fonts:
 ///       - asset: fonts/CustomIcons.ttf
 ///
-/// 
+///
 /// * Modern Pictograms, Copyright (c) 2012 by John Caserta. All rights reserved.
 ///         Author:    John Caserta
 ///         License:   SIL (http://scripts.sil.org/OFL)
@@ -68,4 +68,22 @@ class CustomIcons  {
   static const IconData bed = IconData(0xf236, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData tape = IconData(0xf4db, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData award = IconData(0xe81b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData arm = IconData(0xe80b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData down = IconData(0xe80d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData left = IconData(0xe80e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData right = IconData(0xe80f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData up = IconData(0xe810, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData lifting_1 = IconData(0xe815, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData lifting_3 = IconData(0xe817, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData leaf = IconData(0xe81c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData lightning_bolt = IconData(0xea2d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData moon_sun = IconData(0xea45, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData muscle_fat = IconData(0xea47, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData muscle_up = IconData(0xea48, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData player_king = IconData(0xea68, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData camera_retro = IconData(0xf083, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData users = IconData(0xf0c0, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chat_empty = IconData(0xf0e6, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData address_book = IconData(0xf2b9, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData phone_alt = IconData(0xf879, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }

@@ -10,7 +10,7 @@ import '../marval_arq.dart';
 enum MessageType  {text, photo, audio}
 
 class Message{
-  static CollectionReference chatDB = FirebaseFirestore.instance.collection("users/${authUser!.uid}/chat");
+  static CollectionReference chatDB = FirebaseFirestore.instance.collection("users/${authUser.uid}/chat");
 
   final MessageType type;
   final String message;
@@ -26,7 +26,7 @@ class Message{
     required this.read });
 
   Message.create({required this.message, required this.type}):
-        user = authUser!.uid,
+        user = authUser.uid,
         read = false,
         date = DateTime.now();
 

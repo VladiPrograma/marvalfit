@@ -21,7 +21,7 @@ class MarvalUser {
   String work;
   String? hobbie;
   String? email;
-  bool? active;
+  bool active;
   String? profileImage;
   double lastWeight;
   double currWeight;

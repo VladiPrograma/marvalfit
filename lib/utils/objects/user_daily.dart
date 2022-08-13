@@ -9,7 +9,7 @@ import '../../constants/global_variables.dart';
 
 class Daily {
 
-  static CollectionReference dailyDB = FirebaseFirestore.instance.collection("users/${authUser!.uid}/daily");
+  static CollectionReference dailyDB = FirebaseFirestore.instance.collection("users/${authUser.uid}/daily");
 
   String   id;
   DateTime date;

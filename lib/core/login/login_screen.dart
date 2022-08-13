@@ -32,7 +32,7 @@ class LoginScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: kWhite,
       body: SafeArea(child:
-      Container( width: 100.w, height: 100.h,
+      SizedBox( width: 100.w, height: 100.h,
         child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: Column(
@@ -63,6 +63,7 @@ String _email= "";
 String _password= "";
 
 Creator<String?> _loginErrors = Creator.value(null);
+
 void _clear(Ref ref) => ref.update(_loginErrors, (t) => null);
 void _update(Ref ref, String? text) => ref.update(_loginErrors, (t) => text);
 String? _watch(Ref ref) => ref.watch(_loginErrors);
@@ -108,18 +109,17 @@ class _LogInForm extends StatelessWidget {
                 _clear(context.ref);
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  print('Email: $_email\nPassword: $_password');
 
                   /// We try to LogIn
-                   String? error = await signIn(_email, _password);
-                   logInfo('ERROR: $error');
+                  String? error = await signIn(_email, _password);
                   _update(context.ref, error);
                   _formKey.currentState!.validate();
 
-                  if(isNull(_watch(context.ref)) && isNotNull(FirebaseAuth.instance.currentUser)){
+                  if(isNull(_watch(context.ref)) && isNotNull(getCurrUser())){
                     authUser = FirebaseAuth.instance.currentUser!;
-                    bool _flag = await MarvalForm.existsInDB(authUser?.uid);
-                    _flag ?
+                    context.ref.watch(userCreator);
+                    bool _isDataCompleted = await MarvalForm.existsInDB(authUser.uid);
+                    _isDataCompleted ?
                     Navigator.popAndPushNamed(context, HomeScreen.routeName)
                     :
                     Navigator.popAndPushNamed(context, GetUserDataScreen.routeName);

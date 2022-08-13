@@ -1,4 +1,5 @@
 import 'package:creator/creator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -12,6 +13,7 @@ import 'package:marvalfit/modules/home/home_screen.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/form.dart';
+import 'package:marvalfit/utils/objects/user.dart';
 
 import 'config/firebase_options.dart';
 import 'package:sizer/sizer.dart';
@@ -26,15 +28,24 @@ import 'config/routes.dart';
 
 ///@TODO when restart the BD change 'users_curr' name.
 
-bool _flag = false;
+bool _isDataCompleted = false;
+MarvalUser? _auxUser;
 void main() async{
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  authUser = getCurrUser();
-  _flag = await MarvalForm.existsInDB(authUser?.uid);
-  runApp(CreatorGraph(child: const MyApp()));
+   User? _auxAuthUser = getCurrUser();
+   _isDataCompleted = await MarvalForm.existsInDB(_auxAuthUser?.uid);
+
+  if(isNotNull(_auxAuthUser)){
+    authUser = _auxAuthUser!;
+    _auxUser = await MarvalUser.getFromDB(_auxAuthUser.uid);
+    if(_auxUser!.active) { authUser = _auxAuthUser; user = _auxUser!; }
+    else                 { logOut(); _auxAuthUser = null; }
+
+  }
+  runApp(CreatorGraph( child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -56,8 +67,10 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Comienza el reto',
             routes: routes,
-            initialRoute: isNull(authUser) ? LoginScreen.routeName :
-                _flag ? HomeScreen.routeName :
+            initialRoute: isNull(_auxUser)||!_auxUser!.active ? LoginScreen.routeName :
+                _isDataCompleted ?
+                HomeScreen.routeName
+                    :
                 GetUserDataScreen.routeName
           );
         }
