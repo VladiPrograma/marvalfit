@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
 import 'package:marvalfit/widgets/marval_snackbar.dart';
 
+import '../config/custom_icons.dart';
 import '../utils/marval_arq.dart';
 import '../utils/objects/user.dart';
 
@@ -21,7 +22,7 @@ final userEmitter = Emitter.stream((ref) async {
  return FirebaseFirestore.instance.collection('users').doc(authId).snapshots();
 });
 
-MarvalUser? watchUser(BuildContext context, Ref ref){
+MarvalUser? watchActiveUser(BuildContext context, Ref ref){
   final query = ref.watch(userEmitter.asyncData).data;
   if(isNull(query)) return null;
   MarvalUser auxUser =  MarvalUser.fromJson(query!.data()!);
@@ -34,5 +35,11 @@ MarvalUser? watchUser(BuildContext context, Ref ref){
   return null;
 }
 
-/// HOME VARIABLES */
-late ValueNotifier<DateTime> dateNotifier;
+const Map<String, IconData?> mapIcons = {
+  ''    :  null,
+  'sleep' : CustomIcons.bed,
+  'gallery' : CustomIcons.camera_retro,
+  'tap' : CustomIcons.tape,
+  'steps' : CustomIcons.leg,
+
+};

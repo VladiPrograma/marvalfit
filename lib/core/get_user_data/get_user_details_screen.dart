@@ -38,16 +38,17 @@ class _GetUserDetailsState extends State<GetUserDetails> {
     }
       ///@TODO Create Custom class for new traning state
       Planing training = Planing.create(habits: ["Sol", "Frio", "Naturaleza"],steps: 10000,
-       activities: [
-         {"Descanso" :
-         { "icon": 'sleep', "label": 'Descanso', "type": 'rest', "id": 'ACT_001'}},
-         {"Medidas" :
-         { "icon": 'tap', "label": 'Medidas', "type": 'tap', "id": 'ACT_002'}},
-         {"Galeria" :
-         { "icon": 'gallery', "label": 'Galeria', "images": 'Sleep', "id": 'ACT_003'}},
-         {"RMs" :
-         { "icon": 'rms', "label": 'RMs', "type": 'table_01', "id": 'ACT_004'}},
-       ]);
+       activities:
+         [{"Descanso" :
+         { "icon": 'sleep', "label": 'Descanso', "type": 'rest', "id": 'DESCANSO'},
+         "Medidas" :
+         { "icon": 'tap', "label": 'Medidas', "type": 'table', "id": 'MEDIDAS'},
+         "Galeria" :
+         { "icon": 'gallery', "label": 'Galeria', "images": 'Sleep', "id": 'FOTOS'},
+         "Pasos" :
+         { "icon": 'steps', "label": 'Pasos', "type": 'steps', "id": 'PASOS'}
+         }],
+       );
       training.setInDB();
 
       logInfo(user);

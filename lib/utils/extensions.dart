@@ -73,6 +73,13 @@ extension DateFormat on DateTime{
     }
     return res;
   }
+  DateTime nextSaturday(){
+    DateTime res = this;
+    while(res.weekday!=7){
+      res= res.add(const Duration(days: 1));
+    }
+    return res;
+  }
   bool isSameDate(DateTime date){
     return day == date.day && month == date.month && year == date.year;
   }

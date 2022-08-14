@@ -10,7 +10,7 @@ class Planing{
   int? steps;
   DateTime lastUpdate;
   List<String>? habits;
-  List<dynamic>? activities;
+  List<Map<String, dynamic>>? activities;
 
   Planing({
     required this.id,
@@ -28,8 +28,8 @@ class Planing{
       : id = map["id"],
         habits = List<String>.from(map["habits"]),
         steps = map["steps"],
-  ///@TODO Check this code and improve it.
-        activities  = List<dynamic>.from(List<dynamic>.from(map["activities"])),
+        ///@TODO Check this code and improve it.
+        activities  = List<Map<String, dynamic>>.from(List<dynamic>.from(map["activities"])),
         lastUpdate = map["last_update"].toDate();
 
   static Future<bool> PlaningExists(String? uid) async{

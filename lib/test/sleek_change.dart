@@ -1,9 +1,9 @@
+import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/colors.dart';
 import 'package:sizer/sizer.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
-
 import '../constants/theme.dart';
 import '../utils/firebase/auth.dart';
 
@@ -24,12 +24,34 @@ class TestSleekScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-             Sleek()
+             Watcher((context, ref, child){
+               final primalMax = ref.watch(maxCounter);
+               final primalMin = ref.watch(minCounter);
+               init = (primalMax-primalMin)/2+primalMin;
+               return SleekCircularSlider(
+                 initialValue: init,
+                 onChangeEnd: (value)  async{
+                   double newMax = primalMax + (value-init);
+                   double newMin = primalMin + (value-init);
+                   ref.update(maxCounter, (p0) => newMax);
+                   ref.update(minCounter, (p0) => newMin);
+                 },
+                 max: primalMax,
+                 min: primalMin,
+
+               );
+             })
           ]))
       ),
     );
   }
 }
+
+Creator<double> weightCounter = Creator.value(5);
+Creator<double> maxCounter = Creator.value(10);
+Creator<double> minCounter = Creator.value(0);
+
+
 double max = 180;
 double min = 0;
 double init = 90;
@@ -40,7 +62,6 @@ class Sleek extends StatefulWidget {
   @override
   State<Sleek> createState() => _SleekState();
 }
-
 class _SleekState extends State<Sleek> {
   @override
   Widget build(BuildContext context) {

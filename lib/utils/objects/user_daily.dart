@@ -15,8 +15,9 @@ class Daily {
   DateTime date;
   int      sleep;
   double   weight;
-  Map      activities;
+  List<Map<String, dynamic>> activities;
   List<String> habits;
+  List<String> habitsFromPlaning;
 
   Daily({
     required this.id,
@@ -24,23 +25,24 @@ class Daily {
     required this.sleep,
     required this.weight,
     required this.habits,
+    required this.habitsFromPlaning,
     required this.activities
   });
 
-  Daily.create({required this.date})
+  Daily.create({required this.date, required this.habitsFromPlaning, required this.activities})
   : id = date.id,
     sleep = 0,
     weight = 0,
-    habits = [],
-    activities = {};
+    habits = [];
 
   Daily.fromJson(Map<String, dynamic> map)
   : id = map["id"],
     date = map["date"].toDate(),
     sleep = map["sleep"],
     weight = map["weight"],
-    activities = map["activities"],
-    habits = List<String>.from(map["habits"]);
+    activities  = List<Map<String, dynamic>>.from(map["activities"]),
+    habits = List<String>.from(map["habits"]),
+    habitsFromPlaning = List<String>.from(map["habits_from_planing"]);
 
   Future<void> setInDB() {
     // Call the user's CollectionReference to add a new user
@@ -50,6 +52,7 @@ class Daily {
       'sleep': sleep, //1
       'weight': weight, // 75.5
       'habits': habits, // [Sol, Frio, Agradecer]
+      'habits_from_planing': habitsFromPlaning, // [Sol, Frio, Agradecer]
       'activities': activities, // {}
     }).then((value) => logSuccess("$logSuccessPrefix User Daily  Added"))
       .catchError((error) => logError("$logErrorPrefix Failed to add User Daily : $error"));
@@ -107,10 +110,5 @@ class Daily {
     uploadInDB({
       "habits": habits,
     });
-  }
-
-  void updateActivities(String type, Map value) {
-    activities[type] = value;
-    uploadInDB({"activities": activities});
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
+import 'package:marvalfit/test/sleek_change.dart';
 import 'package:sizer/sizer.dart';
 
 import '../config/custom_icons.dart';
@@ -102,7 +103,7 @@ class MarvalDrawer extends StatelessWidget {
           GestureDetector(
             onTap: () {
               Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName));
-              Navigator.pushNamed(context, SettingScreen.routeName);
+              Navigator.pushNamed(context, TestSleekScreen.routeName);
             },
             child: ListTile(
               leading: Icon(CustomIcons.person ,color: name == "Perfil" ? kGreen : kBlack, size: 6.w,),
