@@ -30,6 +30,7 @@ String? validateNumber(String? value){
 }
 
 Map<String, dynamic>? toMap(DocumentSnapshot doc){
+  if(isNull(doc)||!doc.exists){ return null; }
   try{  return doc.data() as Map<String, dynamic>; }
   catch(E){  logError("DocumentSnapshot fails in cast to Map<String, dynamic):\n $E"); }
   return null;

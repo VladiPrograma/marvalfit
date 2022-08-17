@@ -5,10 +5,12 @@ import 'package:marvalfit/constants/theme.dart';
 import 'package:sizer/sizer.dart';
 
 import '../constants/colors.dart';
+import '../constants/global_variables.dart';
+import '../utils/marval_arq.dart';
 
  enum SNACKTYPE { info, alert, success}
-
-void MarvalSnackBar(BuildContext context, SNACKTYPE type, {String? title, String? subtitle}){
+///@TODO Remove context from everywhere in files
+void MarvalSnackBar(BuildContext? context, SNACKTYPE type, {String? title, String? subtitle}){
    late Color _backgroundColor;
    late Color _iconColor;
    late List<Color> _barColor;
@@ -30,8 +32,7 @@ void MarvalSnackBar(BuildContext context, SNACKTYPE type, {String? title, String
      _barColor = [kGreen, kGreenSec];
      _icon = Icons.tag_faces_rounded ;
    }
-  ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+   snackbarKey.currentState?.showSnackBar( SnackBar(
           padding: EdgeInsets.zero,
           backgroundColor: _backgroundColor,
           content: Container(width: 100.w, height: 10.h,
@@ -80,8 +81,7 @@ void MarvalSnackBar(BuildContext context, SNACKTYPE type, {String? title, String
                   SnackLineAnimation(colors: _barColor),
                 ],
               )
-          ))
-  );
+          )) );
 }
 
 class SnackLineAnimation extends StatefulWidget {

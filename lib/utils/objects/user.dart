@@ -27,6 +27,7 @@ class MarvalUser {
   double currWeight;
   DateTime update;
   DateTime lastUpdate;
+  DateTime startDate;
   Details? details;
   Planing? currenTraining;
   Map<String, Daily>? dailys;
@@ -44,6 +45,7 @@ class MarvalUser {
     required this.currWeight,
     required this.update,
     required this.lastUpdate,
+    required this.startDate,
     this.profileImage,
   });
 
@@ -59,6 +61,7 @@ class MarvalUser {
         currWeight = 0,
         dailys = <String, Daily>{},
         update = DateTime.now(),
+        startDate = DateTime.now(),
         lastUpdate = DateTime.now();
 
   MarvalUser.fromJson(Map<String, dynamic> map)
@@ -74,6 +77,7 @@ class MarvalUser {
         currWeight = map["curr_weight"],
         lastWeight = map["last_weight"],
         update = map["update"].toDate(),
+        startDate = map["start_date"].toDate(),
         lastUpdate = map["last_update"].toDate(),
         dailys = <String, Daily>{};
 
@@ -89,6 +93,7 @@ class MarvalUser {
         dailys = <String, Daily>{},
         active = true,
         update = DateTime.now(),
+        startDate = DateTime.now(),
         lastUpdate = DateTime.now();
 
 
@@ -109,6 +114,7 @@ class MarvalUser {
       'curr_weight': currWeight, // 77.4
       'update': update, // 11/06/2021
       'last_update': lastUpdate, // 11/07/2022
+      'start_date': startDate, // 11/07/2022
     })
         .then((value) => logSuccess("$logSuccessPrefix User Added"))
         .catchError((error) =>
@@ -157,7 +163,8 @@ class MarvalUser {
 
   @override
   String toString() {
-    return " ID: $id"
+    return " ID: $id "
+        "\n Start Date: $startDate"
         "\n Mail: $email Active: $active"
         "\n Name: $name Last Name: $lastName"
         "\n Job: $work"

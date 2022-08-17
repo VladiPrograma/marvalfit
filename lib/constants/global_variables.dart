@@ -35,11 +35,5 @@ MarvalUser? watchActiveUser(BuildContext context, Ref ref){
   return null;
 }
 
-const Map<String, IconData?> mapIcons = {
-  ''    :  null,
-  'sleep' : CustomIcons.bed,
-  'gallery' : CustomIcons.camera_retro,
-  'tap' : CustomIcons.tape,
-  'steps' : CustomIcons.leg,
-
-};
+final GlobalKey<ScaffoldMessengerState> snackbarKey =
+GlobalKey<ScaffoldMessengerState>();

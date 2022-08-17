@@ -61,7 +61,7 @@ class MarvalDrawer extends StatelessWidget {
               )),
           /// Home
           GestureDetector(
-            onTap: () =>  Navigator.of(context).pushNamedAndRemoveUntil(HomeScreen.routeName, (route) => false),
+            onTap: () => Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName)),
             child: ListTile(
               leading: Icon(Icons.home_rounded,color: name=="Home" ? kGreen : kBlack, size: 6.w,),
               title: TextH2('Home', size: 4, color: name=="Home" ? kGreen : kBlack),

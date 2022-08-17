@@ -100,6 +100,12 @@ class Daily {
       "sleep": sleep,
     });
   }
+  void updateActivity(Map<String, dynamic> activity) {
+    activities[activities.indexOf(activity)] = activity;
+    uploadInDB({
+      "activities": activities,
+    });
+  }
 
   void updateHabits(String value) {
     if (habits.contains(value)) {
