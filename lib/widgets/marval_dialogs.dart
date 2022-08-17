@@ -24,12 +24,12 @@ void MarvalDialogsInfo(BuildContext context, double height, {RichText? richText,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  SizedBox(width: 3.w,),
                   Icon(CustomIcons.info, color: kBlue, size: 10.w,),
-                  Spacer(),
+                  SizedBox(width: 3.w,),
                   TextH2(title ?? "", color: kBlue,),
-                  Spacer(),
                 ],
               ),
               SizedBox(height: 2.h,),

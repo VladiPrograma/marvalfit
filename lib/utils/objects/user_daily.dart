@@ -17,7 +17,7 @@ class Daily {
   double   weight;
   List<Map<String, dynamic>> activities;
   List<String> habits;
-  List<String> habitsFromPlaning;
+  List<Map<String, dynamic>>? habitsFromPlaning;
 
   Daily({
     required this.id,
@@ -40,9 +40,9 @@ class Daily {
     date = map["date"].toDate(),
     sleep = map["sleep"],
     weight = map["weight"],
-    activities  = List<Map<String, dynamic>>.from(map["activities"]),
     habits = List<String>.from(map["habits"]),
-    habitsFromPlaning = List<String>.from(map["habits_from_planing"]);
+    activities  = List<Map<String, dynamic>>.from(map["activities"]),
+    habitsFromPlaning =List<Map<String, dynamic>>.from(List<dynamic>.from(map["habits_from_planing"]));
 
   Future<void> setInDB() {
     // Call the user's CollectionReference to add a new user

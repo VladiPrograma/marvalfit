@@ -37,19 +37,7 @@ class _GetUserDetailsState extends State<GetUserDetails> {
       user.profileImage = _urlImage;
     }
       ///@TODO Create Custom class for new traning state
-      Planing training = Planing.create(habits: ["Sol", "Frio", "Naturaleza"],steps: 10000,
-       activities:
-         [{"Descanso" :
-         { "icon": 'sleep', "label": 'Descanso', "type": 'rest', "id": 'DESCANSO'},
-         "Medidas" :
-         { "icon": 'tap', "label": 'Medidas', "type": 'table', "id": 'MEDIDAS'},
-         "Galeria" :
-         { "icon": 'gallery', "label": 'Galeria', "images": 'Sleep', "id": 'FOTOS'},
-         "Pasos" :
-         { "icon": 'steps', "label": 'Pasos', "type": 'steps', "id": 'PASOS'}
-         }],
-       );
-      training.setInDB();
+      Planing training = Planing.createNewTraining();
 
       logInfo(user);
       user.setInDB();

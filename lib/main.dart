@@ -12,6 +12,7 @@ import 'package:marvalfit/modules/home/home_screen.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/form.dart';
+import 'package:marvalfit/utils/objects/planing.dart';
 import 'package:marvalfit/utils/objects/user.dart';
 
 import 'config/firebase_options.dart';

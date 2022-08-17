@@ -74,6 +74,7 @@ class MarvalActivity extends StatelessWidget {
   final Daily? daily;
   @override
   Widget build(BuildContext context) {
+    logInfo(activity!);
     return  GestureDetector(
         onTap: () {
           String type = activity!['label'];
@@ -206,7 +207,6 @@ class MarvalActivityList extends StatelessWidget {
 }
 
 /// MEDIDAS WIDGET
-/// 
 Emitter<List<DataRow>> dataRowEmitter = Emitter((ref, emit){
   Measures measure = Measures.create(date: ref.watch(dateCreator));
   emit(DataRowList(measure));

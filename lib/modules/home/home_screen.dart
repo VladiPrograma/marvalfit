@@ -13,9 +13,11 @@ import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 import '../../config/custom_icons.dart';
 import '../../constants/global_variables.dart';
+import '../../constants/string.dart';
 import '../../utils/decoration.dart';
 import '../../utils/marval_arq.dart';
 import '../../utils/objects/user_daily.dart';
+import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_drawer.dart';
 import '../../widgets/marval_snackbar.dart';
 import 'logic.dart';
@@ -364,7 +366,7 @@ class MoonList extends StatelessWidget {
 /// Habits WIDGETS */
 class MarvalHabit extends StatelessWidget {
   const MarvalHabit({required this.habit, Key? key}) : super(key: key);
-  final String? habit;
+  final Map<String, dynamic>? habit;
   @override
   Widget build(BuildContext context) {
     if(isNull(habit)) return const SizedBox();
@@ -380,12 +382,26 @@ class MarvalHabit extends StatelessWidget {
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  TextH1(habit!, size: 3.8, color: kWhite,),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextH1(habit?['label'] ?? '', size: 3.8, color: kWhite,),
+                        SizedBox(width: 1.w,),
+                        GestureDetector(
+                            onTap: (){ MarvalDialogsInfo(context, 40,
+                                title: habit?['name'] ?? '',
+                                richText:RichText(
+                                  text: TextSpan(text: habit?['description'],
+                                      style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack)),
+                                ));
+                            },
+                            child: Icon(CustomIcons.info, size: 3.w, color: kGreen,))
+                      ]),
                   SizedBox(height: 1.5.h,),
                   GestureDetector(
                       onTap:(){
                         Daily? daily = getDaily(context.ref);
-                        if(isNotNull(daily))  daily!.updateHabits(habit!);
+                        if(isNotNull(daily))  daily!.updateHabits(habit!['label']!);
                       },
                       child: Container(
                           decoration: BoxDecoration(
@@ -404,7 +420,7 @@ class MarvalHabit extends StatelessWidget {
                               radius: 4.w,
                               backgroundColor:  isNull(Daily) ? kGrey :
                                   ///@TODO Change kGrey with dark blue from date
-                              daily!.habits.contains(habit) ? kGreen : kGrey,
+                              daily!.habits.contains(habit!['label']) ? kGreen : kGrey,
                             );
                           })
                       ))
@@ -430,12 +446,12 @@ class MarvalHabitList extends StatelessWidget {
               Watcher((context, ref, child) {
                 Daily? daily = getDaily(ref);
                 return ListView.builder(
-                    itemCount: daily?.habitsFromPlaning.length ?? 0,
+                    itemCount: daily?.habitsFromPlaning?.length ?? 0,
                     scrollDirection: Axis.horizontal,
                     itemBuilder: (context, index) {
                       return Container(
                           margin: EdgeInsets.symmetric(horizontal: 2.w),
-                          child: MarvalHabit(habit: daily?.habitsFromPlaning[index]));
+                          child: MarvalHabit(habit: daily?.habitsFromPlaning?[index]));
                     });
               })
           )
