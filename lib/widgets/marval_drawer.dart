@@ -12,9 +12,10 @@ import '../constants/theme.dart';
 import '../modules/ajustes/settings_screen.dart';
 import '../modules/chat/chat_screen.dart';
 import '../modules/home/home_screen.dart';
+import '../modules/profile/profile_screen.dart';
 import '../utils/marval_arq.dart';
 
-
+///@TODO When u go to settings and change the profile image it dont change in Drawer, change header with the user emmiter
 final _notificationsCreator = Emitter.stream((ref) async {
   logSuccess('NotificationCreator updated');
   return FirebaseFirestore.instance.collection('users/${authUser.uid}/chat')
@@ -103,7 +104,7 @@ class MarvalDrawer extends StatelessWidget {
           GestureDetector(
             onTap: () {
               Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName));
-              Navigator.pushNamed(context, TestSleekScreen.routeName);
+              Navigator.pushNamed(context, ProfileScreen.routeName);
             },
             child: ListTile(
               leading: Icon(CustomIcons.person ,color: name == "Perfil" ? kGreen : kBlack, size: 6.w,),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../modules/profile/profile_screen.dart';
 ///* Test Pages */
 import '../test/sleek_change.dart';
 import '../test/snackbar_and_dialogs.dart';
@@ -27,6 +28,7 @@ final Map<String, WidgetBuilder> routes = {
   ///* Module Screens */
   HomeScreen.routeName : (context) => HomeScreen(),
   ChatScreen.routeName : (context) => ChatScreen(),
+  ProfileScreen.routeName : (context) => ProfileScreen(),
   ///* Setting Screens */
   SettingScreen.routeName : (context) => SettingScreen(),
   ResetEmailScreen.routeName : (context) => ResetEmailScreen(),

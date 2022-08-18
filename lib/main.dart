@@ -37,6 +37,7 @@ void main() async{
     await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
    User? _auxAuthUser = getCurrUser();
    _isDataCompleted = await MarvalForm.existsInDB(_auxAuthUser?.uid);
 

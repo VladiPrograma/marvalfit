@@ -15,6 +15,7 @@ import '../../core/login/login_screen.dart';
 import '../../core/get_user_data/form_screen.dart';
 import '../../core/get_user_data/get_user_data_screen.dart';
 
+import '../../widgets/box_user_data.dart';
 import '../../widgets/marval_drawer.dart';
 import '../../widgets/marval_dialogs.dart';
 
@@ -30,7 +31,7 @@ const _settings = [
   "Conectar con FatSecret",
   "Salir"
 ];
-const _settings_icons = [
+const _settingIcons = [
   CustomIcons.mail,
   CustomIcons.lock,
   CustomIcons.loop,
@@ -81,14 +82,13 @@ class SettingScreen extends StatelessWidget {
                 physics: const NeverScrollableScrollPhysics(),
                 separatorBuilder: (context, index) => SizedBox(height: 2.h,),
                 itemBuilder: (context, index) {
-                return SettingTile(name: _settings[index], iconData: _settings_icons[index],
+                return SettingTile(name: _settings[index], iconData: _settingIcons[index],
                 onTap: () async{
                   logSuccess(_settings[index]);
                   if(_settings[index] == 'Cambio de Contraseña') Navigator.pushNamed(context, ResetPasswordScreen.routeName);
                   if(_settings[index] == 'Cambio de Correo') Navigator.pushNamed(context, ResetEmailScreen.routeName);
                   if(_settings[index] == 'Actualizar Formulario') Navigator.pushNamed(context, FormScreen.routeName);
                   if(_settings[index] == 'Actualizar Datos'){
-                    await user.getDetails();
                     Navigator.pushNamed(context, GetUserDataScreen.routeName);
                   }
                   if(_settings[index]=='Salir'){

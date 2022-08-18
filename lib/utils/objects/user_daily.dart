@@ -15,8 +15,9 @@ class Daily {
   DateTime date;
   int      sleep;
   double   weight;
-  List<Map<String, dynamic>> activities;
+  int?     steps;
   List<String> habits;
+  List<Map<String, dynamic>> activities;
   List<Map<String, dynamic>>? habitsFromPlaning;
 
   Daily({
@@ -26,13 +27,15 @@ class Daily {
     required this.weight,
     required this.habits,
     required this.habitsFromPlaning,
-    required this.activities
+    required this.activities,
+    this.steps,
   });
 
   Daily.create({required this.date, required this.habitsFromPlaning, required this.activities})
   : id = date.id,
     sleep = 0,
     weight = 0,
+    steps = 0,
     habits = [];
 
   Daily.fromJson(Map<String, dynamic> map)
@@ -40,6 +43,7 @@ class Daily {
     date = map["date"].toDate(),
     sleep = map["sleep"],
     weight = map["weight"],
+    steps = map["steps"],
     habits = List<String>.from(map["habits"]),
     activities  = List<Map<String, dynamic>>.from(map["activities"]),
     habitsFromPlaning =List<Map<String, dynamic>>.from(List<dynamic>.from(map["habits_from_planing"]));
@@ -51,6 +55,7 @@ class Daily {
       'date': date, // 12/05/2022
       'sleep': sleep, //1
       'weight': weight, // 75.5
+      'steps': steps ?? 0, // 75.5
       'habits': habits, // [Sol, Frio, Agradecer]
       'habits_from_planing': habitsFromPlaning, // [Sol, Frio, Agradecer]
       'activities': activities, // {}
@@ -88,7 +93,7 @@ class Daily {
   }
 
   void updateWeight(double value) {
-    weight = value;
+    weight = double.parse(value.toStringAsPrecision(3));
     uploadInDB({
       "weight": weight,
     });
@@ -98,6 +103,12 @@ class Daily {
     sleep = value;
     uploadInDB({
       "sleep": sleep,
+    });
+  }
+  void updateSteps(int value) {
+    steps = value;
+    uploadInDB({
+      "steps": steps!,
     });
   }
   void updateActivity(Map<String, dynamic> activity) {

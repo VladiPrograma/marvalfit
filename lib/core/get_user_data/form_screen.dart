@@ -8,6 +8,7 @@ import 'package:sizer/sizer.dart';
 
 import '../../config/custom_icons.dart';
 import '../../constants/colors.dart';
+import '../../constants/global_variables.dart';
 import '../../utils/objects/form.dart';
 
 class FormScreen extends StatefulWidget {
@@ -180,7 +181,6 @@ class _FormPageState extends State<FormPage> with SingleTickerProviderStateMixin
             OptionItem(
               name: answer,
               onTap: (offset) async{
-
                 if(answer==widget.answers.first&&widget.answers.last.contains('Especifica')){
                   answer+= '. ${_specify[_pointer]}';
                 }
@@ -189,6 +189,9 @@ class _FormPageState extends State<FormPage> with SingleTickerProviderStateMixin
                   await MarvalForm.setUserResponse(_completedForm);
                   logInfo(_completedForm.toString());
                   logInfo(_specify.toString());
+                  if(user.currWeight == 0){
+                    user.updateWeight(weight: user.initialWeight);
+                  }
                   Navigator.popAndPushNamed(context, HomeScreen.routeName);
                 }else{
                 onTap(keyIndex, offset);

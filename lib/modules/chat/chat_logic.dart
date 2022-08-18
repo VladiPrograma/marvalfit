@@ -21,7 +21,7 @@ Emitter<int> notifications = Emitter((ref, emit){
     logError('Charging data again');
     final notif = list?.where((element) => element.user!=authUser.uid && !element.read).length ?? 0;
     ref.update(notifyCreator, (p0) => notif);
-});
+}, keepAlive: true);
 
 List<Message>? getLoadMessages(Ref ref){
   final query = ref.watch(_chatCreator.asyncData).data;
@@ -52,5 +52,5 @@ final _chatCreator = Emitter.stream((ref) async {
       .orderBy('date',descending: true)
       .limit(10*ref.watch(_page))
       .snapshots();
-});
+}, keepAlive: true);
 

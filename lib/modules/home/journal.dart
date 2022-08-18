@@ -119,8 +119,11 @@ class MarvalActivity extends StatelessWidget {
                   form: _form,
                   richText: _richText,
                   onSucess: (){
-                    activity!['completed']= isNull(activity?['completed']) ? true : !activity!['completed'] ;
-                    daily!.updateActivity(activity!);
+                    if(isNull(activity?['completed'])){
+                      activity!['completed']= true ;
+                      daily!.updateActivity(activity!);
+                    }
+                    daily!.updateSteps(_steps);
                   }
               );
             }
@@ -211,7 +214,6 @@ Emitter<List<DataRow>> dataRowEmitter = Emitter((ref, emit){
   Measures measure = Measures.create(date: ref.watch(dateCreator));
   emit(DataRowList(measure));
 });
-
 final _formKey = GlobalKey<FormState>();
 
 Map<String, double>? _bodyParts;

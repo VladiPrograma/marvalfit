@@ -16,6 +16,7 @@ import '../../utils/objects/user.dart';
 import '../../utils/objects/message.dart';
 
 import '../../config/custom_icons.dart';
+import '../../widgets/box_user_data.dart';
 import '../../widgets/marval_drawer.dart';
 
 import 'chat_logic.dart';
@@ -24,7 +25,7 @@ import 'chat_logic.dart';
 
 final TextEditingController _controller = TextEditingController();
 
-ScrollController returnController(Ref ref){
+ScrollController _returnController(Ref ref){
   ScrollController  res = ScrollController();
   res.addListener((){ if(res.position.maxScrollExtent==res.offset){ fetchMoreMessages(ref); }});
   return res;
@@ -94,7 +95,7 @@ class ChatScreen extends StatelessWidget {
 
                           return ListView.separated(
                             reverse: true,
-                            controller: returnController(ref),
+                            controller: _returnController(ref),
                             itemCount: data.length,
                             separatorBuilder: (context, index) {
                               if(isNotNull(data[index+1])&& firstDate.day != data[index+1].date.day){
@@ -154,36 +155,7 @@ class ChatScreen extends StatelessWidget {
   }
 }
 
-class BoxUserData extends StatelessWidget {
-  const BoxUserData({required this.user, Key? key}) : super(key: key);
-  final MarvalUser user;
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-         decoration: BoxDecoration(
-           boxShadow: [kMarvalHardShadow],
-           borderRadius: BorderRadius.all(Radius.circular(100.w)),
-         ),
-         child: CircleAvatar(
-             backgroundColor: kBlack,
-             radius: 6.h,
-             backgroundImage:  isNullOrEmpty(user.profileImage) ?
-               null
-                 :
-               Image.network(user.profileImage!, fit: BoxFit.fitHeight).image
-         )),
-        SizedBox(width: 2.w),
-        Column(crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 3.h,),
-          TextH2('${user.name} ${user.lastName}', size: 4),
-          TextH2(user.work, size: 3, color: kGrey,),
-        ])
-      ]);
-  }
-}
+
 const List<int> _sizes = [0, 4, 8, 12, 16, 20];
 const List<int> _margins = [77,65,53,41,29,15];
 

@@ -5,7 +5,6 @@ import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/modules/ajustes/settings_screen.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
-import 'package:marvalfit/utils/objects/user_details.dart';
 import 'package:marvalfit/widgets/marval_elevated_button.dart';
 import 'package:marvalfit/widgets/marval_textfield.dart';
 import 'package:sizer/sizer.dart';
@@ -19,7 +18,6 @@ import '../../utils/marval_arq.dart';
 import '../../utils/objects/planing.dart';
 import 'form_screen.dart';
 
-String? _phone;
 bool _upToBD = false;
 
 class GetUserDetails extends StatefulWidget {
@@ -50,12 +48,23 @@ class _GetUserDetailsState extends State<GetUserDetails> {
       authUser = getCurrUser()!;
       _upToBD = true;
   }
+  void updateProfileImage(XFile? image) async{
+    logInfo('Here we are ${image ?? 'loco'}');
+    if(isNotNull(image)){
+      String? _urlImage = await uploadProfileImg(authUser.uid, image!);
+      user.profileImage = _urlImage;
+      user.uploadInDB({'profile_image' : _urlImage});
+      await authUser.updatePhotoURL(user.profileImage);
+    }
+    _upToBD = true;
+  }
   @override
   Widget build(BuildContext context) {
     final _arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
      XFile? _image = _arguments['image'];
-     _phone = _arguments['phone'];
-     if(!_upToBD&&isNull(user.details)){ updateToBD(_image);}
+     ///@TODO Change this line with something with more sense
+     if(!_upToBD && user.currWeight == 0){ updateToBD(_image);}
+     else {updateProfileImage(_image);}
     return Scaffold(
         backgroundColor: kWhite,
         body: SafeArea(
@@ -91,15 +100,12 @@ class _Form extends StatelessWidget {
     String? _hobbie;
     String? _food;
     String? _city;
-    DateTime? _birthDate;
+    DateTime? _birthdate;
     double? _height;
     double? _weight;
     TextEditingController _textController = TextEditingController(
-                                            text: isNotNull(user.details) ?
-                                            user.details!.birthDate.toFormatStringDate()
-                                                :
-                                            null
-                                          );
+                                            text: isNotNull(user.birthdate) ?
+                                            user.birthdate!.toFormatStringDate() : null );
     return Form(
       key: _formKey,
       child: Column(
@@ -121,7 +127,7 @@ class _Form extends StatelessWidget {
               prefixIcon: CustomIcons.food,
               labelText: "Comida Favorita",
               hintText: "Macarrones con tomate",
-              initialValue: isNotNull(user.details) ? user.details?.favoriteFood : null,
+              initialValue: isNotEmpty(user.favoriteFood) ? user.favoriteFood : null,
               onSaved: (value) => _food = value!.normalize(),
               validator: (value){
                 if(isNullOrEmpty(value)){ return kEmptyValue;}
@@ -134,7 +140,7 @@ class _Form extends StatelessWidget {
             prefixIcon: Icons.location_city,
             labelText: "Localidad",
             hintText: "Zaragoza",
-            initialValue: isNotNull(user.details) ? user.details?.city : null,
+            initialValue: isNotEmpty(user.city) ? user.city : null,
             onSaved: (value) => _city = value!.normalize(),
               validator: (value){
                 if(isNullOrEmpty(value)){ return kEmptyValue; }
@@ -151,9 +157,9 @@ class _Form extends StatelessWidget {
               labelText: "Fecha de Nacimiento",
               hintText: "06/12/2022",
               onTap: () async {
-                _birthDate = await pickDate(context);
-                if(isNotNull(_birthDate)){
-                  _textController.text =  _birthDate!.id;
+                _birthdate = await pickDate(context);
+                if(isNotNull(_birthdate)){
+                  _textController.text =  _birthdate!.id;
                 }
               },
               validator: (value){
@@ -172,7 +178,7 @@ class _Form extends StatelessWidget {
                 keyboardType: TextInputType.number,
                 labelText: "Peso",
                 hintText: "79.5",
-                initialValue: isNotNull(user.details) ? user.details?.initialWeight.toString() : null,
+                initialValue: user.initialWeight!=0 ? user.initialWeight.toString() : null,
                 validator: (value) => validateNumber(value),
                 onSaved: (value) => _weight = value!.toDouble(),
               ),
@@ -183,7 +189,7 @@ class _Form extends StatelessWidget {
                   prefixIcon: CustomIcons.size,
                   labelText: "Altura",
                   hintText: "1.89",
-                  initialValue: isNotNull(user.details) ? user.details?.height.toStringAsFixed(0) : null,
+                  initialValue: user.height!=0 ? user.height.toStringAsFixed(0) : null,
                   validator: (value) => validateNumber(value),
                   onSaved: (value){
                     double? _curr = value!.toDouble();
@@ -201,24 +207,19 @@ class _Form extends StatelessWidget {
               onPressed: () async{
                 if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  bool _fromSettings = isNotNull(user.details);
-                  if(isNull(_birthDate)){_birthDate = user.details!.birthDate;}
-                  if(isNull(_phone)){_phone = user.details!.phone;}
+                  ///@Change this lane with something with more sense
+                  bool _fromSettings = user.currWeight!=0;
+                  if(isNull(_birthdate)){_birthdate = user.birthdate;}
                   ///* Set details */
-                  Details details = Details.create(
+                  user.updateDetails(
                       height: _height!,
                       favoriteFood: _food!,
-                      phone: _phone!,
                       city: _city!,
-                      birthDate: _birthDate!,
+                      birthdate: _birthdate!,
                       initialWeight: _weight!,
+                      hobbie: _hobbie!
                   );
-                  details.setDetails();
-                  logInfo(details.toString());
                   ///* Set Weight */
-                  user.updateWeight(weight: _weight!);
-                  user.updateHobbie(hobbie: _hobbie!);
-                  user.details = details;
                   logInfo(user.toString());
                   _fromSettings ? Navigator.popAndPushNamed(context, SettingScreen.routeName)
                       :

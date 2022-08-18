@@ -8,27 +8,31 @@ import '../marval_arq.dart';
 
 import 'planing.dart';
 import 'user_daily.dart';
-import 'user_details.dart';
 
 class MarvalUser {
 
   static CollectionReference usersDB = FirebaseFirestore.instance.collection("users");
 
   String id;
-  String name;
-  String? objective;
-  String lastName;
-  String work;
-  String? hobbie;
-  String? email;
   bool active;
+  String name;
+  String lastName;
+  String objective;
+  String work;
+  String hobbie;
+  String email;
+  String phone;
+  String city;
+  String favoriteFood;
   String? profileImage;
+  DateTime? birthdate;
+  DateTime startDate;
+  DateTime lastUpdate;
+  DateTime update;
+  double initialWeight;
   double lastWeight;
   double currWeight;
-  DateTime update;
-  DateTime lastUpdate;
-  DateTime startDate;
-  Details? details;
+  double height;
   Planing? currenTraining;
   Map<String, Daily>? dailys;
 
@@ -46,16 +50,26 @@ class MarvalUser {
     required this.update,
     required this.lastUpdate,
     required this.startDate,
-    this.profileImage,
+    required this.favoriteFood,
+    required this.phone,
+    required this.city,
+    required this.birthdate,
+    required this.height,
+    required this.initialWeight,
+    this.profileImage
   });
 
-  ///@TODO Check if i can delete "dailys"
   MarvalUser.create(
       {String? uid, required this.name, required this.email, required this.objective})
       : id = uid ?? FirebaseAuth.instance.currentUser!.uid,
-        lastName = "",
-        work = "",
-        hobbie = "",
+        lastName = '',
+        work = '',
+        hobbie = '',
+        favoriteFood ='',
+        phone ='',
+        city ='',
+        height = 0,
+        initialWeight =0,
         active = true,
         lastWeight = 0,
         currWeight = 0,
@@ -73,29 +87,43 @@ class MarvalUser {
         email = map["email"],
         active = map["active"],
         work = map["work"],
+        favoriteFood = map['favorite_food'],
+        phone = map['phone'],
+        city = map['city'],
+        height = map['height'],
+        initialWeight = map['initial_weight'],
         profileImage = map["profile_image"],
         currWeight = map["curr_weight"],
         lastWeight = map["last_weight"],
-        update = map["update"].toDate(),
+        birthdate = map['birthdate']?.toDate(),
+      update = map["update"].toDate(),
         startDate = map["start_date"].toDate(),
         lastUpdate = map["last_update"].toDate(),
         dailys = <String, Daily>{};
 
   MarvalUser.empty()
-      : id = "",
-        email = "",
-        name = "",
-        lastName = "",
-        work = "",
-        hobbie = "",
+      : id = '',
+        active = true,
+        email = '',
+        name = '',
+        lastName = '',
+        objective = '',
+        work = '',
+        hobbie = '',
+        favoriteFood= '',
+        phone= '',
+        city= '',
+        height= 0,
+        initialWeight= 0,
         lastWeight = 0,
         currWeight = 0,
         dailys = <String, Daily>{},
-        active = true,
+        birthdate= DateTime.now(),
         update = DateTime.now(),
         startDate = DateTime.now(),
         lastUpdate = DateTime.now();
 
+  int get age => birthdate?.fromBirthdayToAge() ?? -1;
 
   Future<void> setInDB() {
     // Call the user's CollectionReference to add a new user
@@ -106,7 +134,13 @@ class MarvalUser {
       'last_name': lastName, // Dumitru
       'hobbie': hobbie, // Dumitru
       'objective': objective, // Dumitru
-      'email': email, // Dumitru
+      'email': email,
+      'favorite_food' : favoriteFood,
+      'phone' : phone,
+      'city' : city,
+      'birthdate' : birthdate,
+      'height'  :height,
+      'initial_weight' :initialWeight, // Dumitru
       'active': active, // Dumitru
       'work': work, // Programador
       'profile_image': profileImage, // Programador
@@ -129,8 +163,6 @@ class MarvalUser {
         .catchError((error) =>
         logError("$logErrorPrefix Failed to Upload user: $error"));
   }
-
-  Future<void> getDetails() async => details = await Details.getFromDB(id);
 
   Future<void> getCurrentTraining() async =>
       currenTraining = await Planing.getFromBD(id);
@@ -171,8 +203,11 @@ class MarvalUser {
         "\n Curr: $currWeight Kg  Last: $lastWeight Kg "
         "\n Update: $update Last Update: $lastUpdate"
         "\n Hobbie: $hobbie Objective: $objective"
+        "\n favoriteFood: $favoriteFood"
+        "\n city: $city phone: $phone"
+        "\n birthdate: $birthdate"
+        "\n height: $height initialWeight: $initialWeight"
         "\n Profile image URL: $profileImage"
-        "\n Details: ${details?.toString()}"
         "\n Current Training: ${currenTraining?.toString()}"
         "\n Dailys: \n${dailys.toString()}";
   }
@@ -219,14 +254,43 @@ class MarvalUser {
     });
   }
 
-  void updateBasicData({required String name, required String lastName, required String work}) {
+  void updateActive() {
+    active = !active;
+    uploadInDB({
+      "active": active,
+    });
+  }
+
+  void updateDetails({required String hobbie, required String city,required String favoriteFood,required DateTime birthdate,required double initialWeight, required double height}){
+
+    this.city =  city;
+    this.favoriteFood =  favoriteFood;
+    this.birthdate =  birthdate;
+    this.height =  height;
+    this.hobbie = hobbie;
+    this.initialWeight =  initialWeight;
+
+    uploadInDB({
+      'phone': this.phone, // Vlad
+      'city': this.city, // Programador
+      'favorite_food': this.favoriteFood, // 76.3
+      'hobbie': this.hobbie, // 76.3
+      'birthdate': this.birthdate!, // 77.4
+      'initial_weight': this.initialWeight, // 11/07/2022
+      'height': this.height, // 11/07/2022
+    });
+  }
+
+  void updateBasicData({required String name, required String lastName, required String work, required String phone}) {
     this.name = name;
     this.lastName = lastName;
     this.work = work;
+    this.phone = phone;
     uploadInDB({
       "name": name,
       "last_name": lastName,
       "work": work,
+      "phone": phone,
     });
   }
 }

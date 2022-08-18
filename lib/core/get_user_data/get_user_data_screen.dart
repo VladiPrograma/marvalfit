@@ -66,7 +66,7 @@ class _Form extends StatelessWidget {
             prefixIcon: CustomIcons.person,
             labelText: "Nombre",
             hintText:  "Mario" ,
-            initialValue: isNotEmpty(user.id) ? user.name : null,
+            initialValue: isNotNull(user) ? user.name : null,
             onSaved: (value) => _name = value!.toCamellCase(),
             validator: (value){
               if(isNullOrEmpty(value)){ return kEmptyValue;}
@@ -79,7 +79,7 @@ class _Form extends StatelessWidget {
             prefixIcon: CustomIcons.person,
             labelText: "Apellido",
             hintText: "Valgañon",
-            initialValue: isNotEmpty(user.id) ? user.lastName : null,
+            initialValue: isNotNull(user) ? user.lastName : null,
             onSaved: (value) => _lastName = value!.toCamellCase(),
             validator: (value){
               if(isNullOrEmpty(value)){ return kEmptyValue; }
@@ -92,7 +92,7 @@ class _Form extends StatelessWidget {
             prefixIcon: Icons.settings,
             labelText: "Trabajo",
             hintText: "Entrenador",
-            initialValue: isNotEmpty(user.id) ? user.work : null,
+            initialValue: isNotNull(user) ? user.work : null,
             validator: (value){
               if(isNullOrEmpty(value)){ return kEmptyValue; }
               if(value!.length>50)    { return kToLong;  }
@@ -109,7 +109,7 @@ class _Form extends StatelessWidget {
               keyboardType: TextInputType.number,
               labelText: "Telefono",
               hintText: "622427441",
-              initialValue: isNotEmpty(user.id) ? user.details!.phone : null,
+              initialValue: isNotNull(user) ? user.phone : null,
               validator: (value){
                 if(isNullOrEmpty(value)){
                   return kEmptyValue;
@@ -126,18 +126,16 @@ class _Form extends StatelessWidget {
               onPressed: () async{
             if (_formKey.currentState!.validate()) {
                   _formKey.currentState!.save();
-                  if(isNotEmpty(user.id)){
-                    user.updateBasicData(name: _name!, lastName: _lastName!, work: _job!);
-                    user.details!.uploadDetails({ "phone" : _phone! });
+                  if(isNotNull(user.birthdate)){
+                    user.updateBasicData(name: _name!, lastName: _lastName!, work: _job!, phone: _phone!);
                     authUser.updateDisplayName(user.name);
-                    authUser.updatePhotoURL(user.profileImage);
-
-                    Navigator.popAndPushNamed(context, GetUserDetails.routeName);
+                    Navigator.popAndPushNamed(context,
+                        GetUserDetails.routeName, arguments: {'image': _backgroundImage });
                   }
                   else {
-                    user = await MarvalUser.getFromDB(authUser.uid);
-                    if (isNull(_backgroundImage) && isNull(user.profileImage)) {
-                      MarvalDialogsAlert(
+                      user = (await MarvalUser.getFromDB(authUser.uid));
+                      if (isNull(_backgroundImage) && isNull(user.profileImage)) {
+                        MarvalDialogsAlert(
                           context, type: MarvalDialogAlertType.ACCEPT,
                           height: 30,
                           title: "Sube una foto de perfil",
@@ -158,30 +156,19 @@ class _Form extends StatelessWidget {
                                 ),
                                 TextSpan(
                                     text: " dentro de la App. Venga animate! "
-                                ),
-                              ],
-                            ),
+                                )]),
                           ),
                           onAccept: () {
-                            user.updateBasicData(name: _name!,
-                                lastName: _lastName!,
-                                work: _job!);
-                            Navigator.popAndPushNamed(
-                                context, GetUserDetails.routeName, arguments: {
-                              'image': _backgroundImage,
-                              'phone': _phone
-                            });
+                            user.updateBasicData(name: _name!, lastName: _lastName!, work: _job!, phone: _phone!);
+                            Navigator.popAndPushNamed( context,
+                            GetUserDetails.routeName, arguments: { 'image': _backgroundImage  });
                           }
                       );
                     }
                     else {
-                      user.updateBasicData( name: _name!, lastName: _lastName!, work: _job!);
+                      user.updateBasicData( name: _name!, lastName: _lastName!, work: _job!, phone: _phone!);
                       Navigator.popAndPushNamed(context,
-                          GetUserDetails.routeName,
-                          arguments: {
-                          'image': _backgroundImage,
-                          'phone': _phone
-                      });
+                      GetUserDetails.routeName, arguments: {'image': _backgroundImage });
                     }
                   }
        }})
@@ -216,12 +203,12 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
            isNotNull(_backgroundImage) ?
            Image.file(File(_backgroundImage!.path)).image
                :
-           isNotEmpty(user.id) ?
-           Image.network(user.profileImage ?? '').image
+           isNotNull(user.profileImage) ?
+           Image.network(user.profileImage!).image
            :
            null,
            radius: 23.w,
-           child: isNull(_backgroundImage) && isEmpty(user.id) && isNull(user.profileImage) ?
+           child: isNull(_backgroundImage) && isNull(user.profileImage) ?
            Icon(CustomIcons.person, color : kWhite, size: 17.w,)
            :
            const SizedBox(),
