@@ -37,7 +37,6 @@ void main() async{
     await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
    User? _auxAuthUser = getCurrUser();
    _isDataCompleted = await MarvalForm.existsInDB(_auxAuthUser?.uid);
 
@@ -48,6 +47,7 @@ void main() async{
     else                 { logOut(); _auxAuthUser = null; }
 
   }
+
   runApp(CreatorGraph( child: const MyApp()));
 }
 

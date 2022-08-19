@@ -14,6 +14,7 @@ class Measures {
       "users/${authUser.uid}/activities");
 
   late final String id;
+  late final String type;
   final DateTime date;
   final double ombligo;
   final double ombligoP2;
@@ -46,6 +47,7 @@ class Measures {
     required this.bicepsDrch,
   }) {
     id = date.id + idMeasures;
+    type = idMeasures;
   }
   
   Map<String, double> bodyParts(){
@@ -67,6 +69,7 @@ class Measures {
   Measures.fromMap({required this.date, required Map<String, double> map})
   :
   id = date.id + idMeasures,
+  type =  idMeasures,
   ombligo= map['Ombligo']!,
   ombligoP2=map['Ombligo +2cm']!,
   ombligoM2=map['Ombligo -2cm']!,
@@ -84,6 +87,7 @@ class Measures {
   Measures.create({required this.date})
   :
   id = date.id + idMeasures,
+  type =  idMeasures,
   ombligo=0,
   ombligoP2=0,
   ombligoM2=0,
@@ -101,6 +105,7 @@ class Measures {
   Measures.fromJson(Map<String, dynamic> map)
   : 
   id= map['id'],
+  type= map['type'],
   date= map['date'].toDate(),
   ombligo= map['ombligo'],
   ombligoP2= map['ombligo_p2'],
@@ -119,6 +124,7 @@ class Measures {
     // Call the user's CollectionReference to add a new user
     return activitiesDB.doc(id).set({
           'id':id, //35.5
+          'type':type, //35.5
           'date':date, //35.5
           'ombligo': ombligo, //35.5
           'ombligo_p2': ombligoP2, //35.5
@@ -160,6 +166,7 @@ class Measures {
   @override
   String toString() {
     return "ID : $id"
+    "\n type : $type"
     "\n date : ${date.id}"
     "\n ombligo : $ombligo"
     "\n ombligo_p2 : $ombligoP2"

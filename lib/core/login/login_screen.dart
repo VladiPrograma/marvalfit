@@ -16,6 +16,7 @@ import '../../constants/colors.dart';
 import '../../constants/global_variables.dart';
 
 import '../../utils/objects/form.dart';
+import '../../utils/objects/user.dart';
 import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_elevated_button.dart';
 import '../../widgets/marval_password_textfield.dart';
@@ -118,6 +119,7 @@ class _LogInForm extends StatelessWidget {
                   if(isNull(_watch(context.ref)) && isNotNull(getCurrUser())){
                     authUser = FirebaseAuth.instance.currentUser!;
                     context.ref.watch(userCreator);
+                    user = await MarvalUser.getFromDB(authUser.uid);
                     bool _isDataCompleted = await MarvalForm.existsInDB(authUser.uid);
                     _isDataCompleted ?
                     Navigator.popAndPushNamed(context, HomeScreen.routeName)

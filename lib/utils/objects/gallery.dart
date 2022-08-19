@@ -14,6 +14,7 @@ class Gallery {
       "users/${authUser.uid}/activities");
 
   late final String id;
+  late final String type;
   final DateTime date;
   String? frontal;
   String? perfil;
@@ -28,6 +29,7 @@ class Gallery {
      this.piernas,
   }) {
     id = date.id + idGallery;
+    type =  idGallery;
   }
 
   Map<String, String?> getPhotos(){
@@ -41,6 +43,7 @@ class Gallery {
   Gallery.fromMap({required this.date, required Map<String, String?> map})
       :
         id = date.id + idGallery,
+        type =  idGallery,
         frontal = map['frontal'],
         perfil  = map['perfil' ],
         espalda = map['espalda'],
@@ -50,6 +53,7 @@ class Gallery {
   Gallery.create({required this.date})
       :
         id = date.id + idGallery,
+        type = idGallery,
         frontal = null,
         perfil = null,
         espalda = null,
@@ -59,6 +63,7 @@ class Gallery {
   Gallery.fromJson(Map<String, dynamic> map)
       :
         id= map['id'],
+        type= map['type'],
         date= map['date'].toDate(),
         frontal = map['frontal'],
         perfil = map['perfil'],
@@ -69,6 +74,7 @@ class Gallery {
     // Call the user's CollectionReference to add a new user
     return activitiesDB.doc(id).set({
       'id'   : id, //35.5
+      'type'   : type, //35.5
       'date' : date, //35.5
       'frontal' : frontal,
       'perfil' : perfil,
@@ -101,6 +107,7 @@ class Gallery {
   @override
   String toString() {
     return "ID : $id"
+        "\n type : $type"
         "\n date : ${date.id}"
         "\n frontal : $frontal"
         "\n perfil : $perfil"

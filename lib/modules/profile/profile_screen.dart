@@ -6,6 +6,7 @@ import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/colors.dart';
 import 'package:marvalfit/constants/components.dart';
 import 'package:marvalfit/constants/theme.dart';
+import 'package:marvalfit/modules/profile/gallery.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
 
@@ -20,6 +21,7 @@ import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_drawer.dart';
 import 'diary.dart';
 import 'logic.dart';
+import 'measures.dart';
 
 
 class ProfileScreen extends StatelessWidget {
@@ -168,6 +170,10 @@ class Journal extends StatelessWidget {
           return Diary();
         }else if(type == 'Habitos'){
           return HabitList();
+        }else if(type == 'Galeria'){
+          return GalleryList();
+        }else if(type == 'Medidas'){
+          return MeasureList();
         }
         return JournalList();
     });

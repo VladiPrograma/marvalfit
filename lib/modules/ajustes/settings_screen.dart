@@ -15,6 +15,7 @@ import '../../core/login/login_screen.dart';
 import '../../core/get_user_data/form_screen.dart';
 import '../../core/get_user_data/get_user_data_screen.dart';
 
+import '../../utils/objects/user.dart';
 import '../../widgets/box_user_data.dart';
 import '../../widgets/marval_drawer.dart';
 import '../../widgets/marval_dialogs.dart';
@@ -99,6 +100,7 @@ class SettingScreen extends StatelessWidget {
                     acceptText: 'Salir',
                     onAccept: (){
                       logOut();
+                      user = MarvalUser.empty();
                       Navigator.popAndPushNamed(context, LoginScreen.routeName);
                     }
                   );}
