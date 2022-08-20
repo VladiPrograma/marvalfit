@@ -52,27 +52,27 @@ class MeasureLabel extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 2.h),
         child:  Column(
             children: [
-                  Row( mainAxisAlignment: MainAxisAlignment.center,
+              Row( mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(width:20.w, height: 0.2.w, color: kWhite,),
                     TextH1(' ${measure.date.id} ', color: kWhite, size: 5,),
                     Container(width:20.w, height: 0.2.w, color: kWhite,),
                   ]),
-                DataTable(
-                  border: const TableBorder(horizontalInside: BorderSide(color: kWhite)),
-                  columns:  [
-                    DataColumn(
-                    label: SizedBox(width: 40.w,
-                    child: const TextH2('Zona', size: 4, color: kWhite, textAlign: TextAlign.start
-                    ))),
+              DataTable(
+                border: const TableBorder(horizontalInside: BorderSide(color: kWhite)),
+                columns:  [
                   DataColumn(
-                    label: SizedBox(width: 30.w,
-                    child: const TextH2('Medida (cm)', size: 4, color: kWhite, textAlign: TextAlign.center
-                    ))),
-                  ],
-                  rows: DataRowList(measure),
-                ),
-                SizedBox(height: 2.h,),
+                      label: SizedBox(width: 40.w,
+                          child: const TextH2('Zona', size: 4, color: kWhite, textAlign: TextAlign.start
+                          ))),
+                  DataColumn(
+                      label: SizedBox(width: 30.w,
+                          child: const TextH2('Medida (cm)', size: 4, color: kWhite, textAlign: TextAlign.center
+                          ))),
+                ],
+                rows: DataRowList(measure),
+              ),
+              SizedBox(height: 2.h,),
             ])
     );
   }
@@ -84,8 +84,26 @@ class MeasureList extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(width: 100.w, height: 76.h,
         child: Watcher((context, ref, child) {
-         List<Measures>? measures = _getLoadMeasures(ref);
-          if(isNull(measures)){ return const SizedBox();}
+          List<Measures>? measures = _getLoadMeasures(ref);
+          if(isNull(measures)){ return Container(width: 100.w,
+              margin: EdgeInsets.only(top: 2.h),
+              child : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox( width: 20.w,
+                        child: GestureDetector(
+                          child: Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen),
+                          onTap: ()=> context.ref.update(journalCreator, (t) => 'List'),
+                        )),
+                    const TextH2("Revisa tus medidas", size: 4, color: kWhite,),
+                    SizedBox( width: 20.w,
+                        child: GestureDetector(
+                          onTap: (){ /**@TODO implement video or image or something*/ },
+                          child: Icon(CustomIcons.info, size: 5.w, color: kGreen),
+                        )),
+                  ])
+          );}
           return ListView.builder(
               controller: _returnController(ref),
               itemCount: measures!.length+1,
@@ -125,7 +143,7 @@ DataRow MarvalDataRow(String text, double num){
   return DataRow(cells: [
     DataCell(SizedBox(width: 40.w, child:TextH2(text, size: 4, color: kWhite, textAlign: TextAlign.start))),
     DataCell(SizedBox(width: 30.w, child:TextH2(num==0 ? '0' : num.toStringAsPrecision(3), size: 4, color: kWhite, textAlign: TextAlign.center))),
-    ]);
+  ]);
 }
 List<DataRow> DataRowList(Measures measures){
   final bodyParts = measures.bodyParts();

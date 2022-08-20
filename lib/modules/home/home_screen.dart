@@ -224,7 +224,7 @@ class MarvalWeight extends StatelessWidget {
                 onChangeEnd: (value) {
                   ///* Firebase Updates */
                   if(isNotNull(daily)){
-                    double newWeight = weight + double.parse(value.toStringAsPrecision(3));
+                    double newWeight =  double.parse((weight+value).toStringAsPrecision(3));
                     _sleekInit != 0 ? _sleekInit=0 : _sleekInit+=0.0001;
                     daily!.updateWeight(newWeight);
                     DateTime date = daily.date;

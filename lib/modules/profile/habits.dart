@@ -70,10 +70,27 @@ class HabitList extends StatelessWidget {
   const HabitList({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return SizedBox(width: 100.w, height: 80.h, child: Watcher((context, ref, child) {
+    return SizedBox(width: 100.w, height: 72.h, child: Watcher((context, ref, child) {
       Daily? daily = getLoadDailys(ref)?.first;
       String type = ref.watch(habitsCreator);
-      if(isNull(daily)){ return SizedBox();}
+      if(isNull(daily)){ return Container(width: 100.w,
+          margin: EdgeInsets.only(top: 3.h),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: 5.w,),
+                SizedBox( width: 35.w,
+                    child: GestureDetector(
+                      onTap: (){ context.ref.update(journalCreator, (p0) => 'List');},
+                      child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen)
+                      ),
+                    )),
+                const TextH2("Habitos", size: 4, color: kWhite,),
+                SizedBox( width: 35.w),
+              ]));}
       if(type=='List'){
         return ListView.separated(
             itemCount: daily!.habitsFromPlaning!.length+1,
@@ -115,44 +132,59 @@ class CalendarList extends StatelessWidget {
   final String habit;
   @override
   Widget build(BuildContext context) {
-    return Column(
-        children: [
-          SizedBox(height: 4.h,),
-          SizedBox(width: 100.w,
-              child: Row( mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(width: 5.w,),
-                    SizedBox( width: 30.w,
-                        child: GestureDetector(
-                          onTap: (){ context.ref.update(habitsCreator, (p0) => 'List');},
-                          child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen)
-                          ),
-                        )),
-                    TextH2(habit, size: 4, color: kWhite,),
-                    SizedBox( width: 30.w),
-                  ])),
-          Watcher((context, ref, child){
-            List<Daily>? dailys = getLoadDailys(ref);
-            if(isNull(dailys)) return SizedBox();
-            final lastDate = dailys!.first.date;
-            int monthDifference = dailys.last.date.monthDifference(lastDate);
+    return Watcher((context, ref, child){
+      List<Daily>? dailys = getLoadDailys(ref);
+      if(isNull(dailys)) { return Container(width: 100.w,
+          margin: EdgeInsets.only(top: 3.h),
+          child: Row( mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(width: 5.w,),
+                SizedBox( width: 30.w,
+                    child: GestureDetector(
+                      onTap: (){ context.ref.update(habitsCreator, (p0) => 'List');},
+                      child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen)
+                      ),
+                    )),
+                TextH2(habit, size: 5, color: kWhite,),
+                SizedBox( width: 30.w),
+              ]));
+      }
+      final lastDate = dailys!.first.date;
+      int monthDifference = dailys.last.date.monthDifference(lastDate);
 
-            return SizedBox(width: 80.w, height: 63.h,
-                child: ListView.separated(
-                  physics: const BouncingScrollPhysics(),
-                  controller: _returnController(ref),
-                  itemCount: monthDifference+1,
-                  itemBuilder: (context, index){
-                    var nextMonth =  DateTime(lastDate.year, lastDate.month - index, lastDate.day);
-                    List<bool> list = getCalendarHabitList(dailys, nextMonth, habit);
-                    return Calendar(habits: list, date: nextMonth);
-                  },
-                  separatorBuilder: (context, index) => SizedBox(height: 5.h,),
-                ));
-          })
-        ]);
+      return SizedBox(width: 100.w, height: 72.h,
+          child: ListView.separated(
+            controller: _returnController(ref),
+            itemCount: monthDifference+2,
+            itemBuilder: (context, index){
+              if(index==0){
+                return SizedBox(width: 100.w,
+                    child: Row( mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(width: 5.w,),
+                          SizedBox( width: 30.w,
+                              child: GestureDetector(
+                                onTap: (){ context.ref.update(habitsCreator, (p0) => 'List');},
+                                child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen)
+                                ),
+                              )),
+                          TextH2(habit, size: 5, color: kWhite,),
+                          SizedBox( width: 30.w),
+                        ]));
+              }
+              var nextMonth =  DateTime(lastDate.year, lastDate.month - (index-1), lastDate.day);
+              List<bool> list = getCalendarHabitList(dailys, nextMonth, habit);
+              return Container(
+                  margin: EdgeInsets.symmetric(horizontal: 10.w),
+                  child: Calendar(habits: list, date: nextMonth));
+            },
+            separatorBuilder: (context, index) => SizedBox(height: 5.h,),
+          ));
+    });
   }
 }
 
@@ -173,7 +205,7 @@ class Calendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return
-      Container(width: 80.w, height: 38.h,
+      Container(width: 80.w, height: 34.h,
           padding: EdgeInsets.symmetric(horizontal: 2.w),
           decoration: BoxDecoration(
               border: Border(
@@ -193,7 +225,7 @@ class Calendar extends StatelessWidget {
                       Container(width: 13.w, height: 0.2.w, color: kWhite,),
                     ]),
                 SizedBox(height: 2.h,),
-                Container(width: 80.w, height: 31.h,
+                Container(width: 80.w, height: 26.h,
                     padding: EdgeInsets.symmetric(horizontal: 1.w),
                     child: GridView.count(
                         crossAxisCount: 7,

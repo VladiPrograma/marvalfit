@@ -19,35 +19,50 @@ class Diary extends StatelessWidget {
   const Diary({ Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return  SizedBox(width: 100.w, height: 80.h, child: Column( children: [
-      SizedBox(height: 2.h,),
-      /// Title
-      SizedBox(width: 100.w,
-       child: Row(
-           mainAxisAlignment: MainAxisAlignment.center,
-           children: [
-             SizedBox(width: 5.w,),
-             SizedBox( width: 20.w,
-                 child: GestureDetector(
-                   child: Align(alignment: Alignment.centerLeft, child:
-                   Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen)),
-                   onTap: (){ context.ref.update(journalCreator, (p0) => 'List');},
-                 )),
-             const TextH2("Revista tus datos", size: 4, color: kWhite,),
-             SizedBox( width: 25.w),
-       ])),
-      Watcher((context, ref, child) {
-        List<Daily>? dailys = getLoadDailys(ref);
-        if(isNull(dailys)||dailys!.isEmpty) return SizedBox();
-        return SizedBox(width: 73.w, height: 65.h,
-            child: ListView.separated(
-              controller: _returnController(ref),
-              itemCount: dailys.length,
-              itemBuilder: (context, index) => DiaryDailyInput(daily: dailys[index]),
-              separatorBuilder: (context, index) => SizedBox(height: 3.h,),
-            ));
-      })
-    ]));
+    return  Watcher((context, ref, child) {
+      List<Daily>? dailys = getLoadDailys(ref);
+
+      if(isNull(dailys)||dailys!.isEmpty) {
+        return Container(width: 100.w,
+            margin: EdgeInsets.only(top: 3.h),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(width: 5.w,),
+                  SizedBox( width: 20.w,
+                      child: GestureDetector(
+                        child: Align(alignment: Alignment.centerLeft, child:
+                        Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen)),
+                        onTap: (){ context.ref.update(journalCreator, (p0) => 'List');},
+                      )),
+                  const TextH2("Revista tus datos", size: 4, color: kWhite,),
+                  SizedBox( width: 25.w),
+                ]));
+      }
+      return SizedBox(width: 100.w, height: 72.h,
+          child: ListView.separated(
+            controller: _returnController(ref),
+            itemCount: dailys.length+1,
+            itemBuilder: (context, index){
+              if(index==0){ return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(width: 5.w,),
+                    SizedBox( width: 20.w,
+                        child: GestureDetector(
+                          child: Align(alignment: Alignment.centerLeft, child:
+                          Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen)),
+                          onTap: (){ context.ref.update(journalCreator, (p0) => 'List');},
+                        )),
+                    const TextH2("Revista tus datos", size: 4, color: kWhite,),
+                    SizedBox( width: 25.w),
+                  ]);}
+              return Container(margin: EdgeInsets.symmetric(horizontal: 12.w), child: DiaryDailyInput(daily: dailys[index-1]));
+            } ,
+            separatorBuilder: (context, index) => SizedBox(height: 3.h,),
+          ));
+    });
   }
 }
 class DiaryDailyInput extends StatelessWidget {
@@ -55,12 +70,12 @@ class DiaryDailyInput extends StatelessWidget {
   final Daily? daily;
   @override
   Widget build(BuildContext context) {
-    if(isNull(daily)) return SizedBox();
-    else{
+    if(isNull(daily)) { return const SizedBox();
+    } else{
       List<String> habits = daily!.habitsFromPlaning!.map((e) => e['label'].toString()).toList();
       List<String> activities = daily!.activities.where((element) => element['completed']==true).map((e) => e['label'].toString()).toList();
       activities.remove('Pasos');
-      return Container( width: 70.w,
+      return Container(
           padding: EdgeInsets.all(3.w),
           decoration: BoxDecoration(
               border: Border(

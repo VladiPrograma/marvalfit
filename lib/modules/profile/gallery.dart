@@ -118,36 +118,50 @@ class GalleryList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(width: 100.w, height: 76.h,
-    child: Watcher((context, ref, child) {
-      List<Gallery>? galleries = _getLoadGalleries(ref);
-      logInfo(galleries ?? ' ta vacio');
-      if(isNull(galleries)){ return SizedBox();}
-      return ListView.builder(
-          controller: _returnController(ref),
-          itemCount: galleries!.length+1,
-          scrollDirection: Axis.vertical,
-          itemBuilder: (context, index) {
-            /// Title
-            if(index==0){
-              return SizedBox(width: 100.w,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox( width: 20.w,
-                          child: GestureDetector(
-                            child: Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen),
-                            onTap: ()=> context.ref.update(journalCreator, (p0) => 'List'),
-                          )),
-                      const TextH2("Tu progreso en fotos", size: 4, color: kWhite,),
-                      ///@TODO On fetching more data set here loading button to indicate we are loading more data
-                      SizedBox( width: 20.w)
-                    ]),);
-            }
-            return Container(
-                margin: EdgeInsets.symmetric(horizontal: 2.w),
-                child: GalleryLabel(gallery: galleries[index-1],));
-          });
-    }));
+        child: Watcher((context, ref, child) {
+          List<Gallery>? galleries = _getLoadGalleries(ref);
+          logInfo(galleries ?? ' ta vacio');
+          if(isNull(galleries)){ return Container(width: 100.w,
+            margin: EdgeInsets.only(top: 2.h),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox( width: 20.w,
+                      child: GestureDetector(
+                        child: Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen),
+                        onTap: ()=> context.ref.update(journalCreator, (p0) => 'List'),
+                      )),
+                  const TextH2("Tu progreso en fotos", size: 4, color: kWhite,),
+                  ///@TODO On fetching more data set here loading button to indicate we are loading more data
+                  SizedBox( width: 20.w)
+                ]),);}
+          return ListView.builder(
+              controller: _returnController(ref),
+              itemCount: galleries!.length+1,
+              scrollDirection: Axis.vertical,
+              itemBuilder: (context, index) {
+                /// Title
+                if(index==0){
+                  return SizedBox(width: 100.w,
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox( width: 20.w,
+                              child: GestureDetector(
+                                child: Icon(CustomIcons.arrow_left, size: 7.w, color: kGreen),
+                                onTap: ()=> context.ref.update(journalCreator, (p0) => 'List'),
+                              )),
+                          const TextH2("Tu progreso en fotos", size: 4, color: kWhite,),
+                          ///@TODO On fetching more data set here loading button to indicate we are loading more data
+                          SizedBox( width: 20.w)
+                        ]),);
+                }
+                return Container(
+                    margin: EdgeInsets.symmetric(horizontal: 2.w),
+                    child: GalleryLabel(gallery: galleries[index-1],));
+              });
+        }));
   }
 }
