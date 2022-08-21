@@ -7,6 +7,7 @@ import 'package:sizer/sizer.dart';
 import '../../config/log_msg.dart';
 import '../../config/custom_icons.dart';
 import '../../modules/home/home_screen.dart';
+import '../../modules/home/logic.dart';
 import '../../utils/firebase/auth.dart';
 import '../../utils/marval_arq.dart';
 
@@ -117,8 +118,7 @@ class _LogInForm extends StatelessWidget {
                   _formKey.currentState!.validate();
 
                   if(isNull(_watch(context.ref)) && isNotNull(getCurrUser())){
-                    authUser = FirebaseAuth.instance.currentUser!;
-                    context.ref.watch(userCreator);
+                    authUser = getCurrUser()!;
                     user = await MarvalUser.getFromDB(authUser.uid);
                     bool _isDataCompleted = await MarvalForm.existsInDB(authUser.uid);
                     _isDataCompleted ?

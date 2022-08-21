@@ -11,6 +11,7 @@ import '../../../constants/string.dart';
 import '../../../constants/colors.dart';
 import '../../../constants/global_variables.dart';
 
+import '../../../widgets/marval_drawer.dart';
 import '../../../widgets/marval_elevated_button.dart';
 import '../../../widgets/marval_textfield.dart';
 
@@ -23,6 +24,7 @@ class ResetEmailScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: kWhite,
+      drawer: const MarvalDrawer(name: "Ajustes",),
       body: SafeArea(child:
       Container( width: 100.w, height: 100.h,
         child: SingleChildScrollView(

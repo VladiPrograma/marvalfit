@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../config/log_msg.dart';
@@ -100,8 +101,8 @@ class SettingScreen extends StatelessWidget {
                     acceptText: 'Salir',
                     onAccept: (){
                       logOut();
-                      user = MarvalUser.empty();
-                      Navigator.popAndPushNamed(context, LoginScreen.routeName);
+                      ///@TODO We could improve this but wherever
+                      SystemChannels.platform.invokeMethod('SystemNavigator.pop');
                     }
                   );}
                 });
