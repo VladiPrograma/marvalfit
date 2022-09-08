@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
-import 'package:marvalfit/test/sleek_change.dart';
 import 'package:sizer/sizer.dart';
 
 import '../config/custom_icons.dart';
@@ -9,10 +8,10 @@ import '../config/log_msg.dart';
 import '../constants/colors.dart';
 import '../constants/global_variables.dart';
 import '../constants/theme.dart';
-import '../modules/ajustes/settings_screen.dart';
 import '../modules/chat/chat_screen.dart';
 import '../modules/home/home_screen.dart';
 import '../modules/profile/profile_screen.dart';
+import '../modules/settings/settings_screen.dart';
 import '../utils/marval_arq.dart';
 
 ///@TODO When u go to settings and change the profile image it dont change in Drawer, change header with the user emmiter

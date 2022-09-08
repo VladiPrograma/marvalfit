@@ -5,24 +5,21 @@ import 'package:sizer/sizer.dart';
 import '../../config/log_msg.dart';
 import '../../config/custom_icons.dart';
 import '../../utils/firebase/auth.dart';
-import '../../modules/ajustes/ajuste/change_email_screen.dart';
 
 import '../../constants/theme.dart';
 import '../../constants/string.dart';
 import '../../constants/colors.dart';
 import '../../constants/global_variables.dart';
 
-import '../../core/login/login_screen.dart';
 import '../../core/get_user_data/form_screen.dart';
 import '../../core/get_user_data/get_user_data_screen.dart';
 
-import '../../utils/objects/user.dart';
 import '../../widgets/box_user_data.dart';
 import '../../widgets/marval_drawer.dart';
 import '../../widgets/marval_dialogs.dart';
 
-import '../chat/chat_screen.dart';
-import 'ajuste/change_password_screen.dart';
+import 'labels/change_email_screen.dart';
+import 'labels/change_password_screen.dart';
 
 
 const _settings = [

@@ -76,7 +76,6 @@ class DecoratedInputBorder extends InputBorder {
   }
 }
 
-
 class InnerShadow extends SingleChildRenderObjectWidget {
   const InnerShadow({
     Key? key,

@@ -20,6 +20,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
+/// @TODO Order this File here and in the CustomIcons Web
+/// @TODO Obtain new icons for "Tareas"
 class CustomIcons  {
   CustomIcons._();
 

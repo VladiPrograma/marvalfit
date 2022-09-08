@@ -8,7 +8,20 @@ import '../marval_arq.dart';
 
 
 const String idMeasures = '_Measures';
-
+const List<String> bodyParts = [
+  'Ombligo',
+  'Ombligo +2cm',
+  'Ombligo -2cm',
+  'Cadera',
+  'Cont. Pecho',
+  'Cont. Hombros',
+  'Gemelo izq',
+  'Gemelo drch',
+  'Muslo izq',
+  'Muslo drch',
+  'Biceps izq',
+  'Biceps drch',
+];
 class Measures {
   static CollectionReference activitiesDB = FirebaseFirestore.instance.collection(
       "users/${authUser.uid}/activities");
@@ -21,7 +34,6 @@ class Measures {
   final double ombligoM2;
   final double cadera;
   final double contPecho;
-
   final double contHombros;
   final double gemeloIzq;
   final double gemeloDrch;
@@ -29,7 +41,6 @@ class Measures {
   final double musloDrch;
   final double bicepsIzq;
   final double bicepsDrch;
-
 
   Measures({
     required this.date,
@@ -49,61 +60,60 @@ class Measures {
     id = date.id + idMeasures;
     type = idMeasures;
   }
-  
+
+  Measures.create({required this.date})
+      :
+        id = date.id + idMeasures,
+        type =  idMeasures,
+        ombligo=0,
+        ombligoP2=0,
+        ombligoM2=0,
+        cadera=0,
+        contPecho=0,
+        contHombros=0,
+        gemeloIzq=0,
+        gemeloDrch=0,
+        musloIzq=0,
+        musloDrch=0,
+        bicepsIzq=0,
+        bicepsDrch=0;
+
   Map<String, double> bodyParts(){
     return <String, double>{
-      'Ombligo' : ombligo,
-      'Ombligo +2cm' : ombligoP2,
-      'Ombligo -2cm' : ombligoM2,
-      'Cadera' : cadera,
-      'Cont. Pecho' : contPecho,
-      'Cont. Hombros' : contHombros,
-      'Gemelo izq' : gemeloIzq,
-      'Gemelo drch' : gemeloDrch,
-      'Muslo izq' : musloIzq,
-      'Muslo drch' : musloDrch,
-      'Biceps izq' : bicepsIzq,
-      'Biceps drch' : bicepsDrch,
+      'Ombligo': ombligo,
+      'Ombligo +2cm': ombligoP2,
+      'Ombligo -2cm': ombligoM2,
+      'Cadera': cadera,
+      'Cont. Pecho': contPecho,
+      'Cont. Hombros': contHombros,
+      'Gemelo izq': gemeloIzq,
+      'Gemelo drch': gemeloDrch,
+      'Muslo izq': musloIzq,
+      'Muslo drch': musloDrch,
+      'Biceps izq': bicepsIzq,
+      'Biceps drch': bicepsDrch,
     };
   }
+
   Measures.fromMap({required this.date, required Map<String, double> map})
   :
   id = date.id + idMeasures,
   type =  idMeasures,
-  ombligo= map['Ombligo']!,
-  ombligoP2=map['Ombligo +2cm']!,
-  ombligoM2=map['Ombligo -2cm']!,
-  cadera=map['Cadera']!,
-  contPecho=map['Cont. Pecho']!,
-  contHombros=map['Cont. Hombros']!,
-  gemeloIzq=map['Gemelo izq']!,
-  gemeloDrch=map['Gemelo drch']!,
-  musloIzq=map['Muslo izq']!,
-  musloDrch=map['Muslo drch']!,
-  bicepsIzq=map['Biceps izq']!,
-  bicepsDrch=map['Biceps drch']!;
-      
-  
-  Measures.create({required this.date})
-  :
-  id = date.id + idMeasures,
-  type =  idMeasures,
-  ombligo=0,
-  ombligoP2=0,
-  ombligoM2=0,
-  cadera=0,
-  contPecho=0,
-  contHombros=0,
-  gemeloIzq=0,
-  gemeloDrch=0,
-  musloIzq=0,
-  musloDrch=0,
-  bicepsIzq=0,
-  bicepsDrch=0;
-  
-  
+  ombligo= map['Ombligo'] ?? 0,
+  ombligoP2=map['Ombligo +2cm'] ?? 0,
+  ombligoM2=map['Ombligo -2cm'] ?? 0,
+  cadera=map['Cadera'] ?? 0,
+  contPecho=map['Cont. Pecho'] ?? 0,
+  contHombros=map['Cont. Hombros'] ?? 0,
+  gemeloIzq=map['Gemelo izq'] ?? 0,
+  gemeloDrch=map['Gemelo drch'] ?? 0,
+  musloIzq=map['Muslo izq'] ?? 0,
+  musloDrch=map['Muslo drch'] ?? 0,
+  bicepsIzq=map['Biceps izq'] ?? 0,
+  bicepsDrch=map['Biceps drch'] ?? 0;
+
   Measures.fromJson(Map<String, dynamic> map)
-  : 
+  :
   id= map['id'],
   type= map['type'],
   date= map['date'].toDate(),
@@ -142,19 +152,16 @@ class Measures {
         .then((value) { logSuccess("$logSuccessPrefix Measures Added");
         }).catchError((error) => logError("$logErrorPrefix Failed to add Measures: $error"));
   }
-
   static Future<bool> measuresExists(DateTime? date) async{
     if(isNull(date)){ return false;}
     DocumentSnapshot ds = await activitiesDB.doc(date!.id+idMeasures).get();
     return ds.exists;
   }
-
   static Future<Measures> getFromBD(DateTime date) async {
     DocumentSnapshot doc = await activitiesDB.doc(date.id+idMeasures).get();
     Map<String, dynamic>? map  = toMap(doc);
     return Measures.fromJson(map!);
   }
-
   Future<void> uploadMeasures(Map<String, Object> map){
     // Call the user's CollectionReference to add a new user
     return activitiesDB

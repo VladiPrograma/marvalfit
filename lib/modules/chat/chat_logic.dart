@@ -14,6 +14,14 @@ final trainerCreator = Emitter.stream((ref) async {
 final _page = Creator.value(1);
 void fetchMoreMessages(Ref ref) => ref.update<int>(_page, (n) => n + 1);
 
+List<Message>? getLoadMessages(Ref ref){
+  final query = ref.watch(_chatCreator.asyncData).data;
+  if(isNull(query)||query!.size==0){ return null; }
+  //Pass data from querySnapshot to Messages
+  final List<Message> list = _queryToData(query);
+
+  return list;
+}
 Creator<int> notifyCreator = Creator.value(0);
 
 Emitter<int> notifications = Emitter((ref, emit){
@@ -23,14 +31,7 @@ Emitter<int> notifications = Emitter((ref, emit){
     ref.update(notifyCreator, (p0) => notif);
 }, keepAlive: true);
 
-List<Message>? getLoadMessages(Ref ref){
-  final query = ref.watch(_chatCreator.asyncData).data;
-  if(isNull(query)||query!.size==0){ return null; }
-  //Pass data from querySnapshot to Messages
-  final List<Message> list = _queryToData(query);
 
-  return list;
-}
 void readMessages(List<Message> data){
   data.where((element) => element.user!=authUser.uid && !element.read)
   .forEach((element) { element.updateRead(); });

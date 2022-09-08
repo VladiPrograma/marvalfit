@@ -1,30 +1,29 @@
 import 'dart:async';
-
-import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
-import 'package:marvalfit/config/log_msg.dart';
-import 'package:marvalfit/constants/colors.dart';
-import 'package:marvalfit/constants/components.dart';
-import 'package:marvalfit/constants/theme.dart';
-import 'package:marvalfit/modules/home/journal.dart';
-import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
+import 'package:creator/creator.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
+import '../../config/log_msg.dart';
 import '../../config/custom_icons.dart';
+import '../../modules/home/journal.dart';
+
+import '../../constants/colors.dart';
+import '../../constants/shadows.dart';
 import '../../constants/global_variables.dart';
 import '../../constants/string.dart';
+import '../../constants/theme.dart';
+
+import '../../utils/extensions.dart';
 import '../../utils/decoration.dart';
 import '../../utils/marval_arq.dart';
 import '../../utils/objects/user_daily.dart';
+
 import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_drawer.dart';
 import '../../widgets/marval_snackbar.dart';
+
 import 'logic.dart';
-
-
-
-
 
 ScrollController _controller = ScrollController();
 void snackBarAlert(BuildContext context){
@@ -35,6 +34,7 @@ void snackBarAlert(BuildContext context){
 int _snackCounter = 0;
 
 ///@TODO Add methods to remove al the "context.ref.watch...."
+///@TODO Animation on date change.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
   static String routeName = "/home";
@@ -51,9 +51,10 @@ class HomeScreen extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
+                    ///Active User
                     Watcher((context, ref, child) {
                       watchActiveUser(context, ref);
-                      return const SizedBox();
+                      return const SizedBox.shrink();
                     }),
                     Container(width: 100.w, height: 124.h,
                         color: kWhite,
@@ -81,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                                                context.ref.update<DateTime>(weekCreator, (date) => date.add(const Duration(days: -7)));
                                                await Future.delayed(const Duration(milliseconds: 100));
                                                context.ref.update<DateTime>(dateCreator, (date) => context.ref.watch(weekCreator).nextSaturday());
-                                               createDaily(context.ref.watch(dateCreator));
+                                               createDailyIfDoNotExists(context.ref.watch(dateCreator));
                                              }
                                            },
                                            child:Row(children:
@@ -103,7 +104,7 @@ class HomeScreen extends StatelessWidget {
                                                   context.ref.update<DateTime>(weekCreator, (date) => date.add(const Duration(days: 7)));
                                                   await Future.delayed(const Duration(milliseconds: 50));
                                                   context.ref.update<DateTime>(dateCreator, (date) => context.ref.watch(weekCreator));
-                                                  createDaily(context.ref.watch(dateCreator));
+                                                  createDailyIfDoNotExists(context.ref.watch(dateCreator));
                                                 }else if(_snackCounter==0){ snackBarAlert(context); _snackCounter++;}
 
                                               },
@@ -278,7 +279,7 @@ class DateCell extends StatelessWidget {
           onTap: ()  {
             if(!date.isAfter(DateTime.now())){
               ref.update(dateCreator, (d) => date);
-              createDaily(date);
+              createDailyIfDoNotExists(date);
             }else if(_snackCounter==0){ snackBarAlert(context); _snackCounter++;}
           },
           child:  Container(width: 11.w, height: 11.h,
@@ -445,6 +446,7 @@ class MarvalHabitList extends StatelessWidget {
               child:
               Watcher((context, ref, child) {
                 Daily? daily = getDaily(ref);
+                if(isNull(daily)) return const SizedBox.shrink();
                 return ListView.builder(
                     itemCount: daily?.habitsFromPlaning?.length ?? 0,
                     scrollDirection: Axis.horizontal,

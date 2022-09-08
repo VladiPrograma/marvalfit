@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:marvalfit/config/custom_icons.dart';
-import 'package:marvalfit/constants/global_variables.dart';
-import 'package:marvalfit/modules/ajustes/settings_screen.dart';
-import 'package:marvalfit/utils/extensions.dart';
-import 'package:marvalfit/utils/firebase/auth.dart';
-import 'package:marvalfit/widgets/marval_elevated_button.dart';
-import 'package:marvalfit/widgets/marval_textfield.dart';
 import 'package:sizer/sizer.dart';
+import 'form_screen.dart';
 
 import '../../config/log_msg.dart';
-import '../../constants/colors.dart';
+import '../../config/custom_icons.dart';
+import '../../modules/settings/settings_screen.dart';
+
+import '../../widgets/marval_elevated_button.dart';
+import '../../widgets/marval_textfield.dart';
+
+import '../../constants/global_variables.dart';
 import '../../constants/string.dart';
 import '../../constants/theme.dart';
-import '../../utils/firebase/storage.dart';
+import '../../constants/colors.dart';
 import '../../utils/marval_arq.dart';
+import '../../utils/extensions.dart';
+import '../../utils/firebase/auth.dart';
 import '../../utils/objects/planing.dart';
-import 'form_screen.dart';
+import '../../utils/firebase/storage.dart';
 
 bool _upToBD = false;
 

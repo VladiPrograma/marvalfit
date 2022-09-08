@@ -35,5 +35,4 @@ MarvalUser? watchActiveUser(BuildContext context, Ref ref){
   return null;
 }
 
-final GlobalKey<ScaffoldMessengerState> snackbarKey =
-GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> snackbarKey = GlobalKey<ScaffoldMessengerState>();

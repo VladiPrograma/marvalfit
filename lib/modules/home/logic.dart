@@ -11,13 +11,15 @@ import '../../utils/objects/user_daily.dart';
 
 Creator<DateTime> dateCreator = Creator((value){
   DateTime date = DateTime.now();
-  createDaily(date);
+  createDailyIfDoNotExists(date);
   return date;
 });
 Creator<DateTime> weekCreator = Creator.value(DateTime.now().lastMonday());
 Creator<String> activityCreator = Creator.value('init');
+Creator<Daily?> dailyCreator = Creator.value(null);
 
-final dailyEmitter = Emitter.stream((ref) async {
+
+final dailyEmitter = Emitter.stream((ref)  {
   final date = ref.watch(dateCreator);
   return FirebaseFirestore.instance.collection('users/${authUser.uid}/daily').doc(date.id).snapshots();
 });
@@ -34,11 +36,11 @@ Future<Planing> getPlaning() async{
   final query = await FirebaseFirestore.instance.collection('trainings').doc(authUser.uid).get();
   return Planing.fromJson(query.data()!);
 }
-void createDaily(DateTime date) async{
+void createDailyIfDoNotExists(DateTime date) async{
   bool exists = await Daily.existsInDB(date);
   if(!exists){
     Planing planing = await getPlaning();
     Daily.create(date: date, habitsFromPlaning: planing.habits ?? [], activities: planing.activities ?? [])
-        .setInDB();
+    .setInDB();
   }
 }

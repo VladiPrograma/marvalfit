@@ -1,17 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
-import 'package:marvalfit/config/custom_icons.dart';
-import 'package:marvalfit/config/log_msg.dart';
-import 'package:marvalfit/constants/colors.dart';
-import 'package:marvalfit/constants/components.dart';
-import 'package:marvalfit/constants/theme.dart';
-import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../config/custom_icons.dart';
+import '../../config/log_msg.dart';
+
+import '../../constants/colors.dart';
+import '../../constants/theme.dart';
+import '../../constants/shadows.dart';
 import '../../constants/global_variables.dart';
+
+import '../../utils/extensions.dart';
 import '../../utils/marval_arq.dart';
 import '../../utils/objects/gallery.dart';
+
 import 'logic.dart';
 
 ScrollController _returnController(Ref ref){

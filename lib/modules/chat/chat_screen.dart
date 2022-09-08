@@ -6,7 +6,6 @@ import 'package:sizer/sizer.dart';
 import '../../constants/theme.dart' ;
 import '../../constants/colors.dart';
 import '../../constants/string.dart';
-import '../../constants/components.dart';
 import '../../constants/global_variables.dart';
 
 import '../../utils/decoration.dart';
@@ -33,6 +32,7 @@ ScrollController _returnController(Ref ref){
 
 
 ///@TODO Remove TEXTH1 "Waiting Conexion"
+///@TODO Dont repeat message time label if is the same time.
 class ChatScreen extends StatelessWidget {
   const ChatScreen({Key? key}) : super(key: key);
   static String routeName = '/chat';

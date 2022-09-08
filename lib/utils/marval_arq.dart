@@ -5,15 +5,10 @@ import '../config/log_msg.dart';
 import '../constants/string.dart';
 
 bool isNull(item) => item==null;
-
 bool isNotNull(item) => item!=null;
-
 bool isEmpty(item) => item.isEmpty;
-
 bool isNotEmpty(item) => item.isNotEmpty;
-
 bool isNullOrEmpty(item) => isNull(item)||isEmpty(item);
-
 bool isNotNullOrEmpty(item) => isNotNull(item)&&isNotEmpty(item);
 
 /// Validations

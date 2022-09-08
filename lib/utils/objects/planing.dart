@@ -79,7 +79,7 @@ class Planing{
        {'label' : 'Sol',
         'name' : 'Tomar el Sol',
         'description' :
-          'La luz solar puede mejorar nuestro estado de ánimo, disminuir la presión arterial,'
+          'La luz solar puede mejorar nuestro estado de ánimo, disminuir la presión arterial, '
           'fortalecer nuestros huesos, músculos e incluso nuestro sistema inmunológico.'
           'Y una breve exposición es suficiente para cosechar todos estos beneficios.'
       },

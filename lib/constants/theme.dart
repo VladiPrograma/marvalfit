@@ -9,6 +9,7 @@ import '../../constants/colors.dart';
 /// P1 Sizes: 4 //
 /// P2 Sizes
 
+///@TODO Normalize text sizes in all the pages.
 class TextH1 extends StatelessWidget {
   final String? text;
   final double? size;

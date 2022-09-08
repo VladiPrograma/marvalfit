@@ -19,7 +19,7 @@ class TestSleekScreen extends StatelessWidget {
       appBar: null,
       backgroundColor: kWhite,
       body: SafeArea(child:
-      Container(width: 100.w, height: 100.h,
+      SizedBox(width: 100.w, height: 100.h,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,

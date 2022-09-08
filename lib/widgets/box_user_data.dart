@@ -3,7 +3,7 @@ import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
 
 import '../constants/colors.dart';
-import '../constants/components.dart';
+import '../constants/shadows.dart';
 import '../constants/theme.dart';
 import '../utils/marval_arq.dart';
 import '../utils/objects/user.dart';

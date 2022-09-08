@@ -70,13 +70,33 @@ class MeasureLabel extends StatelessWidget {
                           child: const TextH2('Medida (cm)', size: 4, color: kWhite, textAlign: TextAlign.center
                           ))),
                 ],
-                rows: DataRowList(measure),
+                rows: [
+                  _MeasureDataRow(bodyParts[0],  measure.ombligo),
+                  _MeasureDataRow(bodyParts[1],  measure.ombligoP2),
+                  _MeasureDataRow(bodyParts[2],  measure.ombligoM2),
+                  _MeasureDataRow(bodyParts[3],  measure.cadera),
+                  _MeasureDataRow(bodyParts[4],  measure.contPecho),
+                  _MeasureDataRow(bodyParts[5],  measure.contPecho),
+                  _MeasureDataRow(bodyParts[6],  measure.gemeloIzq),
+                  _MeasureDataRow(bodyParts[7],  measure.gemeloDrch),
+                  _MeasureDataRow(bodyParts[8],  measure.musloIzq),
+                  _MeasureDataRow(bodyParts[9],  measure.musloDrch),
+                  _MeasureDataRow(bodyParts[10], measure.bicepsIzq),
+                  _MeasureDataRow(bodyParts[11], measure.bicepsDrch),
+                ],
               ),
               SizedBox(height: 2.h,),
             ])
     );
   }
 }
+DataRow _MeasureDataRow(String text, double num){
+  return DataRow(cells: [
+    DataCell(SizedBox(width: 40.w, child:TextH2(text, size: 4, color: kWhite, textAlign: TextAlign.start))),
+    DataCell(SizedBox(width: 30.w, child:TextH2(num==0 ? '0' : num.toStringAsPrecision(3), size: 4, color: kWhite, textAlign: TextAlign.center))),
+  ]);
+}
+
 class MeasureList extends StatelessWidget {
   const MeasureList({Key? key}) : super(key: key);
 
@@ -138,19 +158,7 @@ class MeasureList extends StatelessWidget {
   }
 }
 
-///@TODO Change this with some nice Methods...
-DataRow MarvalDataRow(String text, double num){
-  return DataRow(cells: [
-    DataCell(SizedBox(width: 40.w, child:TextH2(text, size: 4, color: kWhite, textAlign: TextAlign.start))),
-    DataCell(SizedBox(width: 30.w, child:TextH2(num==0 ? '0' : num.toStringAsPrecision(3), size: 4, color: kWhite, textAlign: TextAlign.center))),
-  ]);
-}
-List<DataRow> DataRowList(Measures measures){
-  final bodyParts = measures.bodyParts();
-  List<DataRow> list = [];
-  bodyParts.forEach((key, value) {
-    list.add(MarvalDataRow(key, value));
-  });
-  return list;
-}
+
+
+
 

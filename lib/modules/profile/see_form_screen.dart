@@ -1,35 +1,19 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
-import 'package:marvalfit/config/custom_icons.dart';
-import 'package:marvalfit/config/log_msg.dart';
-import 'package:marvalfit/constants/colors.dart';
-import 'package:marvalfit/constants/components.dart';
-import 'package:marvalfit/constants/theme.dart';
-import 'package:marvalfit/modules/profile/gallery.dart';
-import 'package:marvalfit/utils/extensions.dart';
-import 'package:marvalfit/utils/objects/form.dart';
+import 'package:creator/creator.dart';
 import 'package:sizer/sizer.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../constants/colors.dart';
+import '../../constants/theme.dart';
 import '../../constants/global_variables.dart';
-import '../../constants/icons.dart';
-import '../../constants/string.dart';
-import '../../utils/decoration.dart';
+
 import '../../utils/marval_arq.dart';
-import '../../utils/objects/user.dart';
-import '../../utils/objects/user_daily.dart';
-import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_drawer.dart';
-import 'diary.dart';
-import 'logic.dart';
-import 'measures.dart';
 
 final Emitter<Map<String, dynamic>?> formEmitter = Emitter((ref, emit) async{
   DocumentSnapshot doc = await FirebaseFirestore.instance.collection('forms/').doc(authUser.uid).get();
   emit(toMap(doc));
 });
-
-
 
 class SeeFormScreen extends StatelessWidget {
   const SeeFormScreen({Key? key}) : super(key: key);

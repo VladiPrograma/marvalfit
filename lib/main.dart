@@ -22,6 +22,7 @@ import 'config/routes.dart';
 ///* @TODO Change the Drawer Navigator Routes
 ///* @TODO Drawer have to say "Bienvenido//Bienvenida"
 ///* @TODO Complete full form data to Firebase"
+///* @TODO Open images when user press on it.
 
 ///* @TODO Add Splash Load Screen to IOS
 ///  https://pub.dev/packages/flutter_native_splash/install
