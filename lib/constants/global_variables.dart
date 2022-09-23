@@ -35,4 +35,10 @@ MarvalUser? watchActiveUser(BuildContext context, Ref ref){
   return null;
 }
 
+MarvalUser? getUser(BuildContext context, Ref ref){
+  final query = ref.watch(userEmitter.asyncData).data;
+  if(isNull(query)) return null;
+  return  MarvalUser.fromJson(query!.data()!);
+}
+
 final GlobalKey<ScaffoldMessengerState> snackbarKey = GlobalKey<ScaffoldMessengerState>();

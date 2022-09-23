@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: const MarvalDrawer(name: "Home",),
+        drawer: const MarvalDrawer(page: "Home",),
         backgroundColor: kWhite,
         body:  SingleChildScrollView(
           physics: const NeverScrollableScrollPhysics(),

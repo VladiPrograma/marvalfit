@@ -5,11 +5,21 @@ import 'package:marvalfit/config/log_msg.dart';
 import '../../constants/global_variables.dart';
 import '../../utils/marval_arq.dart';
 import '../../utils/objects/message.dart';
+import '../../utils/objects/user.dart';
 
 final trainerCreator = Emitter.stream((ref) async {
   return  FirebaseFirestore.instance.collection('users')
           .where('email', isEqualTo: 'marval@gmail.com').snapshots();
 });
+
+MarvalUser? getTrainerUser(Ref ref){
+  final query = ref.watch(trainerCreator.asyncData).data;
+  if(isNull(query)||query!.size==0){
+    return null;
+  }
+  final map = query.docs.first.data();
+  return  MarvalUser.fromJson(map);
+}
 
 final _page = Creator.value(1);
 void fetchMoreMessages(Ref ref) => ref.update<int>(_page, (n) => n + 1);

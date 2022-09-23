@@ -1,5 +1,7 @@
+import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:marvalfit/utils/objects/user.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../config/log_msg.dart';
@@ -46,7 +48,7 @@ class SettingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const MarvalDrawer(name: "Ajustes",),
+      drawer: const MarvalDrawer(page: "Ajustes",),
       backgroundColor: kWhite,
       body:  SizedBox( width: 100.w, height: 100.h,
       child: Column(
@@ -72,7 +74,10 @@ class SettingScreen extends StatelessWidget {
               /// User Box Data
               Positioned(  top: 1.h, left: 8.w,
                   child: SafeArea(
-                      child: BoxUserData(user: user)
+                      child: Watcher((context, ref, child) {
+                        MarvalUser? user = getUser(context, ref);
+                        return BoxUserData(user: user ?? MarvalUser.empty());
+                      },)
                   )),
             ])),
           SizedBox(width: 100.w, height: 80.h,

@@ -32,7 +32,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: const MarvalDrawer(name: "Perfil",),
+        drawer: const MarvalDrawer(page: "Perfil",),
         backgroundColor: kWhite,
         body:  SizedBox( width: 100.w, height: 100.h,
           child: Stack(

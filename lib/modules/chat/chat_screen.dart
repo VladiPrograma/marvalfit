@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart' ;
+import 'package:marvalfit/config/log_msg.dart';
 import 'package:sizer/sizer.dart';
 
 
@@ -40,7 +41,7 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: kWhite,
-        drawer: const MarvalDrawer(name: 'Chat',),
+        drawer: const MarvalDrawer(page: 'Chat',),
         body:  SizedBox( width: 100.w, height: 100.h,
             child: Stack(
                     children: [
@@ -58,14 +59,10 @@ class ChatScreen extends StatelessWidget {
                               ))),
                       /// Marval Trainer Data
                       Positioned(  top: 1.h, left: 8.w,
-                        child: SafeArea(child: Watcher((context, ref, _) {
-                          final query = ref.watch(trainerCreator.asyncData).data;
-                          if(isNull(query)||query!.size==0){
-                            return BoxUserData(user: MarvalUser.empty());
-                          }
-                          final map = query.docs.first.data();
-                          final MarvalUser user = MarvalUser.fromJson(map);
-                          return BoxUserData(user: user);
+                        child: SafeArea(
+                          child: Watcher((context, ref, _) {
+                          MarvalUser? trainer = getTrainerUser(ref);
+                          return BoxUserData(user: trainer ?? MarvalUser.empty());
                         }),
                       )),
                       /// Chat Container

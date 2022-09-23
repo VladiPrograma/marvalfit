@@ -25,7 +25,7 @@ class ResetPasswordScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: kWhite,
-      drawer: const MarvalDrawer(name: "Ajustes",),
+      drawer: const MarvalDrawer(page: "Ajustes",),
       body: SafeArea(child:
       Container( width: 100.w, height: 100.h,
         child: SingleChildScrollView(
