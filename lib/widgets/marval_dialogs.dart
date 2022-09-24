@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:marvalfit/constants/theme.dart';
 import 'package:sizer/sizer.dart';
 
@@ -179,6 +182,69 @@ void MarvalDialogsInput(BuildContext context, { required String title, required 
 
                         ),
                         child:  TextH2("Enviar", size: 4, color: kGreen,)))
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+void MarvalImageAlert(BuildContext context, {required XFile image,String? title, Function()? onAccept}){
+  IconData _icon =CustomIcons.info;
+  Color _textColor =kBlue;
+  Color _buttonColor =kBlueThi;
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (_) => Dialog(
+      insetPadding: EdgeInsets.symmetric(horizontal: 2.w),
+      backgroundColor: Colors.transparent,
+      child:  Container(
+        width: 100.w, height: 60.h,
+        decoration: BoxDecoration(
+          color: kWhite,
+          borderRadius: BorderRadius.circular(7.w),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 6.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(_icon, color: _textColor, size: 10.w,),
+                Spacer(),
+                TextH2(title ?? "", color: _textColor,),
+                Spacer(),
+              ],
+            ),
+            SizedBox(height: 2.h,),
+            ClipRRect(
+                borderRadius: BorderRadius.circular(12.w),
+                child: SizedBox(width: 80.w, height: 35.h,
+                    child:  Image.file(File(image.path),
+                      fit: BoxFit.cover,
+                    ))),
+            Spacer(),
+            Row(
+              children: [
+                TextButton(onPressed: (){Navigator.pop(context);}, child: TextH2("Cancelar", size: 4, color: _textColor,)),
+                Spacer(),
+                TextButton(
+                  onPressed: () async{
+                    Navigator.pop(context);
+                    if(isNotNull(onAccept)){  onAccept!();  }
+                  },
+                  child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.3.h),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(4.w)),
+                        color: _buttonColor,
+                      ),
+                      child:  TextH2("Enviar", size: 4, color: _textColor,)),
+                )
               ],
             ),
           ],

@@ -40,15 +40,14 @@ class MarvalDrawer extends StatelessWidget {
     return Drawer(
       backgroundColor: kWhite,
       child: SizedBox( height: 100.h,
-        child: Watcher(
-          (context, ref, child) {
-            MarvalUser? user = getUser(context, ref);
-            print(user);
-             return ListView(
+        child: ListView(
               padding: EdgeInsets.symmetric(horizontal: 3.w),
               children:  <Widget>[
                 ///* HEADER
-                SizedBox(height: 39.h,
+            Watcher(
+            (context, ref, child) {
+            MarvalUser? user = getUser(context, ref);
+             return SizedBox(height: 39.h,
                     child: DrawerHeader(
                       decoration: BoxDecoration( color: kWhite, border: Border.all(color: kWhite) ),
                       child: Column(
@@ -65,7 +64,8 @@ class MarvalDrawer extends StatelessWidget {
                           TextH1(isNull(user) ? "" : user!.name.maxLength(13), color: kBlack, size: 8, textOverFlow: TextOverflow.clip ,),
                         ],
                       ),
-                    )),
+                    ));
+                 }),
                 /// Home
                 GestureDetector(
                   onTap: () => Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName)),
@@ -131,10 +131,6 @@ class MarvalDrawer extends StatelessWidget {
                 SizedBox(height: 10.h,),
                 SizedBox( height: 15.h, child: Image.asset('assets/images/marval_logo.png'),)
               ],
-            );
-          },
-        )
-
-    ));
+    )));
   }
 }
