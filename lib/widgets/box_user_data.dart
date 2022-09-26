@@ -8,6 +8,7 @@ import '../constants/shadows.dart';
 import '../constants/theme.dart';
 import '../utils/marval_arq.dart';
 import '../utils/objects/user.dart';
+import 'image_editor.dart';
 
 class BoxUserData extends StatelessWidget {
   const BoxUserData({required this.user, Key? key}) : super(key: key);
@@ -21,6 +22,25 @@ class BoxUserData extends StatelessWidget {
                   boxShadow: [kMarvalHardShadow],
                   borderRadius: BorderRadius.all(Radius.circular(100.w)),
                 ),
+                child: GestureDetector(
+                onTap: (){
+                  if(isNotNullOrEmpty(user.profileImage)){
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        opaque: false,
+                        barrierColor: kBlack,
+                        pageBuilder: (BuildContext context, _, __) {
+                          return FullScreenPage(
+                            child: Image.network(user.profileImage!, height: 100.h,),
+                            dark: false,
+                            url: user.profileImage!,
+                          );
+                        },
+                      ),
+                    );
+                  }
+                },
                 child: CircleAvatar(
                   backgroundImage: isNullOrEmpty(user.profileImage) ?
                   null :
@@ -29,6 +49,7 @@ class BoxUserData extends StatelessWidget {
                   radius: 6.h,
                   child: isNullOrEmpty(user.profileImage) ? Icon(CustomIcons.person, color: kWhite, size: 13.w,): null,
                 )),
+            ),
             SizedBox(width: 2.w),
             Column(crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

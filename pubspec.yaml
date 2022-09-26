@@ -46,6 +46,7 @@ dependencies:
   sleek_circular_slider: ^2.0.1
   flutter_native_splash: ^2.2.6
   creator: ^0.1.7
+  image_downloader: ^0.31.0
 
 dev_dependencies:
   flutter_test:

@@ -59,64 +59,76 @@ class HomeScreen extends StatelessWidget {
                     Container(width: 100.w, height: 124.h,
                         color: kWhite,
                         child:  Stack( children: [
-                          /// Calendar Widget
+                          /// Calendar Background
                           Positioned( top: 0,
                               child: Container(width: 100.w, height: 26.h,
-                                  padding: EdgeInsets.all(4.w),
+                                  padding: EdgeInsets.symmetric(horizontal: 4.w),
                                   decoration: BoxDecoration(
                                     color: kBlue,
                                     boxShadow: [kMarvalBoxShadow],
                                     borderRadius: BorderRadius.only(bottomLeft: Radius.circular(15.w)),
-                                  ),
-                                  child: SafeArea(
-                                      child: Column( children: [
-                                        /// Calendar Arrows
-                                        Row(children: [
-                                          GestureDetector(
-                                           onTap: () async{
-                                             DateTime date = context.ref.watch(weekCreator);
-                                             date = date.add(const Duration(days: -7)).nextSaturday();
-                                             logInfo(date.id);
-                                             logInfo(user.startDate);
-                                             if(!date.isBefore(user.startDate)){
-                                               context.ref.update<DateTime>(weekCreator, (date) => date.add(const Duration(days: -7)));
-                                               await Future.delayed(const Duration(milliseconds: 100));
-                                               context.ref.update<DateTime>(dateCreator, (date) => context.ref.watch(weekCreator).nextSaturday());
-                                               createDailyIfDoNotExists(context.ref.watch(dateCreator));
-                                             }
-                                           },
-                                           child:Row(children:
-                                           [
-                                             Icon(Icons.arrow_back, color: kWhite, size: 6.w,),
-                                             const TextH2(' Anterior', color: kWhite, size: 4,)
-                                           ])),
-                                          const Spacer(),
-                                          Watcher((context, ref, child){
-                                            DateTime date =ref.watch(dateCreator);
-                                            return TextH1(date.toStringMonth(), color: kWhite, size: 7.5,);
-                                          }),
-                                          const Spacer(),
-                                          GestureDetector(
-                                              onTap: () async{
-                                                DateTime nextWeek = context.ref.watch(weekCreator).add(const Duration(days: 7));
-                                                logInfo(nextWeek.id);
-                                                if(!nextWeek.isAfter(DateTime.now())){
-                                                  context.ref.update<DateTime>(weekCreator, (date) => date.add(const Duration(days: 7)));
-                                                  await Future.delayed(const Duration(milliseconds: 50));
-                                                  context.ref.update<DateTime>(dateCreator, (date) => context.ref.watch(weekCreator));
-                                                  createDailyIfDoNotExists(context.ref.watch(dateCreator));
-                                                }else if(_snackCounter==0){ snackBarAlert(context); _snackCounter++;}
+                          ))),
+                          /// Calendar Arrows
+                          Positioned(
+                            top: 0,
+                            child: Container(width: 100.w,
+                              padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 1.h),
+                              child: SafeArea(
+                              child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                        onTap: () async{
+                                          DateTime date = context.ref.watch(weekCreator);
+                                          date = date.add(const Duration(days: -7)).nextSaturday();
+                                          logInfo(date.id);
+                                          logInfo(user.startDate);
+                                          if(!date.isBefore(user.startDate)){
+                                            context.ref.update<DateTime>(weekCreator, (date) => date.add(const Duration(days: -7)));
+                                            await Future.delayed(const Duration(milliseconds: 100));
+                                            context.ref.update<DateTime>(dateCreator, (date) => context.ref.watch(weekCreator).nextSaturday());
+                                            createDailyIfDoNotExists(context.ref.watch(dateCreator));
+                                          }
+                                        },
+                                        child:Row(children:
+                                        [
+                                          Icon(Icons.arrow_back, color: kWhite, size: 6.w,),
+                                          const TextH2(' Anterior', color: kWhite, size: 4,)
+                                        ])),
+                                    const Spacer(),
 
-                                              },
-                                              child: Row(children: [
-                                                const TextH2('Siguiente ', color: kWhite, size: 4,),
-                                                Icon(Icons.arrow_forward, color: kWhite, size: 6.w,),
-                                              ])),
-                                        ]),
-                                        SizedBox(height: 1.h,),
-                                        DateList(),
-                                      ])
-                                  ))),
+                                    Watcher((context, ref, child){
+                                      DateTime date =ref.watch(dateCreator);
+                                      return TextH1(date.toStringMonth(), color: kWhite, size: 7.5);
+                                    }),
+                                    const Spacer(),
+                                    GestureDetector(
+                                        onTap: () async{
+                                          DateTime nextWeek = context.ref.watch(weekCreator).add(const Duration(days: 7));
+                                          logInfo(nextWeek.id);
+                                          if(!nextWeek.isAfter(DateTime.now())){
+                                            context.ref.update<DateTime>(weekCreator, (date) => date.add(const Duration(days: 7)));
+                                            await Future.delayed(const Duration(milliseconds: 50));
+                                            context.ref.update<DateTime>(dateCreator, (date) => context.ref.watch(weekCreator));
+                                            createDailyIfDoNotExists(context.ref.watch(dateCreator));
+                                          }else if(_snackCounter==0){ snackBarAlert(context); _snackCounter++;}
+
+                                        },
+                                        child: Row(children: [
+                                          const TextH2('Siguiente ', color: kWhite, size: 4,),
+                                          Icon(Icons.arrow_forward, color: kWhite, size: 6.w,),
+                                        ])),
+                                  ]),
+                            )),
+                          ),
+                          /// Date List
+                          Positioned(
+                            top: 8.h,
+                            left: 6.w,
+                            child: Container( width: 100.w,
+                            margin: EdgeInsets.only(top: 4.h),
+                            child: const Center(child: DateList()),
+                          )),
                           /// Little Box to make blue Right Margin
                           Positioned(right: 0, top: 25.h,
                               child: Container(width: 20.w, height: 10.h, color: kBlue

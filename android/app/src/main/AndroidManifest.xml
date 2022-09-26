@@ -1,8 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.zgz.vlandiblas.marvalfit">
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
    <application
-       android:requestLegacyExternalStorage="true"
-       android:label="marvalfit"
+        android:requestLegacyExternalStorage="true"
+        android:label="marvalfit"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

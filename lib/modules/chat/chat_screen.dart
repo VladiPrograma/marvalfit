@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart' ;
+import 'package:flutter/services.dart';
+import 'package:image_downloader/image_downloader.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marvalfit/config/log_msg.dart';
+import 'package:marvalfit/widgets/image_editor.dart';
+import 'package:marvalfit/widgets/marval_snackbar.dart';
 import 'package:sizer/sizer.dart';
 
 
@@ -37,6 +41,7 @@ ScrollController _returnController(Ref ref){
 
 ///@TODO Remove TEXTH1 "Waiting Conexion"
 ///@TODO Dont repeat message time label if is the same time.
+///@TODO Add Instalation in IOS https://pub.dev/packages/image_downloader
 class ChatScreen extends StatelessWidget {
   const ChatScreen({Key? key}) : super(key: key);
   static String routeName = '/chat';
@@ -121,9 +126,11 @@ class ChatScreen extends StatelessWidget {
                        })))),
                       /// TextField
                       Positioned(bottom: 3.w, left: 5.w,
-                      child: SizedBox( width: 90.w,
-                        child: _ChatTextField(),
-                      ),)
+                      child: SafeArea(
+                        child: SizedBox( width: 90.w,
+                          child: _ChatTextField(),
+                        ))
+                      )
                     ])),
     );
   }
@@ -204,6 +211,7 @@ int _getMarginSize(Message message){
   _sizes.where((size) => message.message.length>=size).forEach((element)=> labelSize++);
   return _margins[labelSize-1];
 }
+
 class _MessageBox extends StatelessWidget {
   const _MessageBox({required this.message, Key? key}) : super(key: key);
   final Message message;
@@ -235,7 +243,6 @@ class _MessageBox extends StatelessWidget {
   }
 }
 
-
 class _ImageBox extends StatelessWidget {
   const _ImageBox({required this.message, Key? key}) : super(key: key);
   final Message message;
@@ -265,12 +272,53 @@ class _ImageBox extends StatelessWidget {
                 child: message.message.isEmpty ?
                 Center(child: CircularProgressIndicator(color: kBlueSec, backgroundColor: kWhite))
                     :
-                Image.network(message.message, fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
+                GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          opaque: false,
+                          barrierColor: kWhite,
+                          pageBuilder: (BuildContext context, _, __) {
+                            return FullScreenPage(
+                              child: Image.network(message.message, height: 100.h,),
+                              dark: true,
+                              url: message.message,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    onLongPressStart: (details) async{
+                      try {
+                        // Saved with this method.
+                        var imageId = await ImageDownloader.downloadImage(message.message);
+                        if (imageId == null) {
+                          MarvalSnackBar(context, SNACKTYPE.alert,
+                              title: "Ups, algo ha fallado",
+                              subtitle: "No se ha podido realizar la descarga"
+                          );
+                          return;
+                        }
+                        MarvalSnackBar(context, SNACKTYPE.success,
+                            title: "Descarga completa!",
+                            subtitle: "Ya puedes acceder a la foto desde tu galeria"
+                        );
+                      } on PlatformException catch (error) {
+                        logError(error);
+                        MarvalSnackBar(context, SNACKTYPE.alert,
+                            title: "Ups, algo ha fallado",
+                            subtitle: "No se ha podido realizar la descarga"
+                        );
+                      }
+                    },
+                    child: Image.network(message.message, fit: BoxFit.cover,
+                      loadingBuilder: (context, child, loadingProgress) {
                       if(loadingProgress == null ) return child;
-                      return const CircularProgressIndicator(color: kBlueSec, backgroundColor: kWhite);})
-            )
-        ),
+                      return const Center( child:  CircularProgressIndicator(color: kBlueSec, backgroundColor: kWhite));}
+                    )
+                )
+            )),
           Padding(padding: EdgeInsets.only(left: 4.w, right: 4  .w, bottom: 1.h,),
               child: TextP2(message.date.toFormatStringHour(), color: kGrey,))
         ]);

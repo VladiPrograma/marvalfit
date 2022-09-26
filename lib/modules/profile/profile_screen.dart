@@ -76,22 +76,22 @@ class ProfileScreen extends StatelessWidget {
                   )),
               /// Ativities Widget
               Positioned( top: 28.h, child: Journal() ),
-              ///Shadow
-              Positioned( top: 2.h, left: 6.w,
-                  child: Container( width: 88.w, height: 1.3.h,
-                      padding: EdgeInsets.symmetric(horizontal: 4.w),
-                      decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(12.w),
-                              topLeft:  Radius.circular(12.w)),
-                          boxShadow: [  BoxShadow(
-                            color: Colors.black.withOpacity(0.8),
-                            offset: Offset(0, 1.5.h),
-                            blurRadius: 4.w,
-                          )]
-                      ))
-              ),
+              ///Shadow ¿? @TODO Wtf is this?
+              // Positioned( top: 2.h, left: 6.w,
+              //     child: Container( width: 88.w, height: 1.3.h,
+              //         padding: EdgeInsets.symmetric(horizontal: 4.w),
+              //         decoration: BoxDecoration(
+              //             color: Colors.transparent,
+              //             borderRadius: BorderRadius.only(
+              //                 topRight: Radius.circular(12.w),
+              //                 topLeft:  Radius.circular(12.w)),
+              //             boxShadow: [  BoxShadow(
+              //               color: Colors.black.withOpacity(0.8),
+              //               offset: Offset(0, 1.5.h),
+              //               blurRadius: 4.w,
+              //             )]
+              //         ))
+              // ),
        ])
       ),
     );
