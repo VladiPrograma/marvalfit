@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_downloader/image_downloader.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:sizer/sizer.dart';
 
@@ -154,17 +153,18 @@ class _FullScreenPageState extends State<FullScreenPage> {
                       });
                       try {
                         // Saved with this method.
-                        var imageId = await ImageDownloader.downloadImage(widget.url);
-                        if (imageId == null) {
-                          MarvalSnackBar(context, SNACKTYPE.alert,
-                              title: "Ups, algo ha fallado",
-                              subtitle: "No se ha podido realizar la descarga"
-                          );
-                          return;
-                        }
-                        setState(() {
-                          _downloaded = Icons.download_done_rounded;
-                        });
+                        //@WTF Decoment and add again ImageDownloader Plugin
+                        // var imageId = await ImageDownloader.downloadImage(widget.url);
+                        // if (imageId == null) {
+                        //   MarvalSnackBar(context, SNACKTYPE.alert,
+                        //       title: "Ups, algo ha fallado",
+                        //       subtitle: "No se ha podido realizar la descarga"
+                        //   );
+                        //   return;
+                        // }
+                        // setState(() {
+                        //   _downloaded = Icons.download_done_rounded;
+                        // });
                       } on PlatformException catch (error) {
                         logError(error);
                         MarvalSnackBar(context, SNACKTYPE.alert,

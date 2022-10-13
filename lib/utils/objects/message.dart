@@ -15,6 +15,7 @@ class Message{
   final MessageType type;
   String message;
   final DateTime date;
+  int duration = 0;
   final String user;
   bool read;
 
@@ -37,12 +38,21 @@ class Message{
         read = false,
         date = DateTime.now();
 
+  Message.audio(int durations):
+        user = authUser.uid,
+        type = MessageType.audio,
+        duration = durations,
+        message = "",
+        read = false,
+        date = DateTime.now();
+
   Message.fromJson(Map<String, dynamic> map)
       : user = map["user"],
         message = map["message"],
         read = map["read"],
         type = MessageType.values.byName(map["type"]),
-        date = map["date"].toDate();
+        date = map["date"].toDate(),
+        duration = map["duration"] ?? 0;
 
   Future<String?> addInDB(){
     // Call the user's CollectionReference to add a new user
@@ -52,6 +62,7 @@ class Message{
       'read': read, // Vlad es tonto
       'type': type.name, // text
       'date': date, // 11/07/2022
+      'duration' : duration // 25
     }).then((value){
       logSuccess("$logSuccessPrefix Message Added");
       return value.id;
@@ -69,6 +80,7 @@ class Message{
       'read': read, // Vlad es tonto
       'type': type.name, // text
       'date': date, // 11/07/2022
+      'duration': duration, // 11/07/2022
     }).then((value)=> logSuccess("$logSuccessPrefix Message Set"))
         .catchError((error) => logError("$logErrorPrefix Failed to add Message: $error"));
   }
@@ -90,6 +102,7 @@ class Message{
     return " User_ID: $user"
         "\n Message: $message "
         "\n Type: ${type.name}"
+        "\n Duration: ${duration==0 ? "None" : duration}"
         "\n Read: $read"
         "\n Date: ${date.toFormatStringDate} - ${date.toFormatStringHour()}";
   }

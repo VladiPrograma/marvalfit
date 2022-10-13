@@ -383,7 +383,14 @@ class MarvalHabit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if(isNull(habit)) return const SizedBox();
-    return  Container( width: 33.w,
+    return  GestureDetector(
+        onTap: (){ MarvalDialogsInfo(context, 40,
+            title: habit?['name'] ?? '',
+            richText:RichText(
+              text: TextSpan(text: habit?['description'],
+                  style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack)),
+            ));
+        }, child:    Container( width: 33.w,
         decoration: BoxDecoration(
             color: kBlack,
             borderRadius: BorderRadius.only(
@@ -391,7 +398,7 @@ class MarvalHabit extends StatelessWidget {
                 bottomLeft:  Radius.circular(7.w),
                 bottomRight:  Radius.circular(7.w)
             )),
-        child: Center(
+    child:Center(
             child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -399,16 +406,7 @@ class MarvalHabit extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextH1(habit?['label'] ?? '', size: 3.8, color: kWhite,),
-                        SizedBox(width: 1.w,),
-                        GestureDetector(
-                            onTap: (){ MarvalDialogsInfo(context, 40,
-                                title: habit?['name'] ?? '',
-                                richText:RichText(
-                                  text: TextSpan(text: habit?['description'],
-                                      style: TextStyle(fontFamily: p2, fontSize: 4.5.w, color: kBlack)),
-                                ));
-                            },
-                            child: Icon(CustomIcons.info, size: 3.w, color: kGreen,))
+                        SizedBox(width: 1.w,)
                       ]),
                   SizedBox(height: 1.5.h,),
                   GestureDetector(
@@ -438,7 +436,7 @@ class MarvalHabit extends StatelessWidget {
                           })
                       ))
                 ])
-        ));
+        )));
   }
 }
 class MarvalHabitList extends StatelessWidget {

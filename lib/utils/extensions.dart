@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 
+extension DurationFormat on Duration{
+  String printDuration() {
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = twoDigits(inMinutes.remainder(60));
+    String twoDigitSeconds = twoDigits(inSeconds.remainder(60));
+    return "$twoDigitMinutes:$twoDigitSeconds";
+  }
+}
+
 extension StringFormat on String{
+
+
 
   String maxLength(int num){
     if(length>num){
