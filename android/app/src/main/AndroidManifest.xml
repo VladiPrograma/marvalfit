@@ -8,6 +8,15 @@
         android:label="marvalfit"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+       <provider
+           android:name="com.ko2ic.imagedownloader.FileProvider"
+           android:authorities="${applicationId}.image_downloader.provider"
+           android:exported="false"
+           android:grantUriPermissions="true">
+           <meta-data
+               android:name="android.support.FILE_PROVIDER_PATHS"
+               android:resource="@xml/provider_paths"/>
+       </provider>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -35,4 +44,6 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+
+
 </manifest>

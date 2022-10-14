@@ -4,7 +4,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart' ;
 import 'package:flutter/services.dart';
+import 'package:image_downloader/image_downloader.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:marvalfit/alerts/scnak_errors.dart';
 
 import 'package:sizer/sizer.dart';
 
@@ -156,16 +158,6 @@ class ChatScreen extends StatelessWidget {
   }
 }
 
-Creator<ChatActionType> actionCreator = Creator.value(ChatActionType.RECORD);
-Creator<int> timerCreator = Creator.value(0);
-Timer? _timer;
-enum ChatActionType { SEND_MSG, SEND_AUDIO, RECORD }
-
-Emitter<AudioSystem?> audioEmitter = Emitter((ref, emit) async{
-  AudioSystem audioSystem = AudioSystem();
-  await audioSystem.initAudioSystem();
-  emit(audioSystem);
-});
 
 class _ChatTextField extends StatelessWidget {
   const _ChatTextField({Key? key}) : super(key: key);
@@ -285,10 +277,8 @@ class _ChatTextField extends StatelessWidget {
   }
 }
 
-
 const List<int> _sizes = [0, 4, 8, 12, 16, 20];
 const List<int> _margins = [77,65,53,41,29,15];
-
 int _getMarginSize(Message message){
   int labelSize = 0;
   _sizes.where((size) => message.message.length>=size).forEach((element)=> labelSize++);
@@ -326,6 +316,8 @@ class _MessageBox extends StatelessWidget {
   }
 }
 
+
+//@OPTIONAL Icon Animation when download button is pressedd
 class _ImageBox extends StatelessWidget {
   const _ImageBox({required this.message, Key? key}) : super(key: key);
   final Message message;
@@ -364,37 +356,24 @@ class _ImageBox extends StatelessWidget {
                           barrierColor: kWhite,
                           pageBuilder: (BuildContext context, _, __) {
                             return FullScreenPage(
-                              child: Image.network(message.message, height: 100.h,),
                               dark: true,
                               url: message.message,
+                              child: Image.network(message.message, height: 100.h,),
                             );
                           },
                         ),
                       );
                     },
                     onLongPressStart: (details) async{
-                      try {
-                        // Saved with this method.
-                        //@WTF Add ImageDOwnloadewr
-                        // var imageId = await ImageDownloader.downloadImage(message.message);
-                        // if (imageId == null) {
-                        //   MarvalSnackBar(context, SNACKTYPE.alert,
-                        //       title: "Ups, algo ha fallado",
-                        //       subtitle: "No se ha podido realizar la descarga"
-                        //   );
-                        //   return;
-                        // }
-                        // MarvalSnackBar(context, SNACKTYPE.success,
-                        //     title: "Descarga completa!",
-                        //     subtitle: "Ya puedes acceder a la foto desde tu galeria"
-                        // );
-                      } on PlatformException catch (error) {
-                        logError(error);
-                        MarvalSnackBar(context, SNACKTYPE.alert,
-                            title: "Ups, algo ha fallado",
-                            subtitle: "No se ha podido realizar la descarga"
-                        );
-                      }
+                         ImageDownloader.downloadImage(message.message)
+                            .onError((error, stackTrace){
+                            logError(stackTrace.toString());
+                            ThrowSnackbar.downloadError(context);
+                            return null;
+                        }).then((value){
+
+                        });
+
                     },
                     child: Image.network(message.message, fit: BoxFit.cover,
                       loadingBuilder: (context, child, loadingProgress) {
@@ -408,6 +387,17 @@ class _ImageBox extends StatelessWidget {
         ]);
   }
 }
+
+
+Timer? _timer;
+Creator<int> timerCreator = Creator.value(0);
+enum ChatActionType { SEND_MSG, SEND_AUDIO, RECORD }
+Creator<ChatActionType> actionCreator = Creator.value(ChatActionType.RECORD);
+Emitter<AudioSystem?> audioEmitter = Emitter((ref, emit) async{
+  AudioSystem audioSystem = AudioSystem();
+  await audioSystem.initAudioSystem();
+  emit(audioSystem);
+});
 
 class _AudioBox extends StatelessWidget {
   const _AudioBox({required this.message, Key? key}) : super(key: key);
