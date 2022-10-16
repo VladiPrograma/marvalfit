@@ -49,7 +49,7 @@ class FullScreenPage extends StatefulWidget {
     required this.dark,
   }) : super(key: key);
 
-  final Image child;
+  final Widget child;
   final String url;
   final bool dark;
 

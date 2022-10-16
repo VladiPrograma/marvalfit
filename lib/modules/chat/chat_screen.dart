@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart' ;
 import 'package:flutter/services.dart';
@@ -327,7 +328,8 @@ class _ImageBox extends StatelessWidget {
     final bool fromUser = message.user != authUser.uid;
     return Column(
         crossAxisAlignment: fromUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-        children:[ Container(
+        children:[
+          Container(
             margin: EdgeInsets.only(
                 right: fromUser ? 0   : 4.w,
                 left : fromUser ? 4.w : 0
@@ -344,43 +346,46 @@ class _ImageBox extends StatelessWidget {
             ),
             child: Container(width: 50.w, height: 20.h,
                 color: fromUser ? kBlack : kBlue,
-                child: message.message.isEmpty ?
-                const Center(child: CircularProgressIndicator(color: kBlueSec, backgroundColor: kWhite))
-                    :
-                GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          opaque: false,
-                          barrierColor: kWhite,
-                          pageBuilder: (BuildContext context, _, __) {
-                            return FullScreenPage(
-                              dark: true,
-                              url: message.message,
-                              child: Image.network(message.message, height: 100.h,),
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    onLongPressStart: (details) async{
-                         ImageDownloader.downloadImage(message.message)
+                child: CachedNetworkImage(
+                    imageUrl: message.message,
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => CircularProgressIndicator(),
+                    imageBuilder: (context, imageProvider) {
+                      return GestureDetector(
+                      onTap: () {
+                       Navigator.push(context,
+                       PageRouteBuilder(
+                         opaque: false,
+                         barrierColor: kWhite,
+                         pageBuilder: (BuildContext context, _, __) {
+                           return FullScreenPage(
+                             dark: true,
+                             url: message.message,
+                             child: Container(
+                                height: 100.h, width: 100.w,
+                                 decoration: BoxDecoration(
+                                     image: DecorationImage(
+                                       image: imageProvider,
+                                       fit: BoxFit.cover
+                             ))));
+                      }));},
+                      onLongPressStart: (details) async{
+                        ImageDownloader.downloadImage(message.message)
                             .onError((error, stackTrace){
-                            logError(stackTrace.toString());
-                            ThrowSnackbar.downloadError(context);
-                            return null;
+                          logError(stackTrace.toString());
+                          ThrowSnackbar.downloadError(context);
+                          return null;
                         }).then((value){
 
-                        });
+                      });},
+                      child: Container(
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                          )))
+                      );}),
 
-                    },
-                    child: Image.network(message.message, fit: BoxFit.cover,
-                      loadingBuilder: (context, child, loadingProgress) {
-                      if(loadingProgress == null ) return child;
-                      return const Center( child:  CircularProgressIndicator(color: kBlueSec, backgroundColor: kWhite));}
-                    )
-                )
             )),
           Padding(padding: EdgeInsets.only(left: 4.w, right: 4  .w, bottom: 1.h,),
               child: TextP2(message.date.toFormatStringHour(), color: kGrey,))

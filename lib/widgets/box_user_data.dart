@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
@@ -22,33 +23,39 @@ class BoxUserData extends StatelessWidget {
                   boxShadow: [kMarvalHardShadow],
                   borderRadius: BorderRadius.all(Radius.circular(100.w)),
                 ),
-                child: GestureDetector(
-                onTap: (){
-                  if(isNotNullOrEmpty(user.profileImage)){
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        opaque: false,
-                        barrierColor: kBlack,
-                        pageBuilder: (BuildContext context, _, __) {
-                          return FullScreenPage(
-                            child: Image.network(user.profileImage!, height: 100.h,),
-                            dark: false,
-                            url: user.profileImage!,
-                          );
-                        },
-                      ),
-                    );
-                  }
-                },
-                child: CircleAvatar(
-                  backgroundImage: isNullOrEmpty(user.profileImage) ?
-                  null :
-                  Image.network(user.profileImage!).image,
-                  backgroundColor: kBlack,
-                  radius: 6.h,
-                  child: isNullOrEmpty(user.profileImage) ? Icon(CustomIcons.person, color: kWhite, size: 13.w,): null,
-                )),
+                child: CachedNetworkImage(
+                  imageUrl: user.profileImage ?? "",
+                  imageBuilder: (context, imageProvider) {
+                    return GestureDetector(
+                        onTap: (){
+                          if(isNotNullOrEmpty(user.profileImage)){
+                            Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                opaque: false,
+                                barrierColor: kBlack,
+                                pageBuilder: (BuildContext context, _, __) {
+                                  return  FullScreenPage(
+                                   dark: true,
+                                   url: user.profileImage!,
+                                   child: Container(
+                                       height: 100.h, width: 100.w,
+                                       decoration: BoxDecoration(
+                                           image: DecorationImage(
+                                               image: imageProvider,
+                                               fit: BoxFit.cover
+                                  ))));
+                                },
+                              ),
+                            );}},
+                        child: CircleAvatar(
+                          backgroundImage: imageProvider,
+                          radius: 6.h,
+                        ));
+                  },
+                  placeholder: (context, url) => _profileImage(),
+                  errorWidget: (context, url, error) => _profileImage(),
+                ),
             ),
             SizedBox(width: 2.w),
             Column(crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,5 +65,17 @@ class BoxUserData extends StatelessWidget {
                   TextH2( user.work, size: 3, color: kGrey,),
                 ])
           ]);
+  }
+}
+
+class _profileImage extends StatelessWidget {
+  const _profileImage({Key? key}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+        radius: 6.h,
+        backgroundColor: kBlack,
+        child:  Icon(CustomIcons.person, color: kWhite, size: 13.w)
+    );
   }
 }
