@@ -50,6 +50,7 @@ dependencies:
   flutter_sound: ^9.2.13
   audioplayers: ^1.1.1
   image_downloader: ^0.31.0
+  cached_network_image: ^3.2.2
 
 dev_dependencies:
   flutter_test:

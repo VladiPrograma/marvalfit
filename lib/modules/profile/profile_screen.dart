@@ -76,7 +76,7 @@ class ProfileScreen extends StatelessWidget {
                   )),
               /// Ativities Widget
               Positioned( top: 28.h, child: Journal() ),
-              ///Shadow ¿? @TODO Wtf is this?
+              ///Shadow ¿? @Wtf is this?
               // Positioned( top: 2.h, left: 6.w,
               //     child: Container( width: 88.w, height: 1.3.h,
               //         padding: EdgeInsets.symmetric(horizontal: 4.w),

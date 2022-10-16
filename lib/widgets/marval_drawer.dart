@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
@@ -47,25 +48,36 @@ class MarvalDrawer extends StatelessWidget {
             Watcher(
             (context, ref, child) {
             MarvalUser? user = getUser(context, ref);
+            if(isNull(user)) return const SizedBox.shrink();
              return SizedBox(height: 39.h,
                     child: DrawerHeader(
                       decoration: BoxDecoration( color: kWhite, border: Border.all(color: kWhite) ),
                       child: Column(
                         children: [
-                          CircleAvatar(
-                            backgroundImage: isNull(user)||isNullOrEmpty(user!.profileImage) ?
-                            null :
-                            Image.network(user.profileImage!).image,
-                            backgroundColor: kBlack,
-                            radius: 9.h,
-                            child: isNull(user)||isNullOrEmpty(user!.profileImage) ? Icon(CustomIcons.person, color: kWhite, size: 13.w,): null,
+                          CachedNetworkImage(
+                              fit: BoxFit.fitWidth,
+                              imageUrl: user!.profileImage!,
+                              imageBuilder: (context, imageProvider) => _ProfileImage(image: imageProvider),
+                              placeholder: (context, url)            => const _ProfileImage(),
+                              errorWidget: (context, url, error)     => const _ProfileImage(),
                           ),
                           const TextH2('Bienvenido', color: kGrey, size: 6,),
-                          TextH1(isNull(user) ? "" : user!.name.maxLength(13), color: kBlack, size: 8, textOverFlow: TextOverflow.clip ,),
+                          TextH1(isNull(user) ? "" : user.name.maxLength(13), color: kBlack, size: 8, textOverFlow: TextOverflow.clip ,),
                         ],
                       ),
                     ));
                  }),
+                /// Profile
+                GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName));
+                    Navigator.pushNamed(context, ProfileScreen.routeName);
+                  },
+                  child: ListTile(
+                    leading: Icon(CustomIcons.person,color: page=="Perfil" ? kGreen : kBlack, size: 6.w,),
+                    title: TextH2('Perfil', size: 4, color: page=="Perfil" ? kGreen : kBlack),
+                  ),
+                ),
                 /// Home
                 GestureDetector(
                   onTap: () => Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName)),
@@ -125,12 +137,25 @@ class MarvalDrawer extends StatelessWidget {
                   },
                   child: ListTile(
                     leading: Icon(Icons.settings_rounded,color: page=="Ajustes" ? kGreen : kBlack, size: 6.w,),
-                    title: TextH2('Ajustes', size: 4, color: page=="Ajustes" ? kGreen : kBlack),
+                    title:   TextH2('Ajustes', size: 4 , color: page=="Ajustes" ? kGreen : kBlack),
                   ),
                 ),
-                SizedBox(height: 10.h,),
+                SizedBox( height: 10.h,),
                 SizedBox( height: 15.h, child: Image.asset('assets/images/marval_logo.png'),)
               ],
     )));
+  }
+}
+
+class _ProfileImage extends StatelessWidget {
+  const _ProfileImage({this.image, Key? key}) : super(key: key);
+  final ImageProvider<Object>? image;
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+        radius: 9.h,
+        backgroundColor: kBlack,
+        backgroundImage: image,
+        child: isNull(image) ? Icon( CustomIcons.person, color: kWhite, size: 13.w) : const SizedBox.shrink());
   }
 }

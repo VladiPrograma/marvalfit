@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:creator/creator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,6 @@ import 'package:marvalfit/modules/home/home_screen.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/form.dart';
-import 'package:marvalfit/utils/objects/planing.dart';
 import 'package:marvalfit/utils/objects/user.dart';
 
 import 'config/firebase_options.dart';
@@ -34,18 +34,20 @@ bool _isDataCompleted = false;
 
 MarvalUser? _auxUser;
 void main() async{
+    CachedNetworkImage.logLevel = CacheManagerLogLevel.debug;
+
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-   User? _auxAuthUser = getCurrUser();
-   _isDataCompleted = await MarvalForm.existsInDB(_auxAuthUser?.uid);
+   User? auxAuthUser = getCurrUser();
+   _isDataCompleted = await MarvalForm.existsInDB(auxAuthUser?.uid);
 
-  if(isNotNull(_auxAuthUser)){
-    authUser = _auxAuthUser!;
-    _auxUser = await MarvalUser.getFromDB(_auxAuthUser.uid);
-    if(_auxUser!.active) { authUser = _auxAuthUser; user = _auxUser!; }
-    else                 { logOut(); _auxAuthUser = null; }
+  if(isNotNull(auxAuthUser)){
+    authUser = auxAuthUser!;
+    _auxUser = await MarvalUser.getFromDB(auxAuthUser.uid);
+    if(_auxUser!.active) { authUser = auxAuthUser; user = _auxUser!; }
+    else                 { logOut(); auxAuthUser = null; }
 
   }
 
