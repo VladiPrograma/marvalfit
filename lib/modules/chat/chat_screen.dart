@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marvalfit/alerts/scnak_errors.dart';
+import 'package:marvalfit/widgets/show_fullscreen_image.dart';
 
 import 'package:sizer/sizer.dart';
 
@@ -159,6 +160,15 @@ class ChatScreen extends StatelessWidget {
   }
 }
 
+Timer? _timer;
+Creator<int> timerCreator = Creator.value(0);
+enum ChatActionType { SEND_MSG, SEND_AUDIO, RECORD }
+Creator<ChatActionType> actionCreator = Creator.value(ChatActionType.RECORD);
+Emitter<AudioSystem?> audioEmitter = Emitter((ref, emit) async{
+  AudioSystem audioSystem = AudioSystem();
+  await audioSystem.initAudioSystem();
+  emit(audioSystem);
+});
 
 class _ChatTextField extends StatelessWidget {
   const _ChatTextField({Key? key}) : super(key: key);
@@ -318,7 +328,6 @@ class _MessageBox extends StatelessWidget {
 }
 
 
-//@OPTIONAL Icon Animation when download button is pressedd
 class _ImageBox extends StatelessWidget {
   const _ImageBox({required this.message, Key? key}) : super(key: key);
   final Message message;
@@ -348,43 +357,24 @@ class _ImageBox extends StatelessWidget {
                 color: fromUser ? kBlack : kBlue,
                 child: CachedNetworkImage(
                     imageUrl: message.message,
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) => CircularProgressIndicator(),
+                    fadeInDuration: Duration.zero,
+                    placeholder: (context, url) => Center(child: Icon(CustomIcons.camera_retro, size: 8.w, color: kWhite)),
+                    errorWidget: (context, url, error) =>
+                    Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2.w),
+                      color: kWhite,
+                    ),
+                    child: Column(
+                     mainAxisAlignment: MainAxisAlignment.center,
+                     crossAxisAlignment: CrossAxisAlignment.center,
+                     children: [
+                       Icon(CustomIcons.camera_retro, size: 8.w, color: kRed),
+                       SizedBox(height: 1.h,),
+                       TextP1("Fallo en la descarga", color: kRed, size: 3,)
+                     ])),
                     imageBuilder: (context, imageProvider) {
-                      return GestureDetector(
-                      onTap: () {
-                       Navigator.push(context,
-                       PageRouteBuilder(
-                         opaque: false,
-                         barrierColor: kWhite,
-                         pageBuilder: (BuildContext context, _, __) {
-                           return FullScreenPage(
-                             dark: true,
-                             url: message.message,
-                             child: Container(
-                                height: 100.h, width: 100.w,
-                                 decoration: BoxDecoration(
-                                     image: DecorationImage(
-                                       image: imageProvider,
-                                       fit: BoxFit.cover
-                             ))));
-                      }));},
-                      onLongPressStart: (details) async{
-                        ImageDownloader.downloadImage(message.message)
-                            .onError((error, stackTrace){
-                          logError(stackTrace.toString());
-                          ThrowSnackbar.downloadError(context);
-                          return null;
-                        }).then((value){
-
-                      });},
-                      child: Container(
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
-                          )))
-                      );}),
+                      return FullScreenImage(url: message.message, image: imageProvider);}),
 
             )),
           Padding(padding: EdgeInsets.only(left: 4.w, right: 4  .w, bottom: 1.h,),
@@ -394,15 +384,7 @@ class _ImageBox extends StatelessWidget {
 }
 
 
-Timer? _timer;
-Creator<int> timerCreator = Creator.value(0);
-enum ChatActionType { SEND_MSG, SEND_AUDIO, RECORD }
-Creator<ChatActionType> actionCreator = Creator.value(ChatActionType.RECORD);
-Emitter<AudioSystem?> audioEmitter = Emitter((ref, emit) async{
-  AudioSystem audioSystem = AudioSystem();
-  await audioSystem.initAudioSystem();
-  emit(audioSystem);
-});
+
 
 class _AudioBox extends StatelessWidget {
   const _AudioBox({required this.message, Key? key}) : super(key: key);
@@ -418,7 +400,6 @@ class _AudioBox extends StatelessWidget {
     Emitter<Duration?>   positionStream = Emitter.stream((p0) => audioPlayer.onPositionChanged);
     Emitter<Duration?>   durationStream = Emitter.stream((p0) => audioPlayer.onDurationChanged);
     Emitter<PlayerState?>   stateStream = Emitter.stream((p0) => audioPlayer.onPlayerStateChanged);
-    Emitter   playerCompleteStream = Emitter.stream((p0) => audioPlayer.onPlayerComplete);
 
     void init() async{
       await audioPlayer.setSourceUrl(message.message);
@@ -436,9 +417,7 @@ class _AudioBox extends StatelessWidget {
     Future<void> _pause() async {
       await audioPlayer.pause();
     }
-    Future<void> _stop() async {
-      await audioPlayer.stop();
-    }
+
 
 
     return Column(
