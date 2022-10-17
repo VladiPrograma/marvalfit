@@ -28,8 +28,6 @@ import '../../utils/objects/message.dart';
 import '../../config/custom_icons.dart';
 import '../../config/log_msg.dart';
 
-import '../../widgets/image_editor.dart';
-import '../../widgets/marval_snackbar.dart';
 import '../../widgets/box_user_data.dart';
 import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_drawer.dart';
@@ -43,9 +41,10 @@ ScrollController _returnController(Ref ref){
   return res;
 }
 
-///@TODO Remove TEXTH1 "Waiting Conexion"
 ///@TODO Dont repeat message time label if is the same time.
 ///@TODO Add Instalation in IOS https://pub.dev/packages/image_downloader
+///@TODO Change audio icons or maybe create animation ones.
+///@TODO Try to get again audios and images
 
 class ChatScreen extends StatelessWidget {
   const ChatScreen({Key? key}) : super(key: key);
@@ -126,7 +125,7 @@ class ChatScreen extends StatelessWidget {
                             itemBuilder: (context, index){
                               Message message = data[index];
                               if(message.type == MessageType.photo) return _ImageBox(message: message);
-                              if(message.type == MessageType.audio) return _AudioBox(message: message);
+                              if(message.type == MessageType.audio) return  _AudioBox(message: message);
                               return _MessageBox(message: message);
                             });
                        })))),
@@ -386,40 +385,58 @@ class _ImageBox extends StatelessWidget {
 
 
 
+final AudioPlayer _audioPlayer = AudioPlayer()..setReleaseMode(ReleaseMode.stop);
+Emitter<Duration?>   _positionStream = Emitter.stream((p0) => _audioPlayer.onPositionChanged);
+Emitter<Duration?>   _durationStream = Emitter.stream((p0) => _audioPlayer.onDurationChanged);
+Emitter<PlayerState?>   _stateStream = Emitter.stream((p0) => _audioPlayer.onPlayerStateChanged);
+
+bool _isInit = false;
+Creator<String> _currentAudio = Creator.value("");
+
+void _init(String url, BuildContext  context) async{
+  await _audioPlayer.setSourceUrl(url);
+  await _audioPlayer.resume();
+  context.ref.update<String>(_currentAudio, (p0) => url);
+  _isInit = true;
+}
+Future<void> _play(Ref ref) async {
+  final position = ref.watch(_positionStream.asyncData).data;
+  if (isNotNull(position) && position!.inMilliseconds > 0) {
+    await _audioPlayer.seek(position);
+  }
+  await _audioPlayer.resume();
+}
+Future<void> _pause() async {
+  await _audioPlayer.pause();
+}
+
+
 class _AudioBox extends StatelessWidget {
   const _AudioBox({required this.message, Key? key}) : super(key: key);
+  final Message message;
+  @override
+  Widget build(BuildContext context) {
+    final bool fromUser = message.user != authUser.uid;
+    return Watcher((context, ref, child){
+      String audio = ref.watch(_currentAudio);
+
+      if(audio == message.message){
+        return _AudioBoxPLayer(message: message);
+      }
+
+      return _StaticAudioBox(message: message);
+
+    });
+  }
+}
+
+class _AudioBoxPLayer extends StatelessWidget {
+  const _AudioBoxPLayer({required this.message, Key? key}) : super(key: key);
   final Message message;
 
   @override
   Widget build(BuildContext context) {
     final bool fromUser = message.user != authUser.uid;
-    final AudioPlayer audioPlayer = AudioPlayer()..setReleaseMode(ReleaseMode.stop);
-    bool isInit = false;
-
-
-    Emitter<Duration?>   positionStream = Emitter.stream((p0) => audioPlayer.onPositionChanged);
-    Emitter<Duration?>   durationStream = Emitter.stream((p0) => audioPlayer.onDurationChanged);
-    Emitter<PlayerState?>   stateStream = Emitter.stream((p0) => audioPlayer.onPlayerStateChanged);
-
-    void init() async{
-      await audioPlayer.setSourceUrl(message.message);
-      await audioPlayer.resume();
-      isInit = true;
-    }
-
-    Future<void> _play(Ref ref) async {
-      final position = ref.watch(positionStream.asyncData).data;
-      if (isNotNull(position) && position!.inMilliseconds > 0) {
-        await audioPlayer.seek(position);
-      }
-      await audioPlayer.resume();
-    }
-    Future<void> _pause() async {
-      await audioPlayer.pause();
-    }
-
-
-
     return Column(
         crossAxisAlignment: fromUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
         children:[
@@ -445,20 +462,20 @@ class _AudioBox extends StatelessWidget {
                           message.message.isEmpty ?
                           Icon(Icons.file_download, color: kWhite, size: 7.w,) :
                           Watcher((context, ref, child){
-                            PlayerState? state =  ref.watch(stateStream.asyncData).data;
-                            logWarning(state ?? "Null");
+                            PlayerState? state =  ref.watch(_stateStream.asyncData).data;
+                            logWarning(PlayerState.values[state?.index ?? 0]);
                             return GestureDetector(
                               onTap: () async {
 
-                                  if(!isInit){ init(); }
+                                  if(!_isInit){ _init(message.message, context); }
                                   else if(state == PlayerState.playing){ _pause(); }
                                   else{ _play(ref); }
 
                               },
-                              child: Icon(state == PlayerState.playing ?
-                              Icons.stop_circle_rounded
-                                  :
-                              Icons.play_circle_fill_rounded,
+                              child: Icon(state == PlayerState.paused || state == PlayerState.completed  ?
+                              Icons.play_circle_fill_rounded
+                                :
+                              Icons.stop_circle_rounded,
                               color: kWhite, size: 8.w,),
                             );
                           }),
@@ -468,13 +485,13 @@ class _AudioBox extends StatelessWidget {
                             SizedBox(height: 1.2.h,),
                             SizedBox(width: 60.w, height: 2.h,
                             child: Watcher((context, ref, child) {
-                              Duration? position = ref.watch(positionStream.asyncData).data;
-                              Duration? duration = ref.watch(durationStream.asyncData).data;
+                              Duration? position = ref.watch(_positionStream.asyncData).data;
+                              Duration? duration = ref.watch(_durationStream.asyncData).data;
                               return Slider(
                                 onChanged: (v) {
                                   if (isNull(duration)) { return; }
                                   final position = v * duration!.inMilliseconds;
-                                  audioPlayer.seek(Duration(milliseconds: position.round()));
+                                  _audioPlayer.seek(Duration(milliseconds: position.round()));
                                 },
                                 value: (isNotNull(position) &&
                                     isNotNull(duration) &&
@@ -490,10 +507,10 @@ class _AudioBox extends StatelessWidget {
                             })),
                             Padding(padding: EdgeInsets.only(left: 6.w),
                               child: Watcher((context, ref, child) {
-                                final duration = ref.watch(positionStream.asyncData).data ?? Duration.zero;
-                               return TextP1("${Duration(seconds: message.duration - duration.inSeconds  ).printDuration()} ",
+                                final duration = ref.watch(_positionStream.asyncData).data ?? Duration.zero;
+                                return TextP1("${Duration(seconds: message.duration -  duration.inSeconds ).printDuration()} ",
                                    size: 2.5, color: kWhite);
-                              }))
+                               }))
                           ],)
                         ],
                 )),
@@ -504,5 +521,63 @@ class _AudioBox extends StatelessWidget {
   }
 }
 
-
+class _StaticAudioBox extends StatelessWidget {
+  const _StaticAudioBox({required this.message, Key? key}) : super(key: key);
+  final Message message;
+  @override
+  Widget build(BuildContext context) {
+    final bool fromUser = message.user != authUser.uid;
+    return Column(
+        crossAxisAlignment: fromUser ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        children:[
+          Container(
+            margin: EdgeInsets.only(
+                right: fromUser ? 0   : 4.w,
+                left : fromUser ? 4.w : 0
+            ),
+            padding: EdgeInsets.all(3.w),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topRight:  fromUser ? Radius.circular(2.w) : Radius.zero,
+                topLeft : !fromUser ? Radius.circular(2.w) : Radius.zero,
+                bottomLeft: Radius.circular(2.w),
+                bottomRight: Radius.circular(2.w),
+              ),
+              color: fromUser ? kBlack : kBlue,
+            ),
+            child: Container(width: 70.w, height: 5.2.h,
+                color: fromUser ? kBlack : kBlue,
+                child: Row(
+                  children: [
+                    message.message.isEmpty ?
+                    Icon(Icons.file_download, color: kWhite, size: 7.w,) :
+                    GestureDetector(
+                      onTap: () async {
+                        _init(message.message, context);
+                      },
+                      child: Icon(Icons.play_circle_fill_rounded,  color: kWhite, size: 8.w,),
+                    ),
+                    Column( mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 1.2.h,),
+                          SizedBox(width: 60.w, height: 2.h,
+                              child: Slider(
+                                onChanged: (v) { },
+                                value:  0.0,
+                                inactiveColor: kBlueSec,
+                                activeColor: kWhite,
+                                thumbColor: kBlack,
+                              )),
+                          Padding(padding: EdgeInsets.only(left: 6.w),
+                              child: TextP1("${Duration(seconds: message.duration ).printDuration()} ", size: 2.5, color: kWhite)),
+                        ])
+                  ],
+                )),
+          ),
+          Padding(padding: EdgeInsets.only(left: 4.w, right: 4  .w, bottom: 1.h,),
+              child: TextP2(message.date.toFormatStringHour(), color: kGrey,))
+        ]);
+  }
+}
 
