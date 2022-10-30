@@ -6,9 +6,8 @@ import 'package:sizer/sizer.dart';
 
 import '../constants/colors.dart';
 import '../constants/global_variables.dart';
-import '../utils/marval_arq.dart';
 
- enum SNACKTYPE { info, alert, success}
+enum SNACKTYPE { info, alert, success}
 ///@TODO Remove context from everywhere in files
 void MarvalSnackBar(BuildContext? context, SNACKTYPE type, {String? title, String? subtitle}){
    late Color _backgroundColor;
@@ -51,32 +50,27 @@ void MarvalSnackBar(BuildContext? context, SNACKTYPE type, {String? title, Strin
               child: Column(
                 children: [
                   Container(width: 100.w,
-                      padding: EdgeInsets.symmetric(horizontal: 2.w),
-                      child:Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon( _icon, color: _iconColor, size: 13.w,),
-                          Container(height: 6.h, width: 0.4.w,
-                            color: kGrey,
-                            margin: EdgeInsets.symmetric(horizontal: 3.w),
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              TextH2(title ?? "", size: 4,),
-                              SizedBox(
-                                  width: 69.w,
-                                  child: Text(
-                                    subtitle ?? "",
-                                    style: TextStyle( fontSize: 2.6.w, color: kBlack, fontFamily: p1),
-                                    maxLines: 2,
-                                  )
-                              ),
-
-                            ],
-                          )
-                        ],
-                      )),
+                  padding: EdgeInsets.symmetric(horizontal: 2.w),
+                  child: Row(
+                     crossAxisAlignment: CrossAxisAlignment.center,
+                     children: [
+                       Icon( _icon, color: _iconColor, size: 13.w,),
+                       Container(height: 6.h, width: 0.4.w,
+                         color: kGrey,
+                         margin: EdgeInsets.symmetric(horizontal: 3.w),
+                       ),
+                       Column(
+                         crossAxisAlignment: CrossAxisAlignment.start,
+                         children: [
+                           TextH2(title ?? "", size: 4,),
+                           SizedBox(
+                               width: 69.w,
+                               child: Text(
+                                 subtitle ?? "",
+                                 style: TextStyle( fontSize: 2.6.w, color: kBlack, fontFamily: p1),
+                                 maxLines: 2, ))
+                       ])
+                  ])),
                   const Spacer(),
                   SnackLineAnimation(colors: _barColor),
                 ],

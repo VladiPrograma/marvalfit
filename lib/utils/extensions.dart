@@ -104,6 +104,11 @@ extension DateFormat on DateTime{
 
   get id => '${day<10 ? '0$day' : '$day'}-$month-$year';
 
+  DateTime cropTime(){
+    return DateTime(year, month, day);
+
+  }
+
   DateTime lastMonday(){
     DateTime res = this;
     while(res.weekday!=1){

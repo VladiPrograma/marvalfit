@@ -9,13 +9,12 @@ import 'package:marvalfit/config/log_msg.dart';
 
 Future<String> uploadProfileImg (String uid, XFile xfile) async{
   const path = 'user/';
-  final file = File(path);
+  final file = File(xfile.path);
   final extension = p.extension(file.path);
-  logInfo('Pending to update: ${path+uid+extension}');
   final ref = FirebaseStorage.instance.ref().child(path+uid+extension);
   UploadTask uploadTask = ref.putFile(file);
 
-  final snapshot = await uploadTask.whenComplete(() => {});
+  final snapshot = await uploadTask;
   final urlDownload = await snapshot.ref.getDownloadURL();
   logInfo('Download Link: $urlDownload');
 

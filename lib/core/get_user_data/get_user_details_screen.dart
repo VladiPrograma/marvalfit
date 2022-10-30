@@ -33,11 +33,11 @@ class _GetUserDetailsState extends State<GetUserDetails> {
 
   void updateToBD(XFile? image) async{
     if(isNotNull(image)){
-      String? _urlImage = await uploadProfileImg(authUser.uid, image!);
-      user.profileImage = _urlImage;
+      String? urlImage = await uploadProfileImg(authUser.uid, image!);
+      user.profileImage = urlImage;
     }
       ///@TODO Create Custom class for new traning state
-      Planing training = Planing.createNewTraining();
+      Planing training = Planing.createNewPlaning();
 
       logInfo(user);
       user.setInDB();
@@ -53,20 +53,20 @@ class _GetUserDetailsState extends State<GetUserDetails> {
   void updateProfileImage(XFile? image) async{
     logInfo('Here we are ${image ?? 'loco'}');
     if(isNotNull(image)){
-      String? _urlImage = await uploadProfileImg(authUser.uid, image!);
-      user.profileImage = _urlImage;
-      user.uploadInDB({'profile_image' : _urlImage});
+      String? urlImage = await uploadProfileImg(authUser.uid, image!);
+      user.profileImage = urlImage;
+      user.uploadInDB({'profile_image' : urlImage});
       await authUser.updatePhotoURL(user.profileImage);
     }
     _upToBD = true;
   }
   @override
   Widget build(BuildContext context) {
-    final _arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
-     XFile? _image = _arguments['image'];
+    final arguments = (ModalRoute.of(context)?.settings.arguments ?? <String, dynamic>{}) as Map;
+     XFile? image = arguments['image'];
      ///@TODO Change this line with something with more sense
-     if(!_upToBD && user.currWeight == 0){ updateToBD(_image);}
-     else {updateProfileImage(_image);}
+     if(!_upToBD && user.currWeight == 0){ updateToBD(image);}
+     else {updateProfileImage(image);}
     return Scaffold(
         backgroundColor: kWhite,
         body: SafeArea(

@@ -164,8 +164,8 @@ class MarvalUser {
         logError("$logErrorPrefix Failed to Upload user: $error"));
   }
 
-  Future<void> getCurrentTraining() async =>
-      currenTraining = await Planing.getFromBD(id);
+  Future<void> getPlaning() async =>
+      currenTraining = await Planing.getCurrentFromBD();
 
   Future<void> getDaily(DateTime date) async =>
       dailys![date.id] = await Daily.getFromDB(date);

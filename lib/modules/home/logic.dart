@@ -27,19 +27,17 @@ final dailyEmitter = Emitter.stream((ref)  {
 Daily? getDaily (Ref ref){
   final query = ref.watch(dailyEmitter.asyncData).data;
   if(isNull(query)||isNull(query!.data())){ return null; }
+
   try {
     return Daily.fromJson(query.data()!);
   } catch(e) {
-    logError(logErrorPrefix+'Daily.fromJson tryCatch'); return null;  }
+    logError('$logErrorPrefix Error parsing Daily JSON'); return null;  }
 }
-Future<Planing> getPlaning() async{
-  final query = await FirebaseFirestore.instance.collection('trainings').doc(authUser.uid).get();
-  return Planing.fromJson(query.data()!);
-}
+
 void createDailyIfDoNotExists(DateTime date) async{
   bool exists = await Daily.existsInDB(date);
   if(!exists){
-    Planing planing = await getPlaning();
+    Planing planing = await Planing.getFromBD(date);
     Daily.create(date: date, habitsFromPlaning: planing.habits ?? [], activities: planing.activities ?? [])
     .setInDB();
   }

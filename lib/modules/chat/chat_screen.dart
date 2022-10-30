@@ -4,14 +4,13 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart' ;
-import 'package:flutter/services.dart';
-import 'package:image_downloader/image_downloader.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:marvalfit/alerts/scnak_errors.dart';
+import 'package:marvalfit/alerts/snack_errors.dart';
 import 'package:marvalfit/widgets/show_fullscreen_image.dart';
 
 import 'package:sizer/sizer.dart';
 
+import '../../alerts/dialog_errors.dart';
 import '../../constants/theme.dart' ;
 import '../../constants/colors.dart';
 import '../../constants/string.dart';
@@ -192,7 +191,6 @@ class _ChatTextField extends StatelessWidget {
           ),
           hintText: 'Escribe algo',
           hintStyle: TextStyle(fontSize: 4.w, fontFamily: p2, color: kGrey),
-          ///@TODO Let user send Audios
           ///@TODO Let user send Videos
           prefixIcon: Watcher((context, ref, child) {
             ChatActionType actionType = ref.watch(actionCreator);
@@ -202,27 +200,11 @@ class _ChatTextField extends StatelessWidget {
                   ref.update(timerCreator, (p0) => 0);
                   ref.update(actionCreator, (p0) => ChatActionType.RECORD);
                 }else{
-                  _image = await _picker.pickImage(source: ImageSource.gallery);
-                  if(isNotNull(_image)){
-                    MarvalImageAlert(context,
-                        image: _image!,
-                        title: "Deseas subir esta foto ?",
-                        onAccept: () async{
-                          Message imageMessage = Message.image();
-                          String? docID = await imageMessage.addInDB();
-                          if(isNotNull(docID)){
-                            imageMessage.message = await uploadChatImage(
-                                uid: user.id,
-                                date: imageMessage.date,
-                                name: docID!,
-                                xfile: _image!
-                            );
-                            imageMessage.setInDB(docID);
-                          }else{
-                            logError(logErrorPrefix+" Problem adding Image to BD");
-                          }
-                        });}}
-              },
+                  _image = await _picker.pickImage(source: ImageSource.gallery)
+                  .then((value) { ThrowDialog.uploadImage(context, _image!); })
+                  .onError((error, stackTrace){  ThrowSnackbar.imageError(context); });
+
+              }},
               child:  Watcher((context, ref, child) {
                 ChatActionType actionType = ref.watch(actionCreator);
                 return Icon( actionType == ChatActionType.SEND_AUDIO ? Icons.delete_rounded: CustomIcons.camera,
@@ -276,7 +258,7 @@ class _ChatTextField extends StatelessWidget {
                   );
                   audioMessage.setInDB(docID!);
                 }else{
-                  logError(logErrorPrefix+" Problem adding audio to BD");
+                  logError("$logErrorPrefix Problem adding audio to BD");
                 }
               }
             },
@@ -325,7 +307,6 @@ class _MessageBox extends StatelessWidget {
     ]);
   }
 }
-
 
 class _ImageBox extends StatelessWidget {
   const _ImageBox({required this.message, Key? key}) : super(key: key);
@@ -381,9 +362,6 @@ class _ImageBox extends StatelessWidget {
         ]);
   }
 }
-
-
-
 
 final AudioPlayer _audioPlayer = AudioPlayer()..setReleaseMode(ReleaseMode.stop);
 Emitter<Duration?>   _positionStream = Emitter.stream((p0) => _audioPlayer.onPositionChanged);

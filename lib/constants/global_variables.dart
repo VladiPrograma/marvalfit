@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
 import 'package:marvalfit/widgets/marval_snackbar.dart';
 
-import '../config/custom_icons.dart';
 import '../utils/marval_arq.dart';
 import '../utils/objects/user.dart';
 

@@ -19,4 +19,11 @@ class ThrowSnackbar{
     );
   }
 
+  static void imageError(BuildContext context){
+    MarvalSnackBar(context, SNACKTYPE.alert,
+        title: "Ups, algo ha fallado",
+        subtitle: "No se ha podido seleccionar la imagen"
+    );
+  }
+
 }

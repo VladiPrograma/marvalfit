@@ -4,8 +4,7 @@ import 'package:image_downloader/image_downloader.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:sizer/sizer.dart';
 
-import '../alerts/scnak_errors.dart';
-import 'marval_snackbar.dart';
+import '../alerts/snack_errors.dart';
 
 class ImageFullScreenWrapperWidget extends StatelessWidget {
   final Image child;
