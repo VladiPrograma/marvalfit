@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_downloader/image_downloader.dart';
 import 'package:marvalfit/config/log_msg.dart';
+import 'package:marvalfit/constants/alerts/snack_errors.dart';
 import 'package:sizer/sizer.dart';
-
-import '../alerts/snack_errors.dart';
 
 class ImageFullScreenWrapperWidget extends StatelessWidget {
   final Image child;

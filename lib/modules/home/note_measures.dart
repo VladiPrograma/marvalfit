@@ -2,6 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart';
+import 'package:marvalfit/firebase/dailys/model/activity.dart';
+import 'package:marvalfit/firebase/dailys/model/daily.dart';
+import 'package:marvalfit/modules/home/controllers/home_controller.dart';
+import 'package:marvalfit/utils/marval_arq.dart';
+import 'package:marvalfit/utils/objects/measures.dart';
 import 'package:sizer/sizer.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -15,11 +20,6 @@ import '../../constants/global_variables.dart';
 import '../../constants/icons.dart';
 import '../../constants/string.dart';
 
-import '../../utils/objects/gallery.dart';
-import '../../utils/objects/measures.dart';
-import '../../utils/firebase/storage.dart';
-import '../../utils/marval_arq.dart';
-import '../../utils/objects/user_daily.dart';
 
 import '../../widgets/marval_snackbar.dart';
 import '../../widgets/marval_dialogs.dart';
@@ -29,15 +29,8 @@ import '../../widgets/marval_textfield.dart';
 import 'journal.dart';
 import 'logic.dart';
 /// MEDIDAS WIDGET
+HomeController _controller = HomeController();
 
-/// LOGIC
-Emitter<Measures?> measureEmitter = Emitter((ref, emit) async{
-  Daily? daily = getDaily(ref);
-  if(isNull(daily)) {emit(null);}
-  String? reference = daily!.activities.where((element) => element['label']== 'Medidas').first['reference'];
-  if(isNull(reference)) {emit(Measures.create(date: ref.watch(dateCreator)));}
-  if(isNotNull(reference)) {emit(await Measures.getFromBD(daily.date));}
-});
 
 ///@TODO Show image when clicking on info icon to see how the hell is supose to take the measures.
 ///Widget
@@ -115,7 +108,8 @@ class NoteMeasures extends StatelessWidget {
                               )),
                         ]),
                     Watcher((context, ref, child){
-                      Measures? measure = ref.watch(measureEmitter.asyncData).data;
+                     // Measures? measure = ref.watch(measureEmitter.asyncData).data;
+                      Measures? measure;
                       ///@TODO Avoid data clipping instance when fetching measures
                       ///@TODO Change hint text when fetching data ?¿
                       if(isNull(measure)) return const SizedBox();
@@ -162,10 +156,10 @@ class NoteMeasures extends StatelessWidget {
                             rememberSave = false;
                             /// FIREBASE DAILY UPDATE
                             String reference = daily!.id+idMeasures;
-                            Map<String, dynamic> activity = daily!.activities.where((element) => element['label']=='Medidas').first;
-                            activity['completed']= true;
-                            activity['reference']= reference;
-                            daily!.updateActivity(activity);
+                            Activity activity = daily!.activities.where((element) => element.label == 'Medidas').first;
+                            activity.completed = true;
+                            activity.reference = reference;
+                            //daily!.updateActivity(activity);
                             /// FIREBASE MEASURE UPDATE
                             Measures measure = Measures.fromMap(date: daily!.date, map: _bodyParts! );
                             measure.setInDB().whenComplete((){

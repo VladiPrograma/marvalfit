@@ -1,161 +1,109 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
+import 'package:marvalfit/firebase/users/model/user.dart';
 import 'package:marvalfit/utils/extensions.dart';
+import 'package:marvalfit/widgets/cached_avatar_image.dart';
 import 'package:sizer/sizer.dart';
+import 'package:marvalfit/config/custom_icons.dart';
+import 'package:marvalfit/constants/colors.dart';
+import 'package:marvalfit/constants/global_variables.dart';
+import 'package:marvalfit/constants/theme.dart';
+import 'package:marvalfit/modules/chat/chat_screen.dart';
+import 'package:marvalfit/modules/home/home_screen.dart';
+import 'package:marvalfit/modules/profile/profile_screen.dart';
+import 'package:marvalfit/modules/settings/settings_screen.dart';
 
-import '../config/custom_icons.dart';
-import '../config/log_msg.dart';
-import '../constants/colors.dart';
-import '../constants/global_variables.dart';
-import '../constants/theme.dart';
-import '../modules/chat/chat_screen.dart';
-import '../modules/home/home_screen.dart';
-import '../modules/profile/profile_screen.dart';
-import '../modules/settings/settings_screen.dart';
-import '../utils/marval_arq.dart';
-import '../utils/objects/user.dart';
 
-///@TODO When u go to settings and change the profile image it dont change in Drawer, change header with the user emmiter
-final _notificationsCreator = Emitter.stream((ref) async {
-  logSuccess('NotificationCreator updated');
-  return FirebaseFirestore.instance.collection('users/${authUser.uid}/chat')
-      .where('read', isEqualTo: false)
-      .where('user', isNotEqualTo: authUser.uid)
-      .limit(5)
-      .snapshots();
-});
-int _watchNotifications(Ref ref){
-  final query = ref.watch(_notificationsCreator.asyncData).data;
-  if(isNull(query)||query!.size==0){ return 0; }
-  //Pass data from querySnapshot to Messages
-  return query.size;
+void removeScreens(BuildContext context, String routeName){
+  while(Navigator.canPop(context)) {
+    Navigator.pop(context);
+  }
+  Navigator.pushNamed(context, routeName);
 }
 
 class MarvalDrawer extends StatelessWidget {
-  const MarvalDrawer({required this.page, Key? key}) : super(key: key);
-  final String page;
+  const MarvalDrawer({required this.name, Key? key}) : super(key: key);
+  final String name;
   @override
   Widget build(BuildContext context) {
+
     return Drawer(
-      backgroundColor: kWhite,
-      child: SizedBox( height: 100.h,
-        child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 3.w),
-              children:  <Widget>[
-                ///* HEADER
-            Watcher(
-            (context, ref, child) {
-            MarvalUser? user = getUser(context, ref);
-            if(isNull(user)) return const SizedBox.shrink();
-             return SizedBox(height: 39.h,
+        backgroundColor: kWhite,
+        child: SizedBox( height: 100.h,
+          child: ListView(
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.symmetric(horizontal: 3.w),
+            children:  <Widget>[
+              /// Header
+              Watcher((context, ref, child) {
+                User? user = userLogic.get(ref);
+                return SizedBox(height: 38.h,
                     child: DrawerHeader(
                       decoration: BoxDecoration( color: kWhite, border: Border.all(color: kWhite) ),
                       child: Column(
                         children: [
-                          CachedNetworkImage(
-                              fit: BoxFit.fitWidth,
-                              imageUrl: user!.profileImage!,
-                              imageBuilder: (context, imageProvider) => _ProfileImage(image: imageProvider),
-                              placeholder: (context, url)            => const _ProfileImage(),
-                              errorWidget: (context, url, error)     => const _ProfileImage(),
-                          ),
+                          CachedAvatarImage(url: user?.profileImage ?? '', size: 9),
                           const TextH2('Bienvenido', color: kGrey, size: 6,),
-                          TextH1(isNull(user) ? "" : user.name.maxLength(13), color: kBlack, size: 8, textOverFlow: TextOverflow.clip ,),
+                          TextH1(user?.name.maxLength(13) ?? "" , color: kBlack, size: 7.5, textOverFlow: TextOverflow.clip ,),
                         ],
                       ),
                     ));
-                 }),
-                /// Profile
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName));
-                    Navigator.pushNamed(context, ProfileScreen.routeName);
-                  },
-                  child: ListTile(
-                    leading: Icon(CustomIcons.person,color: page=="Perfil" ? kGreen : kBlack, size: 6.w,),
-                    title: TextH2('Perfil', size: 4, color: page=="Perfil" ? kGreen : kBlack),
-                  ),
+              }),
+              /// Profile
+              GestureDetector(
+                onTap: () => removeScreens(context,ProfileScreen.routeName),
+                child: ListTile(
+                  leading: Icon(CustomIcons.person,color: name=="Perfil" ? kGreen : kBlack, size: 6.w,),
+                  title: TextH2('Perfil', size: 4, color: name=="Perfil" ? kGreen : kBlack),
                 ),
-                /// Home
-                GestureDetector(
-                  onTap: () => Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName)),
-                  child: ListTile(
-                    leading: Icon(Icons.home_rounded,color: page=="Home" ? kGreen : kBlack, size: 6.w,),
-                    title: TextH2('Home', size: 4, color: page=="Home" ? kGreen : kBlack),
-                  ),
+              ),
+              /// Home
+              GestureDetector(
+                onTap: () => removeScreens(context,HomeScreen.routeName),
+                child: ListTile(
+                  leading: Icon(CustomIcons.users, color: name=="Usuarios" ? kGreen : kBlack, size: 6.w,),
+                  title: TextH2('Usuarios', size: 4, color: name=="Usuarios" ? kGreen : kBlack),
                 ),
-                /// Chat
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName));
-                    Navigator.pushNamed(context, ChatScreen.routeName);
-                  },
-                  child: ListTile(
-                    leading: Icon(CustomIcons.chat_empty, color: page=="Chat" ? kGreen : kBlack, size: 6.w,),
-                    title: Watcher((context, ref, _) {
-                      int notification = _watchNotifications(ref);
-                      return Row( children: [
-                        TextH2('Chat', size: 4, color: page == "Chat" ? kGreen : kBlack),
-                        SizedBox(width: 3.w,),
-                        notification == 0 ?
-                        const SizedBox()
-                            :
-                        CircleAvatar( radius: 2.w, backgroundColor: kRed, child: TextH1('$notification', color: kWhite, size: 2,),)
-                      ]);
-                    }),
-                  ),
+              ),
+              /// Chat
+              GestureDetector(
+                onTap: () => removeScreens(context,ChatScreen.routeName),
+                child: ListTile(
+                  leading: Icon(Icons.chat, color: name=="Chat" ? kGreen : kBlack, size: 5.w,),
+                  title: Watcher((context, ref, _) {
+                    //int unread = messagesLogic.getUnread(ref).length;
+                    int unread = 0;
+                    if(unread > 999) unread = 999;
+                    return Row( children: [
+                      TextH2('Chat', size: 4, color: name == "Chat" ? kGreen : kBlack),
+                      SizedBox(width: 3.w,),
+                      unread == 0 ?
+                      const SizedBox()
+                          :
+                      CircleAvatar( radius: 2.3.w, backgroundColor: kRed, child: TextH1('$unread', color: kWhite, size: 2,),)
+                    ]);
+                  }),
                 ),
-                /// Ejercicios
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName));
-                    Navigator.pushNamed(context, SettingScreen.routeName);
-                  },
-                  child: ListTile(
-                    leading: Icon(CustomIcons.gym, color: page=="Ejercicios" ? kGreen : kBlack, size: 6.w,),
-                    title: TextH2('Ejercicios', size: 4, color: page=="Ejercicios" ? kGreen : kBlack),
-                  ),
+              ),
+              GestureDetector(
+                onTap: () => removeScreens(context,ProfileScreen.routeName),
+                child: ListTile(
+                  leading: Icon(CustomIcons.person,color: name=="Perfil" ? kGreen : kBlack, size: 6.w,),
+                  title: TextH2('Perfil', size: 4, color: name=="Perfil" ? kGreen : kBlack),
                 ),
-                /// Perfil
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName));
-                    Navigator.pushNamed(context, ProfileScreen.routeName);
-                  },
-                  child: ListTile(
-                    leading: Icon(CustomIcons.person ,color: page == "Perfil" ? kGreen : kBlack, size: 6.w,),
-                    title: TextH2('Perfil', size: 4, color:  page == "Perfil" ? kGreen : kBlack),
-                  ),
+              ),
+              /// Ajustes
+              GestureDetector(
+                onTap: () => removeScreens(context,SettingScreen.routeName),
+                child: ListTile(
+                  leading: Icon(Icons.settings_rounded,color: name=="Ajustes" ? kGreen : kBlack, size: 7.w,),
+                  title: TextH2('Ajustes', size: 4, color: name=="Ajustes" ? kGreen : kBlack),
                 ),
-                /// Ajustes
-                GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).popUntil(ModalRoute.withName(HomeScreen.routeName));
-                    Navigator.pushNamed(context, SettingScreen.routeName);
-                  },
-                  child: ListTile(
-                    leading: Icon(Icons.settings_rounded,color: page=="Ajustes" ? kGreen : kBlack, size: 6.w,),
-                    title:   TextH2('Ajustes', size: 4 , color: page=="Ajustes" ? kGreen : kBlack),
-                  ),
-                ),
-                SizedBox( height: 10.h,),
-                SizedBox( height: 15.h, child: Image.asset('assets/images/marval_logo.png'),)
-              ],
-    )));
-  }
-}
-
-class _ProfileImage extends StatelessWidget {
-  const _ProfileImage({this.image, Key? key}) : super(key: key);
-  final ImageProvider<Object>? image;
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-        radius: 9.h,
-        backgroundColor: kBlack,
-        backgroundImage: image,
-        child: isNull(image) ? Icon( CustomIcons.person, color: kWhite, size: 13.w) : const SizedBox.shrink());
+              ),
+              SizedBox( height: 12.h,
+                child: Image.asset('assets/images/marval_logo.png'),)
+            ],
+          ),
+        ));
   }
 }

@@ -221,7 +221,7 @@ class Calendar extends StatelessWidget {
                       Container(width: 13.w, height: 0.2.w, color: kWhite,),
                       Container(
                           margin: EdgeInsets.symmetric(horizontal: 2.w),
-                          child: TextH1('${date.toStringMonth()}, de ${date.year}', size: 5, color: kWhite)),
+                          child: TextH1('${date.shortMonthName()}, de ${date.year}', size: 5, color: kWhite)),
                       Container(width: 13.w, height: 0.2.w, color: kWhite,),
                     ]),
                 SizedBox(height: 2.h,),

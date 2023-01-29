@@ -63,7 +63,6 @@ class LoginScreen extends StatelessWidget {
 
 String _email= "";
 String _password= "";
-
 Creator<String?> _loginErrors = Creator.value(null);
 
 void _clear(Ref ref) => ref.update(_loginErrors, (t) => null);

@@ -22,7 +22,7 @@ class SeeFormScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const MarvalDrawer(page: "Perfil",),
+      drawer: const MarvalDrawer(name: "Perfil",),
       backgroundColor: kWhite,
       body:  SizedBox( width: 100.w, height: 100.h,
           child: Column(

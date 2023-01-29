@@ -1,26 +1,19 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart';
+import 'package:marvalfit/firebase/dailys/model/activity.dart';
+import 'package:marvalfit/firebase/dailys/model/daily.dart';
+import 'package:marvalfit/modules/home/controllers/home_controller.dart';
+import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../config/custom_icons.dart';
 import '../../config/log_msg.dart';
 
 import '../../constants/colors.dart';
-import '../../constants/shadows.dart';
 import '../../constants/theme.dart';
-import '../../constants/global_variables.dart';
 import '../../constants/icons.dart';
 import '../../constants/string.dart';
-
-import '../../utils/objects/gallery.dart';
-import '../../utils/firebase/storage.dart';
 import '../../utils/marval_arq.dart';
-import '../../utils/objects/user_daily.dart';
-
-import '../../widgets/marval_snackbar.dart';
 import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_textfield.dart';
 
@@ -28,46 +21,44 @@ import 'add_photos.dart';
 import 'logic.dart';
 import 'note_measures.dart';
 
-bool rememberSave = false;
+HomeController _controller = HomeController();
 
-void _scrollDown(ScrollController controller){
-  controller.animateTo(
-      controller.positions.last.minScrollExtent,
+bool rememberSave = false;
+void _scrollDown(ScrollController scrollController){
+  scrollController.animateTo(
+      scrollController.positions.last.minScrollExtent,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOutExpo
   );
 }
-void _scrollUp(ScrollController controller){
-  controller.animateTo(
-      controller.positions.last.maxScrollExtent,
+void _scrollUp(ScrollController scrollController){
+  scrollController.animateTo(
+      scrollController.positions.last.maxScrollExtent,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeInExpo
   );
 }
 /// JOURNAL WIDGET
 class Journal extends StatelessWidget {
-  const Journal({required this.controller, Key? key}) : super(key: key);
-  final ScrollController controller;
+  const Journal({required this.scrollController, Key? key}) : super(key: key);
+  final ScrollController scrollController;
   @override
   Widget build(BuildContext context) {
     return Watcher((context, ref, child){
-      Daily? daily = getDaily(ref);
-      if(isNull(daily)) return const SizedBox();
-      String type = ref.watch(activityCreator);
-      if(type == 'List'){
-       _scrollDown(controller);
-       ref.update(activityCreator, (p0) => 'Init');
+      Daily daily = _controller.getDaily(ref);
+      ActivityType type = ref.watch(activityCreator);
+      if(type == ActivityType.EMPTY) {
+       return MarvalActivityList(daily: daily);
       }
-
-      if(type == 'Medidas') {
-        _scrollUp(controller);
+      if(type == ActivityType.MEASURES) {
+        _scrollUp(scrollController);
         return NoteMeasures(daily: daily);
 
-      } else if(type == 'Galeria'){
-        _scrollUp(controller);
+      } if(type == ActivityType.GALLERY) {
+        _scrollUp(scrollController);
         return AddPhotosToGallery(daily: daily);
 
-      } else{ return MarvalActivityList(daily: daily);}
+      } else{ return MarvalActivityList(daily: daily); }
     });
   }
 }
@@ -75,21 +66,19 @@ class Journal extends StatelessWidget {
 /// ACTIVITY LIST WIDGET */
 class MarvalActivity extends StatelessWidget {
   const MarvalActivity({required this.activity, required this.daily, Key? key}) : super(key: key);
-  final Map<String, dynamic>? activity;
-  final Daily? daily;
+  final Activity activity;
+  final Daily daily;
   @override
   Widget build(BuildContext context) {
-    logInfo(activity!);
     return  GestureDetector(
         onTap: () {
-          String type = activity!['label'];
           if(isNotNull(daily)&&isNotNull(activity)){
-            if(type == 'Descanso'){
-              activity!['completed']= isNull(activity?['completed']) ? true : !activity!['completed'] ;
-              daily!.updateActivity(activity!);
+            if(activity.type == ActivityType.REST){
+              activity.completed = ! activity.completed;
+              //daily!.updateActivity(activity!);
               /// Guardar en activities
             }
-            else if(type == 'Pasos'){
+            else if(activity.type ==  ActivityType.CARDIO){
               RichText _richText = RichText(
                 textAlign: TextAlign.justify,
                 text: TextSpan(
@@ -102,7 +91,7 @@ class MarvalActivity extends StatelessWidget {
               Form _form = Form(
                 key: _formKey,
                 child: MarvalInputTextField(
-                  labelText: 'Pasos',
+                  labelText: 'Cardio',
                   hintText: "",
                   prefixIcon: CustomIcons.leg,
                   keyboardType: TextInputType.number,
@@ -124,16 +113,14 @@ class MarvalActivity extends StatelessWidget {
                   form: _form,
                   richText: _richText,
                   onSucess: (){
-                    if(isNull(activity?['completed'])){
-                      activity!['completed']= true ;
-                      daily!.updateActivity(activity!);
-                    }
-                    daily!.updateSteps(_steps);
+                      activity. completed= true ;
+                      //daily!.updateActivity(activity!);
+                    //daily!.updateSteps(_steps);
                   }
               );
             }
-            else if(type == 'Medidas'|| type == 'Galeria'){
-              context.ref.update(activityCreator, (s) => activity!['label']);}
+            else if(activity.type == ActivityType.REST || activity.type == ActivityType.REST){
+              context.ref.update(activityCreator, (s) => activity.type);}
           }
         },
         child: Row(
@@ -147,7 +134,7 @@ class MarvalActivity extends StatelessWidget {
                       bottomRight: Radius.circular(3.w),
                       bottomLeft: Radius.circular(3.w))
               ),
-              child: Center(child: Icon(mapIcons[activity?['icon']] ?? mapIcons[''], color: kWhite, size: 7.w,),),
+              child: Center(child: Icon(mapIcons[activity.type], color: kWhite, size: 5.w,)),
             ),
             SizedBox(width: 6.w,),
             Container(width: 50.w, height: 12.w,
@@ -158,7 +145,7 @@ class MarvalActivity extends StatelessWidget {
               ),
               child: Row(
                   children: [
-                    TextH2(activity?['label'] ?? '', color: kWhite, size: 4.2,),
+                    TextH2(activity.label.maxLength(16) , color: kWhite, size: 3.6,),
                     const Spacer(),
                     Container(
                         decoration: BoxDecoration(
@@ -170,8 +157,7 @@ class MarvalActivity extends StatelessWidget {
                         ),
                         child:Watcher((context, ref, child) {
                           return CircleAvatar(
-                            backgroundColor: isNull(activity?['completed'])  ? kBlack
-                                : activity!['completed'] ? kBlue : kBlack,
+                            backgroundColor: activity.completed ? kBlue : kBlack,
                             radius: 1.8.w,
                           );
                         }))
@@ -183,7 +169,7 @@ class MarvalActivity extends StatelessWidget {
 }
 class MarvalActivityList extends StatelessWidget {
   const MarvalActivityList({required this.daily, Key? key}) : super(key: key);
-  final Daily? daily;
+  final Daily daily;
   @override
   Widget build(BuildContext context) {
     return Container( width: 100.w, height: 34.5.h,
@@ -202,14 +188,14 @@ class MarvalActivityList extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(width: 2.w,),
-                        Icon(Icons.man_rounded, size: 5.w, color: kGreen,),
+                        Icon(Icons.bolt, size: 5.w, color: kGreen,),
                         const TextH2(" Completa tus tareas", size: 4, color: kWhite,),
                       ]),
                 );
               }
               return Container(
                   margin: EdgeInsets.only(bottom: 1.5.h),
-                  child: MarvalActivity(daily: daily, activity: daily?.activities[index-1] ?? {},));
+                  child: MarvalActivity(daily: daily, activity: daily.activities[index-1],));
             }));
   }
 }

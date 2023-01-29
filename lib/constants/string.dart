@@ -36,5 +36,18 @@ const String logErrorPrefix = "(__!!!__) --> ";
 ///Form Constants
 const String kSpecifyText = 'Especifica cual, luego pulsa en si';
 
+class ErrorText{
+  late String text;
+  ErrorText( this.text);
+  ErrorText.emptyValue():text = 'Se requiere completar el campo.';
+
+  @override
+  String toString(){
+    return text;
+  }
+
+}
+
+
 
 

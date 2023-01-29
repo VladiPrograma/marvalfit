@@ -1,16 +1,15 @@
 import 'dart:async';
-
 import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart' ;
 import 'package:image_picker/image_picker.dart';
-import 'package:marvalfit/alerts/snack_errors.dart';
+import 'package:marvalfit/constants/alerts/show_dialog.dart';
+import 'package:marvalfit/constants/alerts/snack_errors.dart';
 import 'package:marvalfit/widgets/show_fullscreen_image.dart';
 
 import 'package:sizer/sizer.dart';
 
-import '../../alerts/dialog_errors.dart';
 import '../../constants/theme.dart' ;
 import '../../constants/colors.dart';
 import '../../constants/string.dart';
@@ -28,7 +27,6 @@ import '../../config/custom_icons.dart';
 import '../../config/log_msg.dart';
 
 import '../../widgets/box_user_data.dart';
-import '../../widgets/marval_dialogs.dart';
 import '../../widgets/marval_drawer.dart';
 
 import 'chat_logic.dart';
@@ -52,7 +50,7 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: kWhite,
-        drawer: const MarvalDrawer(page: 'Chat',),
+        drawer: const MarvalDrawer(name: 'Chat',),
         body:  SizedBox( width: 100.w, height: 100.h,
             child: Stack(
                     children: [

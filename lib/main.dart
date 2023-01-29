@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:marvalfit/core/get_user_data/get_user_data_screen.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
 import 'package:marvalfit/constants/global_variables.dart';
+import 'package:marvalfit/firebase/authentication/logic/auth_user_logic.dart';
 
 import 'package:marvalfit/modules/home/home_screen.dart';
 import 'package:marvalfit/utils/firebase/auth.dart';
@@ -30,28 +31,13 @@ import 'config/routes.dart';
 ///@TODO when restart the BD change 'users_curr' name.
 ///@TODO using settings i lost Home page when i press back...
 
-bool _isDataCompleted = false;
 
-MarvalUser? _auxUser;
 void main() async{
-    CachedNetworkImage.logLevel = CacheManagerLogLevel.debug;
-
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform
   );
-   User? auxAuthUser = getCurrUser();
-   _isDataCompleted = await MarvalForm.existsInDB(auxAuthUser?.uid);
-
-  if(isNotNull(auxAuthUser)){
-    authUser = auxAuthUser!;
-    _auxUser = await MarvalUser.getFromDB(auxAuthUser.uid);
-    if(_auxUser!.active) { authUser = auxAuthUser; user = _auxUser!; }
-    else                 { logOut(); auxAuthUser = null; }
-
-  }
-
-  runApp(CreatorGraph( child: const MyApp()));
+  runApp(CreatorGraph(child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -59,8 +45,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    userLogic.get(context.ref);
     return Sizer(
         builder: (context, orientation, deviceType) {
+          AuthUserLogic auth = AuthUserLogic();
           return MaterialApp(
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
@@ -74,11 +62,8 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'Comienza el reto',
             routes: routes,
-            initialRoute: isNull(_auxUser)||!_auxUser!.active ? LoginScreen.routeName :
-                _isDataCompleted ?
-                HomeScreen.routeName
-                    :
-                GetUserDataScreen.routeName
+            //TODO  go to GetUserDataScreen if he doesn't complete his data yet.
+            initialRoute: auth.get() == null ? LoginScreen.routeName : HomeScreen.routeName
           );
         }
     );

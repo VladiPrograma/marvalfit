@@ -2,6 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:creator/creator.dart';
+import 'package:marvalfit/firebase/dailys/model/activity.dart';
+import 'package:marvalfit/firebase/dailys/model/daily.dart';
+import 'package:marvalfit/modules/home/controllers/home_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -18,7 +21,6 @@ import '../../constants/string.dart';
 import '../../utils/objects/gallery.dart';
 import '../../utils/firebase/storage.dart';
 import '../../utils/marval_arq.dart';
-import '../../utils/objects/user_daily.dart';
 
 import '../../widgets/marval_snackbar.dart';
 import '../../widgets/marval_dialogs.dart';
@@ -30,6 +32,10 @@ import 'note_measures.dart';
 
 ///@TODO Add load icon when loading data.
 ///@TODO Make the save button availaible one time once to avoid multiple upload of the same images.
+///
+
+HomeController _controller = HomeController();
+
 class AddPhotosToGallery extends StatelessWidget {
   const AddPhotosToGallery({required this.daily, Key? key}) : super(key: key);
   final Daily? daily;
@@ -100,14 +106,13 @@ class AddPhotosToGallery extends StatelessWidget {
                           bool exists = true;
                           /// * FIREBASE DAILY UPDATE
                           String reference = daily!.id+idGallery;
-                          Map<String, dynamic> activity = daily!.activities.where((element) => element['label']=='Galeria').first;
-                          if(isNull(activity['completed']) || !activity['completed']){
+                          Activity activity = daily!.activities.where((element) => element.label =='Galeria').first;
+                          if(activity.completed){
                             exists = false;
-                            activity['completed']= true;
-                            activity['reference']= reference;
-                            daily!.updateActivity(activity);
+                            activity.completed= true;
+                            activity.reference = reference;
+                            //daily!.updateActivity(activity);
                           }
-
                           /// * FIREBASE ACTIVITY UPDATE
                           Map<String, String> mapGallery = {};
                           for (var map in _backgroundImageList){
@@ -152,9 +157,9 @@ class AddPhotosToGallery extends StatelessWidget {
   }
 }
 Emitter<Gallery?> galleryEmitter = Emitter((ref, emit) async{
-  Daily? daily = getDaily(ref);
+  Daily daily = _controller.getDaily(ref);
   if(isNull(daily)) {emit(null);}
-  String? reference = daily!.activities.where((element) => element['label']== 'Galeria').first['reference'];
+  String? reference = daily!.activities.where((element) => element.label == 'Galeria').first.reference;
   if(isNull(reference)) emit(null);
   if(isNotNull(reference)) {
     try{
@@ -163,9 +168,9 @@ Emitter<Gallery?> galleryEmitter = Emitter((ref, emit) async{
     }catch(e){
       emit(null);
     }
-
   }
 });
+
 List<Map<String, XFile?>> _backgroundImageList = List.generate(4, (index) => {});
 final ImagePicker _picker = ImagePicker();
 class ImageFrame extends StatefulWidget {
