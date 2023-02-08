@@ -36,7 +36,6 @@ class UserRepository{
     final authId = await ref.watch(
         authEmitter.where((auth) => auth != null).map((auth) => auth!.uid));
     return _db.doc(authId).update(map);
-
   }
 
 }

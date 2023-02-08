@@ -61,7 +61,7 @@ class BoxUserData extends StatelessWidget {
             Column(crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(height: 3.h,),
-                  TextH2( '${user.name.clearSimbols()} ${user.lastName}'.maxLength(20), size: 4),
+                  TextH2( '${user.name.removeIcon()} ${user.lastName}'.maxLength(20), size: 4),
                   TextH2( user.work, size: 3, color: kGrey,),
                 ])
           ]);

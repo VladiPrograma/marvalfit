@@ -1,22 +1,37 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:marvalfit/constants/global_variables.dart';
+import 'package:marvalfit/utils/extensions.dart';
 import 'package:path/path.dart' as path;
 import 'package:marvalfit/firebase/storage/service/storage_service.dart';
 
 class StorageController{
   final StorageService _service = StorageService();
 
-  Future<String?> uploadUserImg(String userId, XFile xfile) async{
+  Future<String?> uploadUserImg(XFile xfile) async{
     const storageCollection = 'user';
     const String slash = '/';
     final File file = File(xfile.path);
     Uint8List filePath = await xfile.readAsBytes();
 
     final String extension = path.extension(file.path);
-    final String storagePath = storageCollection + slash + userId + extension;
+    final String storagePath = storageCollection + slash + uid! + extension;
+    return _service.uploadFile(filePath, storagePath); // Image Network Direction
+  }
+
+  Future<String?> uploadGalleryImage (DateTime date, XFile xfile) async{
+    String parent = 'gallery';
+    const String slash = '/';
+    final String id = Timestamp.now().microsecondsSinceEpoch.toString();
+
+    final file = File(xfile.path);
+    Uint8List filePath = await xfile.readAsBytes();
+
+    final extension = path.extension(file.path);
+    final String storagePath = parent + slash + uid! + slash + date.id + slash + id + extension;
+
     return _service.uploadFile(filePath, storagePath); // Image Network Direction
   }
 

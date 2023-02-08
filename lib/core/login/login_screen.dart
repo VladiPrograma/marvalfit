@@ -7,7 +7,6 @@ import 'package:sizer/sizer.dart';
 import '../../config/log_msg.dart';
 import '../../config/custom_icons.dart';
 import '../../modules/home/home_screen.dart';
-import '../../modules/home/logic.dart';
 import '../../utils/firebase/auth.dart';
 import '../../utils/marval_arq.dart';
 

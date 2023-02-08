@@ -5,7 +5,7 @@ import 'form_screen.dart';
 
 import '../../config/log_msg.dart';
 import '../../config/custom_icons.dart';
-import '../../modules/settings/settings_screen.dart';
+import '../../modules/settingsv2/settings_screen.dart';
 
 import '../../widgets/marval_elevated_button.dart';
 import '../../widgets/marval_textfield.dart';

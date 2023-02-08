@@ -1,6 +1,8 @@
 import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
 import 'package:marvalfit/firebase/users/model/user.dart';
+import 'package:marvalfit/modules/exercise/exercise_home_screen.dart';
+import 'package:marvalfit/modules/settingsv2/settings_screen.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/widgets/cached_avatar_image.dart';
 import 'package:sizer/sizer.dart';
@@ -11,7 +13,6 @@ import 'package:marvalfit/constants/theme.dart';
 import 'package:marvalfit/modules/chat/chat_screen.dart';
 import 'package:marvalfit/modules/home/home_screen.dart';
 import 'package:marvalfit/modules/profile/profile_screen.dart';
-import 'package:marvalfit/modules/settings/settings_screen.dart';
 
 
 void removeScreens(BuildContext context, String routeName){
@@ -51,7 +52,7 @@ class MarvalDrawer extends StatelessWidget {
               }),
               /// Profile
               GestureDetector(
-                onTap: () => removeScreens(context,ProfileScreen.routeName),
+                onTap: () => removeScreens(context, ProfileScreen.routeName),
                 child: ListTile(
                   leading: Icon(CustomIcons.person,color: name=="Perfil" ? kGreen : kBlack, size: 6.w,),
                   title: TextH2('Perfil', size: 4, color: name=="Perfil" ? kGreen : kBlack),
@@ -86,15 +87,15 @@ class MarvalDrawer extends StatelessWidget {
                 ),
               ),
               GestureDetector(
-                onTap: () => removeScreens(context,ProfileScreen.routeName),
+                onTap: () => removeScreens(context,  ExerciseHomeScreen.routeName),
                 child: ListTile(
-                  leading: Icon(CustomIcons.person,color: name=="Perfil" ? kGreen : kBlack, size: 6.w,),
-                  title: TextH2('Perfil', size: 4, color: name=="Perfil" ? kGreen : kBlack),
+                  leading: Icon(CustomIcons.moon,color: name=="Ejercicios" ? kGreen : kBlack, size: 6.w,),
+                  title: TextH2('Ejercicios', size: 4, color: name=="Ejercicios" ? kGreen : kBlack),
                 ),
               ),
               /// Ajustes
               GestureDetector(
-                onTap: () => removeScreens(context,SettingScreen.routeName),
+                onTap: () => removeScreens(context, SettingScreen.routeName),
                 child: ListTile(
                   leading: Icon(Icons.settings_rounded,color: name=="Ajustes" ? kGreen : kBlack, size: 7.w,),
                   title: TextH2('Ajustes', size: 4, color: name=="Ajustes" ? kGreen : kBlack),

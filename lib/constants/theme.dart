@@ -9,25 +9,29 @@ import '../../constants/colors.dart';
 /// P1 Sizes: 4 //
 /// P2 Sizes
 
-///@TODO Normalize text sizes in all the pages.
 class TextH1 extends StatelessWidget {
   final String? text;
   final double? size;
   final Color? color;
   final TextAlign? textAlign;
   final TextOverflow? textOverFlow;
-  const TextH1(String this.text,{Key? key, this.size, this.color, this.textAlign, this.textOverFlow}) : super(key: key);
+  final double? height;
+  final List<Shadow>? shadows;
+  const TextH1(String this.text,{Key? key, this.size, this.color, this.textAlign, this.textOverFlow, this.height, this.shadows}) : super(key: key);
 
   Widget build(BuildContext context) {
     return Text(
       text ?? "",
       textAlign: textAlign ?? TextAlign.start,
       style: TextStyle(
-      fontFamily: h1,
-      fontSize: size?.w ?? 9.w,
-      overflow: textOverFlow,
-      color: color ?? kBlack,
+        shadows: shadows,
+        height: height,
+        fontFamily: h1,
+        fontSize: size?.w ?? 9.w,
+        overflow: textOverFlow,
+        color: color ?? kBlack,
       ),
+
     );
   }
 }
@@ -72,16 +76,20 @@ class TextP2 extends StatelessWidget {
   final String? text;
   final double? size;
   final Color? color;
-  const TextP2(String this.text,{Key? key, this.size, this.color}) : super(key: key);
+  final TextAlign? textAlign;
+  final int? maxLines;
+  const TextP2(String this.text,{Key? key, this.size,this.maxLines, this.color, this.textAlign}) : super(key: key);
 
   Widget build(BuildContext context) {
     return Text(
       text ?? "",
-      textAlign: TextAlign.justify,
+      textAlign: textAlign ?? TextAlign.justify,
+      maxLines: maxLines,
       style: TextStyle(
-        fontFamily: p2,
-        fontSize: size?.w,
-        color: color ?? kBlack,
+          fontFamily: p2,
+          fontSize: size?.w ?? 4.w,
+          color: color ?? kBlack,
+          overflow: TextOverflow.ellipsis
       ),
     );
   }

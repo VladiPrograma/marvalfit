@@ -41,31 +41,20 @@ extension StringFormat on String{
     catch(E){ return null;  }
   }
 
-  String clearSimbols(){
+
+  String removeIcon(){
     String regex = r'[^\p{Alphabetic}\p{Mark}\p{Decimal_Number}\p{Connector_Punctuation}\p{Join_Control}\s]+';
     return replaceAll(RegExp(regex, unicode: true),'');
   }
-}
 
-extension DateFormat on DateTime{
-  String monthName(){
-    switch(month){
-      case 1 : return "Enero";
-      case 2 : return "Febrero";
-      case 3 : return "Marzo";
-      case 4 : return "Abril";
-      case 5 : return "Mayo";
-      case 6 : return "Junio";
-      case 7 : return "Julio";
-      case 8 : return "Agosto";
-      case 9 : return "Septiembre";
-      case 10 : return "Octubre";
-      case 11 : return "Noviembre";
-      case 12 : return "Diciembre";
-      default : return "";
-    }
+  String getIcon(){
+    String regex = r'[^\p{Alphabetic}\p{Mark}\p{Decimal_Number}\p{Connector_Punctuation}\p{Join_Control}\s]+';
+    int iconIndex = indexOf(RegExp(regex, unicode: true));
+    return iconIndex  != -1 ? characters.toList()[iconIndex] : '';
   }
-  String shortMonthName(){
+}
+extension DateFormat on DateTime{
+  String toStringMonth(){
     switch(month){
       case 1 : return "Ene";
       case 2 : return "Feb";
@@ -79,6 +68,23 @@ extension DateFormat on DateTime{
       case 10 : return "Oct";
       case 11 : return "Nov";
       case 12 : return "Dic";
+      default : return "";
+    }
+  }
+  String toStringMonthLong(){
+    switch(month){
+      case 1 : return "Enero";
+      case 2 : return "Febrero";
+      case 3 : return "Marzo";
+      case 4 : return "Abrril";
+      case 5 : return "Mayo";
+      case 6 : return "Junio";
+      case 7 : return "Julio";
+      case 8 : return "Agosto";
+      case 9 : return "Septiembre";
+      case 10 : return "Octubre";
+      case 11 : return "Noviembre";
+      case 12 : return "Diciembre";
       default : return "";
     }
   }
@@ -116,8 +122,25 @@ extension DateFormat on DateTime{
       default : return "";
     }
   }
+  String toStringWeekDayLong(){
+    switch(weekday){
+      case 1 : return "Lunes";
+      case 2 : return "Martes";
+      case 3 : return "Miercoles";
+      case 4 : return "Jueves";
+      case 5 : return "Viernes";
+      case 6 : return "Sabado";
+      case 7 : return "Domingo";
+      default : return "";
+    }
+  }
   String toFormatStringDate(){ return '$day-$month-$year';}
-  String toFormatStringHour(){ return '$hour:${minute>10 ? minute : '0$minute'} ${hour<12? 'am' : 'pm'}';}
+  String aestheticStringDate(){
+    if(id == DateTime.now().id){ return "     Hoy     ";}
+    if(id == DateTime.now().add(const Duration(days: -1)).id){ return "     Ayer      ";}
+    return ' ${toStringWeekDayLong()} $day de ${toStringMonth()} ';
+  }
+  String toFormatStringHour(){ return '$hour:${minute>=10 ? minute : '0$minute'} ${hour<12? 'am' : 'pm'}';}
 
   get id => '${day<10 ? '0$day' : '$day'}-$month-$year';
 
@@ -160,4 +183,3 @@ extension DateFormat on DateTime{
     return age;
   }
 }
-

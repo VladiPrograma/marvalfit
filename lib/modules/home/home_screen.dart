@@ -1,6 +1,5 @@
-import 'package:marvalfit/firebase/dailys/model/daily.dart';
 import 'package:marvalfit/modules/home/controllers/home_controller.dart';
-import 'package:marvalfit/modules/home/journal.dart';
+import 'package:marvalfit/modules/home/screens/journal.dart';
 import 'package:marvalfit/modules/home/widgets/calendar_widget.dart';
 import 'package:marvalfit/modules/home/widgets/habit_widget.dart';
 import 'package:marvalfit/modules/home/widgets/sleep_widget.dart';
@@ -10,21 +9,17 @@ import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
 
 import '../../config/custom_icons.dart';
-
 import '../../constants/colors.dart';
 import '../../constants/shadows.dart';
 import '../../constants/global_variables.dart';
 import '../../constants/theme.dart';
-
 import '../../utils/decoration.dart';
-
 import '../../widgets/marval_drawer.dart';
 
 ScrollController _scrollController = ScrollController();
 HomeController _controller = HomeController();
 int _snackCounter = 0;
 
-///@TODO Animation on date change.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
   static String routeName = "/home";
@@ -35,10 +30,10 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
         drawer: const MarvalDrawer(name: "Home",),
         backgroundColor: kWhite,
+        resizeToAvoidBottomInset: true,
         body:  SingleChildScrollView(
-          physics: const NeverScrollableScrollPhysics(),
           controller: _scrollController,
-          child: SizedBox( width: 130.w, height: 124.h,
+          child: SizedBox( width: 100.w, height: 100.h,
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -47,7 +42,7 @@ class HomeScreen extends StatelessWidget {
                       watchActiveUser(context, ref);
                       return const SizedBox.shrink();
                     }),
-                    Container(width: 100.w, height: 124.h,
+                    Container(width: 100.w, height: 100.h,
                         color: kWhite,
                         child:  Watcher((context, ref, child) {
                           DateTime date = _controller.getDate(ref);

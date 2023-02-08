@@ -1,9 +1,10 @@
+import 'package:marvalfit/firebase/dailys/model/activity.dart';
 import 'package:marvalfit/utils/extensions.dart';
 
 // @TODO change "_Measures" with "Measures"
 class Measures{
    String id;
-   String type =  '_Measures';
+   ActivityType type =  ActivityType.MEASURES;
    DateTime date;
    double ombligo;
    double ombligoP2;
@@ -36,7 +37,7 @@ class Measures{
   });
    Measures.create({required this.date})
        :
-         id = date.id+'_Measures',
+         id = '${date.id}_${ActivityType.MEASURES}',
          ombligo=0,
          ombligoP2=0,
          ombligoM2=0,
@@ -52,7 +53,7 @@ class Measures{
 
    Measures.fromMap(Map<String, dynamic> map)
        : id = map['id'],
-         type = map['type'],
+         type = ActivityType.values.byName(map['type']),
          date = map['date'].toDate(),
          ombligo = map['ombligo'],
          ombligoP2 = map['ombligo_p2'],
@@ -70,7 +71,7 @@ class Measures{
    Map<String, dynamic> toMap(){
      return {
        'id' : id,
-       'type' : type,
+       'type' : type.name,
        'date' : date,
        'ombligo' : ombligo,
        'ombligo_p2' : ombligoP2,
@@ -86,4 +87,9 @@ class Measures{
        'biceps_drch' : bicepsDrch,
      };
    }
+
+   @override
+  String toString() {
+    return 'Measures{id: $id, type: $type, date: $date, ombligo: $ombligo, ombligoP2: $ombligoP2, ombligoM2: $ombligoM2, cadera: $cadera, contPecho: $contPecho, contHombros: $contHombros, gemeloIzq: $gemeloIzq, gemeloDrch: $gemeloDrch, musloIzq: $musloIzq, musloDrch: $musloDrch, bicepsIzq: $bicepsIzq, bicepsDrch: $bicepsDrch}';
+  }
 }

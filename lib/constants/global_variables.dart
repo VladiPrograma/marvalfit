@@ -4,11 +4,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:marvalfit/core/login/login_screen.dart';
 import 'package:marvalfit/firebase/dailys/logic/daily_logic.dart';
+import 'package:marvalfit/firebase/exercises/logic/exercise_logic.dart';
+import 'package:marvalfit/firebase/gallery/logic/gallery_logic.dart';
+import 'package:marvalfit/firebase/measures/logic/measures_logic.dart';
 import 'package:marvalfit/firebase/plan/logic/plan_logic.dart';
+import 'package:marvalfit/firebase/storage/controller/storage_controller.dart';
 import 'package:marvalfit/firebase/users/logic/user_logic.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 import 'package:marvalfit/utils/objects/user.dart';
 import 'package:marvalfit/widgets/marval_snackbar.dart';
+
 
 
 /// - - - Auth - - - */
@@ -20,6 +25,10 @@ String? uid = FirebaseAuth.instance.currentUser?.uid;
 final UserLogic userLogic = UserLogic();
 final DailyLogic dailyLogic = DailyLogic();
 final PlanLogic planLogic = PlanLogic();
+final MeasuresLogic measuresLogic = MeasuresLogic();
+final GalleryLogic galleryLogic = GalleryLogic();
+final ExerciseLogic exerciseLogic = ExerciseLogic();
+final StorageController storageController = StorageController();
 /// - - - FIREBASE AUTH - - -  */
  late User authUser;
  late MarvalUser user;

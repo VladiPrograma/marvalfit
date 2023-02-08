@@ -12,6 +12,14 @@ class Activity{
 
   Activity({required this.id, required this.icon, required this.label, required this.type, required this.completed, required this.reference});
 
+  Activity.empty()
+      : id ="",
+        completed =  false,
+        reference =  "",
+        icon = "",
+        label = "",
+        type = ActivityType.EMPTY;
+
   Activity.fromMap(Map<String, dynamic> map)
       : id = map["id"],
         completed = map["completed"] ?? false,
@@ -70,6 +78,15 @@ class Activity{
       'label': label,
       'type': type.name,
     };
+  }
+
+  void clone(Activity activity){
+    id = activity.id;
+    completed =activity.completed;
+    reference = activity.reference;
+    icon =activity.icon;
+    label = activity.label;
+    type = activity.type;
   }
 
   @override

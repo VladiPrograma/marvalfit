@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:marvalfit/modules/exercise/exercise_home_screen.dart';
+import 'package:marvalfit/modules/exercise/exercise_screen.dart';
+import 'package:marvalfit/modules/profile/journal/see_form_screen.dart';
 
 ///* Test Pages */
 import '../test/sleek_change.dart';
@@ -10,14 +13,13 @@ import '../core/get_user_data/form_screen.dart';
 import '../core/get_user_data/get_user_data_screen.dart';
 import '../core/get_user_data/get_user_details_screen.dart';
 
-import '../modules/settings/labels/change_email_screen.dart';
-import '../modules/settings/labels/change_password_screen.dart';
-import '../modules/settings/settings_screen.dart';
+import '../modules/settingsv2/labels/change_email_screen.dart';
+import '../modules/settingsv2/labels/change_password_screen.dart';
+import '../modules/settingsv2/settings_screen.dart';
 
 import '../modules/home/home_screen.dart';
 import '../modules/chat/chat_screen.dart';
 import '../modules/profile/profile_screen.dart';
-import '../modules/profile/see_form_screen.dart';
 
 
 final Map<String, WidgetBuilder> routes = {
@@ -32,10 +34,13 @@ final Map<String, WidgetBuilder> routes = {
   ProfileScreen.routeName : (context) => ProfileScreen(),
   SeeFormScreen.routeName : (context) => SeeFormScreen(),
   ///* Setting Screens */
-  SettingScreen.routeName : (context) => SettingScreen(),
-  ResetEmailScreen.routeName : (context) => ResetEmailScreen(),
-  ResetPasswordScreen.routeName : (context) => ResetPasswordScreen(),
+  SettingScreen.routeName : (context) => const SettingScreen(),
+  ResetEmailScreen.routeName : (context) =>const ResetEmailScreen(),
+  ResetPasswordScreen.routeName : (context) => const ResetPasswordScreen(),
   ///* Test Screens */
-  TestSleekScreen.routeName : (context) => TestSleekScreen(),
-  TestComponentScreen.routeName : (context) =>  TestComponentScreen(),
+  TestSleekScreen.routeName : (context) => const TestSleekScreen(),
+  TestComponentScreen.routeName : (context) => const  TestComponentScreen(),
+  // EXERCISES
+  ExerciseHomeScreen.routeName : (context) =>  const ExerciseHomeScreen(),
+  ExerciseScreen.routeName : (context) => const ExerciseScreen(),
 };

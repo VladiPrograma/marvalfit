@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:creator/creator.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/utils/extensions.dart';
-import 'package:marvalfit/utils/marval_arq.dart';
 import '../model/daily.dart';
 
 Creator<int> _page = Creator.value(3);

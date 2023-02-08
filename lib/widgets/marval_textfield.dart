@@ -11,11 +11,33 @@ import '../utils/marval_arq.dart';
 /// Custom TextField
 
 class MarvalInputTextField extends StatelessWidget {
-  const MarvalInputTextField({Key? key,this.controller, this.initialValue, this.readOnly, this.width, this.labelText,this.onTap, this.validator, this.onSaved, this.onChanged, this.hintText, this.keyboardType, this.prefixIcon, this.obscureText, this.suffixIcon}) : super(key: key);
+  const MarvalInputTextField({Key? key,
+    this.controller,
+    this.maxLines,
+    this.maxLength,
+    this.readOnly,
+    this.initialValue,
+    this.width,
+    this.labelText,
+    this.labelIcon,
+    this.onTap,
+    this.validator,
+    this.onSaved,
+    this.onChanged,
+    this.hintText,
+    this.keyboardType,
+    this.prefixIcon,
+    this.obscureText,
+    this.suffixIcon
+  }) : super(key: key);
+
   final double? width;
-  final String? labelText;
-  final String? hintText;
+  final int? maxLines;
+  final int? maxLength;
   final String? initialValue;
+  final String? labelText;
+  final Widget? labelIcon;
+  final String? hintText;
   final TextInputType? keyboardType;
   final IconData? prefixIcon;
   final Widget? suffixIcon;
@@ -36,32 +58,51 @@ class MarvalInputTextField extends StatelessWidget {
               return Column(
                 children: [
                   /** Text field */
-                  Container(
+                  SizedBox(
                       width: width ?? 70.w,
                       child:  TextFormField(
-                        initialValue: initialValue,
                         controller: controller,
                         readOnly: readOnly ?? false,
                         cursorColor: kWhite,
+                        textInputAction: TextInputAction.next,
+                        onEditingComplete: (){
+                          if(FocusScope.of(context).canRequestFocus){
+                            FocusScope.of(context).nextFocus();
+                            FocusScope.of(context).nextFocus();
+                          }
+                        },
                         keyboardType: keyboardType ?? TextInputType.text,
                         obscureText: obscureText ?? false,
+                        initialValue: initialValue,
+                        maxLines: maxLines ?? 1,
+                        maxLength: maxLength,
                         style: TextStyle( fontFamily: p1, color: hasFocus ? kWhite : kBlack, fontSize: 4.w),
                         decoration: InputDecoration(
                             filled: true,
                             fillColor: hasFocus ? kGreen: kWhite,
                             label: hasFocus ?
                             Container(
-                                margin: EdgeInsets.only(bottom: 2.3.h),
-                                child: TextP1(
-                                    labelText ?? "",
-                                    color: kBlack
-                                )
-                            )
+                                margin: EdgeInsets.only(bottom: labelIcon!=null ? 3.5.h : 2.3.h),
+                                child: labelIcon != null ?
+                                Row( children: [
+                                  labelIcon!,
+                                  SizedBox(width: 2.w,),
+                                  TextP1( labelText ?? "", color: kBlack )
+                                ])
+                                    :
+                                TextP1( labelText ?? "", color: kBlack  ))
+                                : // NO Focus
+                            labelText != null ?
+                            labelIcon != null && controller!=null && controller!.text.isNotEmpty ?
+                            Row(children: [
+                              labelIcon!,
+                              SizedBox(width: 2.w,),
+                              TextP1( labelText ?? "", color: kBlack )
+                            ])
                                 :
-                            TextP1(
-                                labelText ?? "",
-                                color: kBlack
-                            ),
+                            TextP1(labelText!, color: kBlack)
+                                :
+                            const SizedBox.shrink(),
                             border: DecoratedInputBorder(
                               child:  OutlineInputBorder(
                                 borderSide: BorderSide.none,
@@ -88,8 +129,6 @@ class MarvalInputTextField extends StatelessWidget {
                         onSaved:(value){ isNotNull(onSaved) ? onSaved!(value) : null;},
                         onChanged: (value){isNotNull(onChanged) ? onChanged!(value):null;},
                         onTap: (){isNotNull(onTap) ? onTap!() : null;},
-
-
                       )),
                 ],
               );}));

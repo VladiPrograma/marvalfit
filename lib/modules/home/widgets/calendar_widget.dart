@@ -29,7 +29,7 @@ class CalendarTitle extends StatelessWidget {
                       Icon(Icons.arrow_back, color: kWhite, size: 6.w,),
                     ])),
                 const Spacer(),
-                TextH1(date.monthName(), color: kWhite, size: 5),
+                TextH1(date.toStringMonth(), color: kWhite, size: 5),
                 const Spacer(),
                 GestureDetector(
                     onTap: () async{
