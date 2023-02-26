@@ -1,6 +1,3 @@
-
-import 'package:marvalfit/constants/global_variables.dart';
-
 enum MessageType  {TEXT, IMAGE, AUDIO}
 class Message {
   String id;
@@ -30,7 +27,7 @@ class Message {
         date = DateTime(1000);
 
   Message.create(this.content,this.type, this.user, {int? duration}):
-    trainer = true,
+    trainer = false,
     read= false,
     duration = duration ?? 0,
     id= '',

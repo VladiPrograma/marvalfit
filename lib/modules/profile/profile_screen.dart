@@ -29,7 +29,7 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     String userId = uid!;
     return Scaffold(
-        drawer: const MarvalDrawer(name: r'Usuarios',),
+        drawer: const MarvalDrawer(name: r'Perfil',),
         backgroundColor: kWhite,
         body:  SizedBox( width: 100.w, height: 100.h,
           child: Stack(

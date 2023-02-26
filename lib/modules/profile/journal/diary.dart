@@ -89,11 +89,16 @@ class _DiaryEntry extends StatelessWidget {
         ),
         SizedBox(height: 0.7.h,),
         // Steps
-        Row(children: [
-          const TextH2('🏋 Pull ', color: kWhite, size: 3.8),
-          const Spacer(),
-          TextH2('${numberFormat.format(daily.steps).replaceAll(',', '.')}🏃', color: kWhite, size: 3.8,),
-        ]),
+        Wrap(
+          spacing: 2.w,
+          runSpacing: 0.7.h,
+          children: daily.cardio.map((cardio) =>
+              TextH2(
+              '${cardioNames[cardio.type]!.getIcon()} ${cardio.num} ${cardioMeasureNames[cardio.measure]}',
+                color: kWhite,
+                size: 3.8,)
+          ).toList(),
+        ),
         SizedBox(height: 0.7.h,),
         //@TODO Fatsecret and Gym integration
         Row(children: const [

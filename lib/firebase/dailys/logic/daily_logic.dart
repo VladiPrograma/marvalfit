@@ -29,6 +29,7 @@ class DailyLogic{
         sleep: 0,
         weight: lastWeight,
         habits: [],
+        cardio: [],
         habitsFromPlaning: plan.habits,
         activities: activities,
         steps: plan.stepGoal

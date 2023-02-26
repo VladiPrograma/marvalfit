@@ -20,12 +20,11 @@ class ThrowDialog{
         image: xfile,
         title: "Deseas subir esta foto ?",
         onAccept: () async{
-          // @TODO
-          // String? networkImg = await storageController.uploadChatImage(userId, xfile);
-          // if(networkImg !=null){
-          //   Message message = Message.create( networkImg, MessageType.IMAGE, userId);
-          //   messagesLogic.add(context.ref, message);
-          // }
+           String? networkImg = await storageController.uploadChatImage(uid!, xfile);
+           if(networkImg !=null){
+             Message message = Message.create( networkImg, MessageType.IMAGE, uid!);
+             messagesLogic.add(context.ref, message);
+           }
         });
   }
 

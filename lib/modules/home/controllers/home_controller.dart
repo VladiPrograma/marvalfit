@@ -4,12 +4,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:marvalfit/config/log_msg.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/firebase/dailys/model/activity.dart';
+import 'package:marvalfit/firebase/dailys/model/cardio.dart';
 import 'package:marvalfit/firebase/dailys/model/daily.dart';
 import 'package:marvalfit/firebase/gallery/logic/gallery_logic.dart';
 import 'package:marvalfit/firebase/gallery/model/gallery.dart';
+import 'package:marvalfit/firebase/gym_notes/logic/gym_notes_logic.dart';
+import 'package:marvalfit/firebase/gym_notes/model/gym_notes.dart';
 import 'package:marvalfit/firebase/measures/logic/measures_logic.dart';
 import 'package:marvalfit/firebase/measures/model/measures.dart';
 import 'package:marvalfit/firebase/storage/controller/storage_controller.dart';
+import 'package:marvalfit/firebase/trainings/model/training.dart';
 import 'package:marvalfit/firebase/users/model/user.dart';
 import 'package:marvalfit/utils/marval_arq.dart';
 
@@ -19,8 +23,37 @@ Creator<bool>  _updateCreator = Creator.value(false);
 Creator<Activity> _activityCreator = Creator.value(Activity.empty());
 Creator<Measures?> _measuresCreator = Creator.value(null);
 Creator<Gallery?> _galleryCreator = Creator.value(null);
+Creator<GymNotes?> _gymNotesCreator = Creator.value(null);
+Creator<bool> _saveIconCreator = Creator.value(false);
 
 class HomeController{
+
+  GymNotes? getGymNotes(Ref ref) => ref.watch(_gymNotesCreator);
+  void setGymNotes(Ref ref, GymNotes? notes) => ref.update<GymNotes?>(_gymNotesCreator, (p0) => notes);
+
+  bool getSaveFlag(Ref ref) => ref.watch(_saveIconCreator);
+  void hasToSave(Ref ref) => ref.update<bool?>(_saveIconCreator, (p0) => true);
+  void notHasToSave(Ref ref) => ref.update<bool?>(_saveIconCreator, (p0) => false);
+
+
+  void initGymNotes(Ref ref, String id, Training training) async{
+    GymNotes? notes = getGymNotes(ref);
+    if( notes?.id != id){
+      GymNotesLogic logic = GymNotesLogic();
+      GymNotes? notes = await logic.getById(ref, id);
+      notes ??= GymNotes.fromTraining(training);
+      setGymNotes(ref, notes);
+    }
+  }
+  void updateGymNotes(Ref ref, Daily daily, Activity activity, GymNotes notes) async{
+    GymNotesLogic logic = GymNotesLogic();
+    notes.date = daily.date;
+    logic.add(ref, notes);
+    activity.completed = true;
+    updateActivity(ref, daily, activity);
+  }
+
+
 
   Measures? getMeasures(Ref ref) => ref.watch(_measuresCreator);
   void setMeasures(Ref ref, Measures? measures) => ref.update<Measures?>(_measuresCreator, (p0) => measures);
@@ -118,6 +151,7 @@ class HomeController{
       double weight = user?.currWeight ?? 0;
       daily = await dailyLogic.add(ref, date, weight);
     }
+    setActivity(ref, Activity.empty());
     setDaily(ref, daily);
     onChange(ref);
   }
@@ -162,6 +196,22 @@ class HomeController{
      onChange(ref);
   }
 
+  updateCardio(Ref ref, Daily daily, Cardio cardio){
+      daily.cardio.add(cardio);
+      dailyLogic.update(ref, daily.date, {
+        'cardio' : FieldValue.arrayUnion([cardio.toMap()])
+      });
+      onChange(ref);
+  }
+
+  removeCardio(Ref ref, Daily daily, Cardio cardio){
+    daily.cardio.removeWhere((element) => element.id == cardio.id,);
+    dailyLogic.update(ref, daily.date, {
+      'cardio' : FieldValue.arrayRemove([cardio.toMap()])
+    });
+    onChange(ref);
+  }
+
   updateWeight(Ref ref, Daily daily, double weight){
     weight = double.parse(weight.toStringAsPrecision(3));
     // Firebase updates
@@ -171,6 +221,4 @@ class HomeController{
     daily.weight = weight;
     onChange(ref);
   }
-
-
 }

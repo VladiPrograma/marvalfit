@@ -1,8 +1,10 @@
 import 'package:creator/creator.dart';
 import 'package:flutter/material.dart';
+import 'package:marvalfit/firebase/messages/model/message.dart';
 import 'package:marvalfit/firebase/users/model/user.dart';
+import 'package:marvalfit/modules/chat/chat_user_screen.dart';
 import 'package:marvalfit/modules/exercise/exercise_home_screen.dart';
-import 'package:marvalfit/modules/settingsv2/settings_screen.dart';
+import 'package:marvalfit/modules/settings/settings_screen.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:marvalfit/widgets/cached_avatar_image.dart';
 import 'package:sizer/sizer.dart';
@@ -10,7 +12,6 @@ import 'package:marvalfit/config/custom_icons.dart';
 import 'package:marvalfit/constants/colors.dart';
 import 'package:marvalfit/constants/global_variables.dart';
 import 'package:marvalfit/constants/theme.dart';
-import 'package:marvalfit/modules/chat/chat_screen.dart';
 import 'package:marvalfit/modules/home/home_screen.dart';
 import 'package:marvalfit/modules/profile/profile_screen.dart';
 
@@ -62,30 +63,33 @@ class MarvalDrawer extends StatelessWidget {
               GestureDetector(
                 onTap: () => removeScreens(context,HomeScreen.routeName),
                 child: ListTile(
-                  leading: Icon(CustomIcons.users, color: name=="Usuarios" ? kGreen : kBlack, size: 6.w,),
-                  title: TextH2('Usuarios', size: 4, color: name=="Usuarios" ? kGreen : kBlack),
+                  leading: Icon(Icons.menu_book, color: name=="Agenda" ? kGreen : kBlack, size: 6.w,),
+                  title: TextH2('Agenda', size: 4, color: name=="Agenda" ? kGreen : kBlack),
                 ),
               ),
               /// Chat
-              GestureDetector(
-                onTap: () => removeScreens(context,ChatScreen.routeName),
-                child: ListTile(
-                  leading: Icon(Icons.chat, color: name=="Chat" ? kGreen : kBlack, size: 5.w,),
-                  title: Watcher((context, ref, _) {
-                    //int unread = messagesLogic.getUnread(ref).length;
-                    int unread = 0;
-                    if(unread > 999) unread = 999;
-                    return Row( children: [
-                      TextH2('Chat', size: 4, color: name == "Chat" ? kGreen : kBlack),
-                      SizedBox(width: 3.w,),
-                      unread == 0 ?
-                      const SizedBox()
-                          :
-                      CircleAvatar( radius: 2.3.w, backgroundColor: kRed, child: TextH1('$unread', color: kWhite, size: 2,),)
-                    ]);
-                  }),
-                ),
-              ),
+              Watcher((context, ref, child) {
+                List<Message> list =  messagesLogic.getUnread(ref);
+                int unread = list.length;
+                if(unread > 999) unread = 999;
+                return GestureDetector(
+                  onTap: () {
+                    removeScreens(context,ChatScreen.routeName);
+                    list.forEach((message) {messagesLogic.read(message);});
+                  },
+                  child: ListTile(
+                    leading: Icon(Icons.chat, color: name=="Chat" ? kGreen : kBlack, size: 5.w,), //CustomIcons.chat
+                    title:  Row( children: [
+                        TextH2('Chat', size: 4, color: name == "Chat" ? kGreen : kBlack),
+                        SizedBox(width: 3.w,),
+                        unread == 0 ?
+                        const SizedBox()
+                            :
+                        CircleAvatar( radius: 2.3.w, backgroundColor: kRed, child: TextH1('$unread', color: kWhite, size: 2,),)
+                      ])
+                  ),
+                );
+              }),
               GestureDetector(
                 onTap: () => removeScreens(context,  ExerciseHomeScreen.routeName),
                 child: ListTile(

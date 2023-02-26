@@ -8,17 +8,12 @@ class MessagesLogic{
 
   void fetchMore(Ref ref, {int? n}) => repo.fetchMore(ref, n: n);
   void fetchReset(Ref ref) => repo.fetchReset(ref);
-  List<Message> get(Ref ref, String userId) => repo.getChat(ref, userId);
+  List<Message> get(Ref ref) => repo.getChat(ref);
 
   List<Message> getUnread(Ref ref) => repo.getUnread(ref);
-  List<Message> getUnreadById(Ref ref, String userId) => repo.getUnread(ref).where((msg) => msg.user == userId && !msg.trainer ).toList();
 
-  List<Message> getChat(Ref ref, String userId) => repo.getChat(ref, userId);
+  List<Message> getChat(Ref ref) => repo.getChat(ref);
 
-  Message? getLastById(Ref ref, String userId){
-   List<Message> chat= repo.getChat(ref, userId);
-   return chat.isNotEmpty ? chat.first : null;
-  }
 
   Future<void> add(Ref ref, Message message){
     message.date = DateTime.now();

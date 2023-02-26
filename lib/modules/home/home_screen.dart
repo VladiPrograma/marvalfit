@@ -28,11 +28,12 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     _controller.init(context.ref);
     return Scaffold(
-        drawer: const MarvalDrawer(name: "Home",),
+        drawer: const MarvalDrawer(name: "Agenda",),
         backgroundColor: kWhite,
         resizeToAvoidBottomInset: true,
         body:  SingleChildScrollView(
           controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
           child: SizedBox( width: 100.w, height: 100.h,
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,

@@ -3,6 +3,8 @@ import 'package:creator/creator.dart';
 import 'package:marvalfit/firebase/dailys/model/activity.dart';
 import 'package:marvalfit/firebase/dailys/model/daily.dart';
 import 'package:marvalfit/modules/home/controllers/home_controller.dart';
+import 'package:marvalfit/modules/home/screens/add_cardio.dart';
+import 'package:marvalfit/modules/home/screens/add_workout.dart';
 import 'package:marvalfit/modules/home/screens/note_measures.dart';
 import 'package:marvalfit/utils/extensions.dart';
 import 'package:sizer/sizer.dart';
@@ -46,12 +48,13 @@ class Journal extends StatelessWidget {
         case ActivityType.EMPTY:
           return MarvalActivityList(daily: daily, ref: ref);
         case ActivityType.CARDIO:
-          //@TODO
-          return MarvalActivityList(daily: daily, ref: ref);
+          return AddCardio(daily: daily, ref: ref, activity: activity,);
         case ActivityType.MEASURES:
           return NoteMeasures(daily: daily, ref: ref, activity: activity,);
         case ActivityType.GALLERY:
           return AddPhotosToGallery(daily: daily, activity: activity, ref: ref,);
+        case ActivityType.GYM:
+          return AddWorkout(daily: daily, activity: activity, ref: ref,);
         default:
           return MarvalActivityList(daily: daily, ref: ref);
       }
